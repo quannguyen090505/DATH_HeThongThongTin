@@ -1,3 +1,4 @@
 - đây là repo Đồ án tốt nghiệp - hướng hệ thống thông tin HK252
 - Để dùng chung và xây dụng database sử dụng ngôn ngữ mySQL, hãy pull file DATH.sql về máy để chỉnh sửa
 - khi muốn pull lên repo chung, hãy chọn mục "Server" trên thanh công cụ, chọn "Export data" để xuất code, lựa chọn schema để xuất dữ liệu, lựa chọn "Dump structure and data", chọn các ô "Dump stored procedures and function" + "Dump triggers" và "Export to self-contained file" ( chọn "Include create schema" nếu cần) trước khi chọn "Start export" để dữ liệu xuất ra đầy đủ nhất
+<img width="1920" height="1030" alt="image" src="https://github.com/user-attachments/assets/96b481ad-4474-4ef9-b63c-617b2de44c13" />
