@@ -25,12 +25,12 @@ DROP TABLE IF EXISTS `banan`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `banan` (
-  `MaBanAn` int NOT NULL AUTO_INCREMENT,
+  `MaBan` int NOT NULL AUTO_INCREMENT,
   `MaChiNhanh` int NOT NULL,
-  `TinhTrangSuDung` enum('Ban trong','Dang su dung','Goi mon','Can thanh toan','Can don') NOT NULL DEFAULT 'Ban trong',
+  `TinhTrangSuDung` enum('BanTrong','DangSuDung','CanThanhToan','DaThanhToan') NOT NULL DEFAULT 'BanTrong',
   `ViTri` varchar(30) NOT NULL DEFAULT '0',
   `SoLuongChoNgoi` int NOT NULL DEFAULT '0',
-  PRIMARY KEY (`MaBanAn`),
+  PRIMARY KEY (`MaBan`),
   KEY `banan_ibfk_1` (`MaChiNhanh`),
   CONSTRAINT `banan_ibfk_1` FOREIGN KEY (`MaChiNhanh`) REFERENCES `chinhanh` (`MaChiNhanh`),
   CONSTRAINT `banan_chk_1` CHECK ((`SoLuongChoNgoi` >= 0))
@@ -58,7 +58,7 @@ CREATE TABLE `chinhanh` (
   `DiaChi` varchar(30) DEFAULT NULL,
   `SDT` char(11) DEFAULT NULL,
   `Email` varchar(30) DEFAULT NULL,
-  `TinhTrangQuan` enum('Con cho','Het Cho') DEFAULT 'Con cho',
+  `TinhTrangQuan` enum('ConCho','HetCho') DEFAULT 'ConCho',
   `GioMoCua` datetime DEFAULT NULL,
   PRIMARY KEY (`MaChiNhanh`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -98,82 +98,6 @@ LOCK TABLES `cungcapthucdon` WRITE;
 /*!40000 ALTER TABLE `cungcapthucdon` DISABLE KEYS */;
 /*!40000 ALTER TABLE `cungcapthucdon` ENABLE KEYS */;
 UNLOCK TABLES;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `kiem_tra_so_luong1` BEFORE INSERT ON `cungcapthucdon` FOR EACH ROW begin
-	if (new.SoLuongMon < 0) then
-	signal sqlstate '45000' set message_text="so luong mon khong the la so am";
-	end if;
-end */;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `kiem_tra_so_luong_1` BEFORE INSERT ON `cungcapthucdon` FOR EACH ROW begin
-	if (new.SoLuongMon < 0) then
-	signal sqlstate '45000' set message_text="so luong mon khong the la so am";
-	end if;
-end */;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `kiem_tra_so_luong2` BEFORE UPDATE ON `cungcapthucdon` FOR EACH ROW begin
-	if (new.SoLuongMon<0) then
-    signal sqlstate '45000' set message_text="so luong mon khong the la so am\n";
-    end if;
-end */;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `kiem_tra_so_luong_2` BEFORE UPDATE ON `cungcapthucdon` FOR EACH ROW begin
-	if (new.SoLuongMon<0) then
-    signal sqlstate '45000' set message_text="so luong mon khong the la so am\n";
-    end if;
-end */;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Table structure for table `dattruocmon`
@@ -213,7 +137,7 @@ CREATE TABLE `hoadon` (
   `MaPhieuGoiMon` int NOT NULL,
   `NgayGioTaoHoaDon` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `MaNhanVien` int NOT NULL,
-  `GiaTriHoaDon` int NOT NULL,
+  `GiaTri` int NOT NULL,
   `PhuongThucThanhToan` varchar(30) NOT NULL,
   PRIMARY KEY (`MaHoaDon`),
   KEY `hoadon_ibfk_1_idx` (`MaPhieuGoiMon`),
@@ -231,6 +155,55 @@ LOCK TABLES `hoadon` WRITE;
 /*!40000 ALTER TABLE `hoadon` DISABLE KEYS */;
 /*!40000 ALTER TABLE `hoadon` ENABLE KEYS */;
 UNLOCK TABLES;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `tich_diem_cho_khach` AFTER INSERT ON `hoadon` FOR EACH ROW begin
+	declare t_SDTKhach varchar(11);
+    select SDTKhach into t_SDTKhach
+    from PhieuGoiMon
+    where MaPhieuGoiMon=new.MaPhieuGoiMon;
+    if t_SDTKhach is not Null
+    then 
+		update Khach
+		set DiemTichLuy=DiemTichLuy + new.GiaTri*0.001
+		where SDT = t_SDTKhach;
+    end if;
+end */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `cap_nhat_trang_thai_ban_2` AFTER INSERT ON `hoadon` FOR EACH ROW begin
+	update BanAn
+    set TinhTrangSuDung="DaThanhToan"
+    where MaBan=(
+	select MaBanAn
+    from PhieuGoiMon
+    where MaPhieuGoiMon=new.MaPhieuGoiMon
+    );
+end */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Table structure for table `khach`
@@ -295,6 +268,8 @@ CREATE TABLE `monduocgoi` (
   `MaMonAn` int NOT NULL,
   `MaPhieuGoiMon` int NOT NULL,
   `SoLuong` int DEFAULT '0',
+  `DonGiaMon` int NOT NULL DEFAULT '0',
+  `TinhTrang` enum('GoiMon','ChoLenMon','DaPhucVu') NOT NULL DEFAULT 'GoiMon',
   PRIMARY KEY (`MaMonAn`,`MaPhieuGoiMon`),
   KEY `goimon_ibfk_2_idx` (`MaPhieuGoiMon`),
   CONSTRAINT `goimon_ibfk_1` FOREIGN KEY (`MaMonAn`) REFERENCES `monan` (`MaMon`),
@@ -324,6 +299,27 @@ DELIMITER ;;
 	if new.SoLuongMon <= 0 then
     signal sqlstate '45000' set message_text="so luong mon goi khong the nho hon hoac bang 0";
     end if;
+end */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `luu_don_gia` BEFORE INSERT ON `monduocgoi` FOR EACH ROW begin
+    set new.DonGiaMon=(
+    select DonGia
+    from MonAn
+    where MaMon=new.MaMonAn
+    );
 end */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -409,7 +405,7 @@ CREATE TABLE `phieudatban` (
   KEY `phieudatban_ibfk_2` (`SDTKhach`),
   KEY `phieudatban_ibfk_1` (`MaBanAn`),
   KEY `phieudatban_ibfk_3_idx` (`MaNhanVienPhucVu`),
-  CONSTRAINT `phieudatban_ibfk_1` FOREIGN KEY (`MaBanAn`) REFERENCES `banan` (`MaBanAn`),
+  CONSTRAINT `phieudatban_ibfk_1` FOREIGN KEY (`MaBanAn`) REFERENCES `banan` (`MaBan`),
   CONSTRAINT `phieudatban_ibfk_2` FOREIGN KEY (`SDTKhach`) REFERENCES `khach` (`SDT`),
   CONSTRAINT `phieudatban_ibfk_3` FOREIGN KEY (`MaNhanVienPhucVu`) REFERENCES `nhanvien` (`MaNhanVien`),
   CONSTRAINT `phieudatban_chk_1` CHECK ((`NgayGioNhanBan` >= `NgayGioTaoPhieu`))
@@ -437,7 +433,7 @@ DELIMITER ;;
 if exists(
 select 1
 from PhieuDatban
-where MaBanAn=new.MaBanAn and abs(timestampdiff(minute,NgayGioNhanBan,new.NgayGioNhanBan))<180) and TinhTrang='ChoNhanBan'
+where MaBanAn=new.MaBanAn and abs(timestampdiff(minute,NgayGioNhanBan,new.NgayGioNhanBan))<180 and (TinhTrang='ChoNhanBan' or TinhTrang='DaNhanBan'))
 then
 signal sqlstate '45000' set message_text="Trung lich dat ban tuong ung";
 end if;
@@ -460,7 +456,7 @@ DELIMITER ;;
 if exists(
 select 1
 from PhieuDatban
-where MaBanAn=new.MaBanAn and abs(timestampdiff(minute,NgayGioNhanBan,new.NgayGioNhanBan))<180) and TinhTrang='ChoNhanBan'
+where MaBanAn=new.MaBanAn and abs(timestampdiff(minute,NgayGioNhanBan,new.NgayGioNhanBan))<180 and (TinhTrang='ChoNhanBan' or TinhTrang='DaNhanBan'))
 then
 signal sqlstate '45000' set message_text="Trung lich dat ban tuong ung";
 end if;
@@ -490,7 +486,7 @@ CREATE TABLE `phieugoimon` (
   KEY `phieugoimon_ibfk_1_idx` (`MaBanAn`),
   KEY `phieugoimon_ibfk_2_idx` (`MaNhanVienPhucVu`),
   KEY `phieugoimon_ibfk_3_idx` (`SDTKhach`),
-  CONSTRAINT `phieugoimon_ibfk_1` FOREIGN KEY (`MaBanAn`) REFERENCES `banan` (`MaBanAn`),
+  CONSTRAINT `phieugoimon_ibfk_1` FOREIGN KEY (`MaBanAn`) REFERENCES `banan` (`MaBan`),
   CONSTRAINT `phieugoimon_ibfk_2` FOREIGN KEY (`MaNhanVienPhucVu`) REFERENCES `nhanvien` (`MaNhanVien`),
   CONSTRAINT `phieugoimon_ibfk_3` FOREIGN KEY (`SDTKhach`) REFERENCES `khach` (`SDT`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -504,6 +500,28 @@ LOCK TABLES `phieugoimon` WRITE;
 /*!40000 ALTER TABLE `phieugoimon` DISABLE KEYS */;
 /*!40000 ALTER TABLE `phieugoimon` ENABLE KEYS */;
 UNLOCK TABLES;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `cap_nhat_trang_thai_ban_1` AFTER INSERT ON `phieugoimon` FOR EACH ROW begin
+if new.MaBanAn is not null and current_timestamp()=new.NgayGioTaoPhieu
+then
+	update BanAn
+    set TinhTrangSuDung="DangSuDung"
+    where MaBan=new.MaBanAn;
+end if;
+end */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Table structure for table `phieunhapkho`
@@ -589,7 +607,7 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `ThanhToanPhieuAn` */;
+/*!50003 DROP FUNCTION IF EXISTS `gia_tri_phieu_an` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
 /*!50003 SET @saved_col_connection = @@collation_connection */ ;
@@ -599,25 +617,102 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ThanhToanPhieuAn`(
-    IN p_MaPhieuAn VARCHAR(5),
+CREATE DEFINER=`root`@`localhost` FUNCTION `gia_tri_phieu_an`(MaPhieuAn int) RETURNS decimal(18,2)
+    DETERMINISTIC
+BEGIN
+    DECLARE v_Tong DECIMAL(18,2);
+    SELECT SUM(gm.SoLuongMon * ma.DonGia) INTO v_Tong
+    FROM GoiMon as GM JOIN MonAn as MA ON GM.MaMon = MA.MaMon
+    WHERE GM.MaPhieu = MaPhieuAn;
+    RETURN IFNULL(v_Tong, 0);
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP FUNCTION IF EXISTS `gia_tri_phieu_goi_mon` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `gia_tri_phieu_goi_mon`(MaPhieuAn int) RETURNS decimal(18,2)
+    DETERMINISTIC
+BEGIN
+    DECLARE v_Tong DECIMAL(18,2);
+    SELECT SUM(gm.SoLuongMon * ma.DonGia) INTO v_Tong
+    FROM GoiMon as GM JOIN MonAn as MA ON GM.MaMon = MA.MaMon
+    WHERE GM.MaPhieu = MaPhieuAn;
+    RETURN IFNULL(v_Tong, 0);
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `hoan_tat_dat_mon_truoc` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `hoan_tat_dat_mon_truoc`(in p_MaPhieuDatBan int, in p_MaPhieuGoiMon int)
+begin
+	declare p_GiaTriHoaDon decimal(18,2);
+    set p_GiaTriHoaDon = GiatriPhieuAn(p_MaPhieuGoiMon);
+    update PhieuDatBan 
+    set TienCoc=p_GiaTriHoaDon*0.3
+    where p_MaPhieuDatBan=MaPhieuDatBan;
+end ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `thanh_toan_phieu_an` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `thanh_toan_phieu_an`(
+    IN p_MaPhieuGoiMon int,
     IN p_PTThanhToan NVARCHAR(30),
-    IN p_MaNV VARCHAR(5)
+    IN p_MaNV int
 )
 BEGIN
-	declare p_MaHoaDonMoi char(5);
     declare p_GiaTriHoaDon decimal(18,2);
-    declare p_MaHoaDonID int;
-    start transaction;
-    select ifnull(max(cast(MaHoaDon as unsigned)),0) into p_MaHoaDonID
-    from HoaDon;
-    set p_MaHoaDonMoi= p_MaHoaDonID+1;
-    set p_GiaTriHoaDon = GiatriPhieuAn(P_MaPhieuAn);    
-    INSERT INTO HoaDon (MaHoaDon, MaPhieuAn, NgayGioTaoHoaDon, MaNhanVienThanhToan, GiaTriHoaDon, PhuongThucThanhToan)
-    VALUES (p_MaHoaDon, p_MaPhieuAn, now(), p_MaNV, p_GiaTriHoaDon, p_PTThanhToan);
-    UPDATE BanAn SET TinhTrangSuDung = 'DaThanhToan'
-    WHERE MaBanAn = (SELECT MaBanAn FROM PhieuGoiMon WHERE MaPhieu = p_MaPhieuAn);
-    commit;
+    declare p_SDTKhach varchar(11);
+    declare p_DiemTichLuy int;
+    set p_GiaTriHoaDon = GiatriPhieuGoiMon(P_MaPhieuAn);
+    
+    select SDTKhach into p_SDTKhach
+    from PhieuGoiMon
+    where MaPhieu=p_MaPhieuGoiMon;
+    
+    select DiemTichLuy into p_DiemTichLuy
+    from Khach
+    where SDT=p_SDTKhach;
+    
+    if p_DiemTichLuy is not null and p_DiemTichLuy>5000
+    then set p_GiaTriHoaDon =p_GiaTriHoaDon*(1- p_DiemTichLuy*0.0001);
+    end if;
+    
+    INSERT INTO HoaDon (MaPhieuGoiMon, MaNhanVien, GiaTri, PhuongThucThanhToan)
+    VALUES (p_MaPhieuGoiMon, p_MaNV, p_GiaTriHoaDon, p_PTThanhToan);
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -634,4 +729,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-05-05 18:17:34
+-- Dump completed on 2026-05-05 23:14:26
