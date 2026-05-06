@@ -265,7 +265,7 @@ DROP TABLE IF EXISTS `monduocgoi`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `monduocgoi` (
-  `MaGoiMon` int NOT NULL DEFAULT '0',
+  `MaGoiMon` int NOT NULL AUTO_INCREMENT,
   `MaMonAn` int NOT NULL,
   `MaPhieuGoiMon` int NOT NULL,
   `SoLuong` int DEFAULT '0',
@@ -842,4 +842,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-05-07  0:00:33
+-- Dump completed on 2026-05-07  0:06:11
