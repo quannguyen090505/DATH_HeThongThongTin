@@ -360,7 +360,9 @@ def khach_truy_xuat_phieu_goi_mon(ma_ban_an: int):
 
 @app.get("/api/nhanvien/truy-xuat-phieu-goi-mon/")
 def nhan_vien_truy_xuat_phieu_goi_mon(
-    ma_ban_an: int, tinh_trang: Optional[str] = None, thanh_toan: Optional[bool] = None
+    ma_ban_an: Optional[int] = None,
+    tinh_trang_phieu: Optional[str] = None,
+    thanh_toan: Optional[bool] = None,
 ):
     conn = get_db_connection()
     try:
@@ -369,7 +371,7 @@ def nhan_vien_truy_xuat_phieu_goi_mon(
             "truy_xuat_phieu_goi_mon",
             (
                 ma_ban_an,
-                tinh_trang,
+                tinh_trang_phieu,
                 thanh_toan,
             ),
         )
@@ -379,17 +381,130 @@ def nhan_vien_truy_xuat_phieu_goi_mon(
         if not danh_sach_mon:
             return {
                 "status": "success",
-                "message": "Phiếu này trống hoặc không tồn tại",
+                "message": "Danh sách phiếu gọi món trống ",
                 "data": [],
             }
 
         return {
             "status": "success",
-            "ma_phieu": ma_ban_an,
+            "ma_ban_an": ma_ban_an,
             "tong_tien": sum(mon["ThanhTien"] for mon in danh_sach_mon),
             "data": danh_sach_mon,
         }
 
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@app.get("/api/quan-ly/truy-xuat-danh-sach-nv/")
+def truy_xuat_danh_sach_nv(ma_chi_nhanh: Optional[int] = None):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.callproc(
+            "truy_xuat_ds_nv",
+            (ma_chi_nhanh,),
+        )
+        result = []
+        for res in cursor.stored_results():
+            result = res.fetchall()
+        if not result:
+            return {
+                "status": "success",
+                "message": "danh sách nhân viên trống",
+                "data": [],
+            }
+        return {
+            "status": "success",
+            "data": result,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@app.get("/api/quan-ly/thong-ke-doanh-so/")
+def thong_ke_doanh_so(
+    ma_chi_nhanh: Optional[int] = None,
+    thoi_gian_bat_dau: Optional[str] = None,
+    thoi_gian_ket_thuc: Optional[str] = None,
+    doanh_so_toi_thieu: Optional[int] = None,
+    doanh_so_toi_da: Optional[int] = None,
+    pham_vi: Optional[str] = None,
+    uu_tien: Optional[str] = None,
+):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.callproc(
+            "thong_ke_doanh_so",
+            (
+                ma_chi_nhanh,
+                thoi_gian_bat_dau,
+                thoi_gian_ket_thuc,
+                doanh_so_toi_thieu,
+                doanh_so_toi_da,
+                pham_vi,
+                uu_tien,
+            ),
+        )
+        result = []
+        for res in cursor.stored_results():
+            result = res.fetchall()
+        if not result:
+            return {
+                "status": "success",
+                "message": "danh sách hóa đơn trống",
+                "data": [],
+            }
+        return {
+            "status": "success",
+            "data": result,
+        }
+    except Exception as e:
+        return HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@app.get("/api/quan-ly/thong-ke-mon-an")
+def thong_ke_mon_an(
+    ma_chi_nhanh: Optional[int] = None,
+    thoi_gian_bat_dau: Optional[str] = None,
+    thoi_gian_ket_thuc: Optional[str] = None,
+    pham_vi: Optional[str] = None,
+):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.callproc(
+            "thong_ke_mon_an",
+            (
+                ma_chi_nhanh,
+                thoi_gian_bat_dau,
+                thoi_gian_ket_thuc,
+                pham_vi,
+            ),
+        )
+        result = []
+        for res in cursor.stored_results():
+            result = res.fetchall()
+        if not result:
+            return {
+                "status": "success",
+                "message": "danh sách món bán ra trống",
+                "data": [],
+            }
+        return {
+            "status": "success",
+            "data": result,
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     finally:

@@ -43,7 +43,7 @@ CREATE TABLE `banan` (
 
 LOCK TABLES `banan` WRITE;
 /*!40000 ALTER TABLE `banan` DISABLE KEYS */;
-INSERT INTO `banan` VALUES (1,1,'DangSuDung','Tang 1',4),(2,1,'DangSuDung','Tang 1',4),(3,1,'BanTrong','Tang 1',4),(4,1,'BanTrong','Tang 1',4),(5,1,'BanTrong','Tang 1',4),(6,1,'BanTrong','Tang 1',4),(7,2,'BanTrong','Tang 1',4),(8,2,'BanTrong','Tang 1',4),(9,2,'BanTrong','Tang 1',4),(10,2,'BanTrong','Tang 1',4),(11,2,'BanTrong','Tang 1',4),(12,2,'BanTrong','Tang 1',4),(13,2,'BanTrong','Tang 1',4),(14,3,'BanTrong','Tang 1',4),(15,3,'BanTrong','Tang 1',4),(16,3,'BanTrong','Tang 1',4),(17,3,'BanTrong','Tang 1',4),(18,3,'BanTrong','Tang 1',4),(19,3,'BanTrong','Tang 2',4),(20,3,'BanTrong','Tang 2',4),(21,3,'BanTrong','Tang 2',4),(22,3,'BanTrong','Tang 2',4),(23,3,'BanTrong','Tang 2',4),(24,3,'BanTrong','Tang 1',4);
+INSERT INTO `banan` VALUES (1,1,'DaThanhToan','Tang 1',4),(2,1,'DaThanhToan','Tang 1',4),(3,1,'DaThanhToan','Tang 1',4),(4,1,'DaThanhToan','Tang 1',4),(5,1,'DaThanhToan','Tang 1',4),(6,1,'BanTrong','Tang 1',4),(7,2,'BanTrong','Tang 1',4),(8,2,'BanTrong','Tang 1',4),(9,2,'BanTrong','Tang 1',4),(10,2,'BanTrong','Tang 1',4),(11,2,'BanTrong','Tang 1',4),(12,2,'BanTrong','Tang 1',4),(13,2,'BanTrong','Tang 1',4),(14,3,'BanTrong','Tang 1',4),(15,3,'BanTrong','Tang 1',4),(16,3,'BanTrong','Tang 1',4),(17,3,'BanTrong','Tang 1',4),(18,3,'BanTrong','Tang 1',4),(19,3,'BanTrong','Tang 2',4),(20,3,'BanTrong','Tang 2',4),(21,3,'BanTrong','Tang 2',4),(22,3,'BanTrong','Tang 2',4),(23,3,'BanTrong','Tang 2',4),(24,3,'BanTrong','Tang 1',4);
 /*!40000 ALTER TABLE `banan` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -74,6 +74,28 @@ LOCK TABLES `chinhanh` WRITE;
 INSERT INTO `chinhanh` VALUES (1,'Quận 1, TP. HCM','1111','1111@gmail.com','ConCho','2026-05-12 08:00:00'),(2,'Quận 3, TP. HCM','222','222@gmail.com','ConCho','2026-05-12 08:00:00'),(3,'Quận 10, TP. HCM','333','333@gmail.com','ConCho','2026-05-12 08:00:00');
 /*!40000 ALTER TABLE `chinhanh` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Temporary view structure for view `chitietphieugoimon`
+--
+
+DROP TABLE IF EXISTS `chitietphieugoimon`;
+/*!50001 DROP VIEW IF EXISTS `chitietphieugoimon`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `chitietphieugoimon` AS SELECT 
+ 1 AS `MaChiNhanh`,
+ 1 AS `MaBanAn`,
+ 1 AS `MaPhieuGoiMon`,
+ 1 AS `TinhTrangPhieuGoiMon`,
+ 1 AS `MaMon`,
+ 1 AS `TenMon`,
+ 1 AS `SoLuong`,
+ 1 AS `DonGiaMon`,
+ 1 AS `ThanhTien`,
+ 1 AS `TinhTrangMon`,
+ 1 AS `ThanhToan`*/;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `cungcapthucdon`
@@ -150,6 +172,23 @@ DELIMITER ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
+-- Temporary view structure for view `dsnhanvien`
+--
+
+DROP TABLE IF EXISTS `dsnhanvien`;
+/*!50001 DROP VIEW IF EXISTS `dsnhanvien`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `dsnhanvien` AS SELECT 
+ 1 AS `MaChiNhanh`,
+ 1 AS `HoTen`,
+ 1 AS `SDT`,
+ 1 AS `DiaChi`,
+ 1 AS `CaLam`,
+ 1 AS `Luong`*/;
+SET character_set_client = @saved_cs_client;
+
+--
 -- Table structure for table `hoadon`
 --
 
@@ -168,7 +207,7 @@ CREATE TABLE `hoadon` (
   KEY `hoadon_ibfk_2_idx` (`MaNhanVien`),
   CONSTRAINT `hoadon_ibfk_1` FOREIGN KEY (`MaPhieuGoiMon`) REFERENCES `phieugoimon` (`MaPhieuGoiMon`),
   CONSTRAINT `hoadon_ibfk_2` FOREIGN KEY (`MaNhanVien`) REFERENCES `nhanvien` (`MaNhanVien`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -177,6 +216,7 @@ CREATE TABLE `hoadon` (
 
 LOCK TABLES `hoadon` WRITE;
 /*!40000 ALTER TABLE `hoadon` DISABLE KEYS */;
+INSERT INTO `hoadon` VALUES (1,1,'2026-05-14 09:10:00',1,130000,'TienMat'),(2,2,'2026-05-14 10:20:00',2,150000,'ChuyenKhoan'),(3,3,'2026-05-14 11:05:00',1,120000,'TienMat'),(4,4,'2026-05-14 12:40:00',3,120000,'TheTinDung'),(5,5,'2026-05-14 13:15:00',2,230000,'ChuyenKhoan'),(6,6,'2026-05-14 13:50:00',1,120000,'TienMat'),(7,7,'2026-05-14 14:30:00',3,250000,'ChuyenKhoan'),(8,8,'2026-05-14 15:45:00',2,140000,'TienMat'),(9,9,'2026-05-14 16:20:00',1,75000,'ChuyenKhoan'),(10,10,'2026-05-14 19:15:00',3,300000,'TheTinDung');
 /*!40000 ALTER TABLE `hoadon` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -193,11 +233,11 @@ DELIMITER ;;
     declare v_SDTKhach varchar(11);
     declare v_DiemTichLuy int;
     
-    set v_GiaTriHoaDon =  gia_tri_phi_goi_mon(new.MaPhieuGoiMon);
+    set v_GiaTriHoaDon =  gia_tri_phieu_goi_mon(new.MaPhieuGoiMon);
     
     select SDTKhach into v_SDTKhach
     from PhieuGoiMon
-    where MaPhieu=new.MaPhieuGoiMon;
+    where MaPhieuGoiMon=new.MaPhieuGoiMon;
     select DiemTichLuy into v_DiemTichLuy
     from Khach
     where SDT=v_SDTKhach;
@@ -246,7 +286,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `cap_nhat_trang_thai_ban_2` AFTER INSERT ON `hoadon` FOR EACH ROW begin
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `cap_nhat_trang_thai_ban_2` AFTER INSERT ON `hoadon` FOR EACH ROW BEGIN
 	update BanAn
     set TinhTrangSuDung="DaThanhToan"
     where MaBan=(
@@ -254,7 +294,7 @@ DELIMITER ;;
     from PhieuGoiMon
     where MaPhieuGoiMon=new.MaPhieuGoiMon
     );
-end */;;
+END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
@@ -282,6 +322,7 @@ CREATE TABLE `khach` (
 
 LOCK TABLES `khach` WRITE;
 /*!40000 ALTER TABLE `khach` DISABLE KEYS */;
+INSERT INTO `khach` VALUES ('0901234567',NULL,150),('0909090909',NULL,300),('0911223344',NULL,0),('0912345678',NULL,120),('0987654321',NULL,250);
 /*!40000 ALTER TABLE `khach` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -334,7 +375,7 @@ CREATE TABLE `monduocgoi` (
   CONSTRAINT `goimon_ibfk_1` FOREIGN KEY (`MaMonAn`) REFERENCES `monan` (`MaMon`) ON UPDATE CASCADE,
   CONSTRAINT `goimon_ibfk_2` FOREIGN KEY (`MaPhieuGoiMon`) REFERENCES `phieugoimon` (`MaPhieuGoiMon`) ON UPDATE CASCADE,
   CONSTRAINT `monduocgoi_chk_2` CHECK ((`SoLuong` > 0))
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -343,7 +384,7 @@ CREATE TABLE `monduocgoi` (
 
 LOCK TABLES `monduocgoi` WRITE;
 /*!40000 ALTER TABLE `monduocgoi` DISABLE KEYS */;
-INSERT INTO `monduocgoi` VALUES (2,2,4,1,65000,'DoiLenMon');
+INSERT INTO `monduocgoi` VALUES (5,1,1,2,55000,'DaPhucVu'),(6,2,1,1,65000,'DaPhucVu'),(7,3,2,1,75000,'DaPhucVu'),(8,1,3,1,55000,'DaPhucVu'),(9,4,3,2,85000,'DaPhucVu'),(10,5,3,1,45000,'DaPhucVu'),(11,6,4,3,250000,'DaPhucVu'),(12,7,5,1,220000,'DaPhucVu'),(13,8,5,2,200000,'DaPhucVu'),(14,2,6,4,65000,'DaPhucVu'),(15,1,7,2,55000,'DaPhucVu'),(16,3,7,1,75000,'DaPhucVu'),(17,9,8,1,180000,'DaPhucVu'),(18,10,8,2,190000,'DaPhucVu'),(19,5,8,2,45000,'DaPhucVu'),(20,8,9,5,200000,'DaPhucVu'),(21,4,10,4,85000,'DaPhucVu'),(22,7,10,1,220000,'DaPhucVu'),(23,1,11,1,55000,'DoiLenMon'),(24,3,11,1,75000,'GoiMon'),(25,2,12,2,65000,'GoiMon');
 /*!40000 ALTER TABLE `monduocgoi` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -583,7 +624,7 @@ CREATE TABLE `phieugoimon` (
   CONSTRAINT `phieugoimon_ibfk_1` FOREIGN KEY (`MaBanAn`) REFERENCES `banan` (`MaBan`),
   CONSTRAINT `phieugoimon_ibfk_2` FOREIGN KEY (`MaNhanVienPhucVu`) REFERENCES `nhanvien` (`MaNhanVien`),
   CONSTRAINT `phieugoimon_ibfk_3` FOREIGN KEY (`SDTKhach`) REFERENCES `khach` (`SDT`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -592,7 +633,7 @@ CREATE TABLE `phieugoimon` (
 
 LOCK TABLES `phieugoimon` WRITE;
 /*!40000 ALTER TABLE `phieugoimon` DISABLE KEYS */;
-INSERT INTO `phieugoimon` VALUES (4,1,NULL,NULL,'2026-05-12 16:59:09',0,'GoiMon');
+INSERT INTO `phieugoimon` VALUES (1,1,NULL,1,'2026-05-14 08:30:00',0,'DaPhucVu'),(2,2,'0901234567',2,'2026-05-14 09:15:00',1,'DaPhucVu'),(3,3,NULL,1,'2026-05-14 10:00:00',0,'DaPhucVu'),(4,4,'0912345678',3,'2026-05-14 11:30:00',0,'DaPhucVu'),(5,5,NULL,2,'2026-05-14 12:00:00',0,'DaPhucVu'),(6,1,NULL,1,'2026-05-14 12:45:00',1,'DaPhucVu'),(7,2,'0987654321',3,'2026-05-14 13:10:00',0,'DaPhucVu'),(8,3,NULL,2,'2026-05-14 14:20:00',0,'DaPhucVu'),(9,4,NULL,1,'2026-05-14 15:30:00',0,'DaPhucVu'),(10,5,'0909090909',3,'2026-05-14 18:00:00',1,'DaPhucVu'),(11,1,NULL,2,'2026-05-14 19:30:00',0,'GoiMon'),(12,2,'0911223344',1,'2026-05-14 19:45:00',0,'GoiMon');
 /*!40000 ALTER TABLE `phieugoimon` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -693,6 +734,22 @@ INSERT INTO `theloaimon` VALUES (1,'Món Mặn','Các món ăn chính với cơm
 UNLOCK TABLES;
 
 --
+-- Temporary view structure for view `tongkethoadon`
+--
+
+DROP TABLE IF EXISTS `tongkethoadon`;
+/*!50001 DROP VIEW IF EXISTS `tongkethoadon`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `tongkethoadon` AS SELECT 
+ 1 AS `MaChiNhanh`,
+ 1 AS `MaHoaDon`,
+ 1 AS `NgayGioTaoHoaDon`,
+ 1 AS `MaPhieuGoiMon`,
+ 1 AS `GiaTri`*/;
+SET character_set_client = @saved_cs_client;
+
+--
 -- Dumping events for database 'dath_hethongthongtin'
 --
 
@@ -709,13 +766,13 @@ UNLOCK TABLES;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `gia_tri_phieu_goi_mon`(MaPhieuAn int) RETURNS decimal(18,2)
+CREATE DEFINER=`root`@`localhost` FUNCTION `gia_tri_phieu_goi_mon`(f_MaPhieuGoiMon int) RETURNS decimal(18,2)
     DETERMINISTIC
 BEGIN
     DECLARE v_Tong DECIMAL(18,2);
-    SELECT SUM(gm.SoLuongMon * ma.DonGia) INTO v_Tong
-    FROM GoiMon as GM JOIN MonAn as MA ON GM.MaMon = MA.MaMon
-    WHERE GM.MaPhieu = MaPhieuAn;
+    SELECT SUM(SoLuong * DonGiaMon) INTO v_Tong
+    FROM MonDuocGoi  
+    WHERE MaPhieuGoiMon = f_MaPhieuGoiMon;
     RETURN IFNULL(v_Tong, 0);
 END ;;
 DELIMITER ;
@@ -1131,6 +1188,86 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `thong_ke_doanh_so` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `thong_ke_doanh_so`(
+in p_MaChiNhanh int,
+in p_ThoiGianBatDau datetime,
+in p_ThoiGianKetThuc datetime,
+in p_DoanhSoToiThieu int,
+in p_DoanhSoToiDa int,
+in p_PhamVi enum('Ngay','Thang','Nam'),
+in p_UuTien enum('ChiNhanh','NgayTaoHoaDon')
+)
+begin 
+	select HD.MaChiNhanh, 
+		case p_PhamVi
+			WHEN 'Nam' THEN DATE_FORMAT(HD.NgayGioTaoHoaDon, '%Y')     
+			WHEN 'Thang' THEN DATE_FORMAT(HD.NgayGioTaoHoaDon, '%m-%Y')  
+			ELSE DATE_FORMAT(HD.NgayGioTaoHoaDon, '%d-%m-%Y')
+		end as NgayGioTaoHoaDon,
+        sum(HD.GiaTri) as DoanhSo
+    from TongKetHoaDon HD 
+    where (p_MaChiNhanh is null or p_MaChiNhanh=HD.MaChiNhanh)
+    and (p_ThoiGianBatDau is NULL or HD.NgayGioTaoHoaDon >= p_ThoiGianBatDau) 
+    and ( p_ThoiGianKetThuc is null or HD.NgayGioTaoHoaDon<=p_ThoiGianKetThuc)
+    group by HD.NgayGioTaoHoaDon, HD.MaChiNhanh
+    having (p_DoanhSoToiThieu is null or DoanhSo>=p_DoanhSoToiThieu) and ( p_DoanhSoToiDa is null or DoanhSo<=p_DoanhSoToiDa)
+	ORDER BY 
+        CASE WHEN p_UuTien = 'ChiNhanh' THEN HD.MaChiNhanh ELSE HD.NgayGioTaoHoaDon END ASC,
+        CASE WHEN p_UuTien = 'ChiNhanh' THEN HD.NgayGioTaoHoaDon ELSE HD.MaChiNhanh END ASC;
+end ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `thong_ke_mon_an` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `thong_ke_mon_an`(
+in p_MaChiNhanh int,
+in p_ThoiGianBatDau datetime,
+in p_ThoiGianKetThuc datetime,
+in p_PhamVi enum('Ngay','Thang','Nam')
+)
+begin
+	select HD.MaChiNhanh, HD.NgayGioTaoHoaDon,
+    		case p_PhamVi
+			WHEN 'Nam' THEN DATE_FORMAT(HD.NgayGioTaoHoaDon, '%Y')     
+			WHEN 'Thang' THEN DATE_FORMAT(HD.NgayGioTaoHoaDon, '%m-%Y')  
+			ELSE DATE_FORMAT(HD.NgayGioTaoHoaDon, '%d-%m-%Y')
+		end as NgayGioTaoHoaDon,
+    MA.TenMon, sum(MDG.SoLuong) as DoanhSoBanRa
+    from TongKetHoaDon HD
+    join MonDuocGoi MDG on HD.MaPhieuGoiMon =MDG.MaPhieuGoiMon
+    join MonAn MA on MDG.MaMonAn = MA.MaMon
+    where (p_MaChiNhanh is NULL or p_MachiNhanh=HD.MaChiNhanh)
+    and (p_ThoiGianBatDau is NULL or HD.NgayGioTaoHoaDon >= p_ThoiGianBatDau) 
+    and ( p_ThoiGianKetThuc is null or HD.NgayGioTaoHoaDon<=p_ThoiGianKetThuc)
+    group by  HD.MaChiNhanh,HD.NgayGioTaoHoaDon, MA.TenMon
+    order by DoanhSoBanRa asc;
+end ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `truy_xuat_ds_nv` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -1170,7 +1307,7 @@ in p_ThanhToan bool
 begin
 	select *
     from ChiTietPhieuGoiMon
-    where MaBanAn=p_MaBanAn 
+    where (p_MaBanAn is null or MaBanAn=p_MaBanAn) 
     and (p_TinhTrang is null or TinhTrangPhieuGoiMon =p_TinhTrang )
     and (p_ThanhToan is null or ThanhToan=p_ThanhToan);
 end ;;
@@ -1193,7 +1330,7 @@ DELIMITER ;
 /*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
 /*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `chitietphieugoimon` AS select `ba`.`MaBan` AS `MaBanAn`,`p`.`MaPhieuGoiMon` AS `MaPhieuGoiMon`,`p`.`TinhTrang` AS `TinhTrangPhieuGoiMon`,`ma`.`TenMon` AS `TenMon`,`mdg`.`SoLuong` AS `SoLuong`,`mdg`.`DonGiaMon` AS `DonGiaMon`,(`mdg`.`SoLuong` * `mdg`.`DonGiaMon`) AS `ThanhTien`,`mdg`.`TinhTrang` AS `TinhTrang`,(case when (`hd`.`MaHoaDon` is null) then false else true end) AS `ThanhToan` from ((((`monan` `ma` join `monduocgoi` `mdg` on((`ma`.`MaMon` = `mdg`.`MaMonAn`))) join `phieugoimon` `p` on((`mdg`.`MaPhieuGoiMon` = `p`.`MaPhieuGoiMon`))) join `banan` `ba` on((`p`.`MaBanAn` = `ba`.`MaBan`))) left join `hoadon` `hd` on((`p`.`MaPhieuGoiMon` = `hd`.`MaPhieuGoiMon`))) */;
+/*!50001 VIEW `chitietphieugoimon` AS select `ba`.`MaChiNhanh` AS `MaChiNhanh`,`ba`.`MaBan` AS `MaBanAn`,`p`.`MaPhieuGoiMon` AS `MaPhieuGoiMon`,`p`.`TinhTrang` AS `TinhTrangPhieuGoiMon`,`ma`.`MaMon` AS `MaMon`,`ma`.`TenMon` AS `TenMon`,`mdg`.`SoLuong` AS `SoLuong`,`mdg`.`DonGiaMon` AS `DonGiaMon`,(`mdg`.`SoLuong` * `mdg`.`DonGiaMon`) AS `ThanhTien`,`mdg`.`TinhTrang` AS `TinhTrangMon`,(case when (`hd`.`MaHoaDon` is null) then false else true end) AS `ThanhToan` from ((((`monan` `ma` join `monduocgoi` `mdg` on((`ma`.`MaMon` = `mdg`.`MaMonAn`))) join `phieugoimon` `p` on((`mdg`.`MaPhieuGoiMon` = `p`.`MaPhieuGoiMon`))) join `banan` `ba` on((`p`.`MaBanAn` = `ba`.`MaBan`))) left join `hoadon` `hd` on((`p`.`MaPhieuGoiMon` = `hd`.`MaPhieuGoiMon`))) order by `ba`.`MaChiNhanh`,`ba`.`MaBan` */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
@@ -1211,7 +1348,25 @@ DELIMITER ;
 /*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
 /*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `dsnhanvien` AS select `cn`.`MaChiNhanh` AS `MaChiNhanh`,`nv`.`HoTen` AS `HoTen`,`nv`.`SDT` AS `SDT`,`nv`.`DiaChi` AS `DiaChi`,`nv`.`CaLam` AS `CaLam`,`nv`.`Luong` AS `Luong` from (`nhanvien` `nv` join `chinhanh` `cn` on((`nv`.`MaChiNhanh` = `cn`.`MaChiNhanh`))) */;
+/*!50001 VIEW `dsnhanvien` AS select `cn`.`MaChiNhanh` AS `MaChiNhanh`,`nv`.`HoTen` AS `HoTen`,`nv`.`SDT` AS `SDT`,`nv`.`DiaChi` AS `DiaChi`,`nv`.`CaLam` AS `CaLam`,`nv`.`Luong` AS `Luong` from (`nhanvien` `nv` join `chinhanh` `cn` on((`nv`.`MaChiNhanh` = `cn`.`MaChiNhanh`))) order by `cn`.`MaChiNhanh` */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
+-- Final view structure for view `tongkethoadon`
+--
+
+/*!50001 DROP VIEW IF EXISTS `tongkethoadon`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `tongkethoadon` AS select `cn`.`MaChiNhanh` AS `MaChiNhanh`,`hd`.`MaHoaDon` AS `MaHoaDon`,`hd`.`NgayGioTaoHoaDon` AS `NgayGioTaoHoaDon`,`p`.`MaPhieuGoiMon` AS `MaPhieuGoiMon`,`hd`.`GiaTri` AS `GiaTri` from (((`hoadon` `hd` join `phieugoimon` `p` on((`hd`.`MaPhieuGoiMon` = `p`.`MaPhieuGoiMon`))) join `banan` `ba` on((`p`.`MaBanAn` = `ba`.`MaBan`))) join `chinhanh` `cn` on((`ba`.`MaChiNhanh` = `cn`.`MaChiNhanh`))) order by `cn`.`MaChiNhanh`,`hd`.`NgayGioTaoHoaDon` */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
@@ -1225,4 +1380,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-05-14 11:13:18
+-- Dump completed on 2026-05-14 23:49:30

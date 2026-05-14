@@ -8,9 +8,7 @@ def get_db_connection():
             host="localhost",
             database="DATH_HeThongThongTin",  # Đổi lại tên DB
             user="root",
-intermediate
-            password="",  # Đổi lại mật khẩu MySQL đang dùng
-main
+            password="77882^66Quan",  # Đổi lại mật khẩu MySQL đang dùng
         )
         return connection
     except Error as e:
