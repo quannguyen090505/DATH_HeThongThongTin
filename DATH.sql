@@ -120,7 +120,7 @@ CREATE TABLE `cungcapthucdon` (
 
 LOCK TABLES `cungcapthucdon` WRITE;
 /*!40000 ALTER TABLE `cungcapthucdon` DISABLE KEYS */;
-INSERT INTO `cungcapthucdon` VALUES (1,1),(2,1),(3,1),(1,2),(2,2),(3,2),(1,3),(2,3),(3,3),(1,4),(2,4),(3,4),(1,5),(2,5),(3,5),(1,6),(2,6),(3,6),(1,7),(2,7),(3,7),(1,8),(2,8),(3,8),(1,9),(2,9),(3,9),(1,10),(2,10),(3,10),(1,11),(2,11),(3,11),(1,12),(2,12),(3,12),(1,13),(2,13),(3,13),(1,14),(2,14),(3,14),(1,15),(2,15),(3,15),(1,16),(2,16),(3,16),(1,17),(2,17),(3,17),(1,18),(2,18),(3,18),(1,19),(2,19),(3,19),(1,20),(2,20),(3,20),(1,21),(2,21),(3,21),(1,22),(2,22),(3,22),(1,23),(2,23),(3,23),(1,24),(2,24),(3,24),(1,25),(2,25),(3,25);
+INSERT INTO `cungcapthucdon` VALUES (1,1),(2,1),(3,1),(1,2),(2,2),(3,2),(1,3),(2,3),(3,3),(1,4),(2,4),(3,4),(1,5),(2,5),(3,5),(1,6),(2,6),(3,6),(1,7),(2,7),(3,7),(1,8),(2,8),(3,8),(1,9),(2,9),(3,9),(1,10),(2,10),(3,10),(1,11),(2,11),(3,11),(1,12),(2,12),(3,12),(1,13),(2,13),(3,13),(1,14),(2,14),(3,14),(1,15),(2,15),(3,15),(1,16),(2,16),(3,16),(1,17),(2,17),(3,17),(1,18),(2,18),(3,18),(1,19),(2,19),(3,19),(1,20),(2,20),(3,20),(1,21),(2,21),(3,21),(1,22),(2,22),(3,22),(1,23),(2,23),(3,23),(1,24),(2,24),(3,24),(1,25),(2,25),(3,25),(1,32);
 /*!40000 ALTER TABLE `cungcapthucdon` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -170,6 +170,41 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+
+--
+-- Temporary view structure for view `dsbanan`
+--
+
+DROP TABLE IF EXISTS `dsbanan`;
+/*!50001 DROP VIEW IF EXISTS `dsbanan`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `dsbanan` AS SELECT 
+ 1 AS `MaChiNhanh`,
+ 1 AS `MaBan`,
+ 1 AS `SoLuongChoNgoi`,
+ 1 AS `ViTri`,
+ 1 AS `TinhTrangSuDung`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Temporary view structure for view `dsmonan`
+--
+
+DROP TABLE IF EXISTS `dsmonan`;
+/*!50001 DROP VIEW IF EXISTS `dsmonan`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `dsmonan` AS SELECT 
+ 1 AS `MaChiNhanh`,
+ 1 AS `MaMon`,
+ 1 AS `TenMon`,
+ 1 AS `DonGia`,
+ 1 AS `ThongTinMon`,
+ 1 AS `MaTheLoai`,
+ 1 AS `TenTheLoai`,
+ 1 AS `ThongTinTheLoai`*/;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Temporary view structure for view `dsnhanvien`
@@ -342,7 +377,7 @@ CREATE TABLE `monan` (
   PRIMARY KEY (`MaMon`),
   KEY `monan_ibfk_1_idx` (`MaTheLoai`),
   CONSTRAINT `monan_ibfk_1` FOREIGN KEY (`MaTheLoai`) REFERENCES `theloaimon` (`MaTheLoai`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -351,7 +386,7 @@ CREATE TABLE `monan` (
 
 LOCK TABLES `monan` WRITE;
 /*!40000 ALTER TABLE `monan` DISABLE KEYS */;
-INSERT INTO `monan` VALUES (1,'Thịt Kho Tộ',55000,1,'Thịt heo kho tiêu đâm đà'),(2,'Cá Lóc Kho Tộ',65000,1,'Cá lóc đồng kho mặn ngọt'),(3,'Gà Chiên Nước Mắm',75000,1,'Cánh gà chiên giòn rụm'),(4,'Sườn Xào Chua Ngọt',85000,1,'Sườn non xào vị chua ngọt'),(5,'Đậu Hũ Nhồi Thịt',45000,1,'Đậu hũ chiên nhồi thịt băm'),(6,'Lẩu Thái Hải Sản',250000,2,'Lẩu chua cay tôm mực'),(7,'Lẩu Bò Nấm',220000,2,'Lẩu bò Mỹ nấm kim châm'),(8,'Lẩu Gà Lá Giang',200000,2,'Lẩu gà ta nấu lá giang'),(9,'Lẩu Cá Diêu Hồng',180000,2,'Lẩu cá tươi sống rau xanh'),(10,'Lẩu Cua Đồng',190000,2,'Lẩu cua đồng miền Tây'),(11,'Cơm Chiên Hải Sản',65000,3,'Cơm chiên tôm mực'),(12,'Cơm Chiên Dưa Bò',70000,3,'Cơm chiên thịt bò dưa chua'),(13,'Cơm Tấm Sườn Bì',50000,3,'Cơm tấm sườn nướng mỡ hành'),(14,'Cơm Gà Xối Mỡ',60000,3,'Cơm gà xối mỡ tỏi gòn'),(15,'Cơm Trắng',15000,3,'Cơm gạo dẻo thơm'),(16,'Hàu Nướng Phô Mai',90000,4,'Hàu Pháp nướng thơm béo'),(17,'Mực Nướng Sa Tế',120000,4,'Mực ống nguyên con nướng cay'),(18,'Sườn Nướng Tảng',150000,4,'Sườn non nướng BBQ'),(19,'Bạch Tuộc Nướng',110000,4,'Bạch tuộc ướp sa tế'),(20,'Bò Nướng Lá Lốt',85000,4,'Bò cuộn lá lốt nướng mỡ chài'),(21,'Trà Đá',5000,5,'Trà đá mát lạnh'),(22,'Nước Suối Lavie',15000,5,'Nước khoáng đóng chai'),(23,'Nước Ép Dưa Hấu',35000,5,'Nước ép trái cây tươi'),(24,'Trà Đào Cam Sả',40000,5,'Trà đào giải nhiệt mùa hè'),(25,'Bia Heineken',25000,5,'Bia lon 330ml');
+INSERT INTO `monan` VALUES (1,'Thịt Kho Tộ',55000,1,'Thịt heo kho tiêu đâm đà'),(2,'Cá Lóc Kho Tộ',65000,1,'Cá lóc đồng kho mặn ngọt'),(3,'Gà Chiên Nước Mắm',75000,1,'Cánh gà chiên giòn rụm'),(4,'Sườn Xào Chua Ngọt',85000,1,'Sườn non xào vị chua ngọt'),(5,'Đậu Hũ Nhồi Thịt',45000,1,'Đậu hũ chiên nhồi thịt băm'),(6,'Lẩu Thái Hải Sản',250000,2,'Lẩu chua cay tôm mực'),(7,'Lẩu Bò Nấm',220000,2,'Lẩu bò Mỹ nấm kim châm'),(8,'Lẩu Gà Lá Giang',200000,2,'Lẩu gà ta nấu lá giang'),(9,'Lẩu Cá Diêu Hồng',180000,2,'Lẩu cá tươi sống rau xanh'),(10,'Lẩu Cua Đồng',190000,2,'Lẩu cua đồng miền Tây'),(11,'Cơm Chiên Hải Sản',65000,3,'Cơm chiên tôm mực'),(12,'Cơm Chiên Dưa Bò',70000,3,'Cơm chiên thịt bò dưa chua'),(13,'Cơm Tấm Sườn Bì',50000,3,'Cơm tấm sườn nướng mỡ hành'),(14,'Cơm Gà Xối Mỡ',60000,3,'Cơm gà xối mỡ tỏi gòn'),(15,'Cơm Trắng',15000,3,'Cơm gạo dẻo thơm'),(16,'Hàu Nướng Phô Mai',90000,4,'Hàu Pháp nướng thơm béo'),(17,'Mực Nướng Sa Tế',120000,4,'Mực ống nguyên con nướng cay'),(18,'Sườn Nướng Tảng',150000,4,'Sườn non nướng BBQ'),(19,'Bạch Tuộc Nướng',110000,4,'Bạch tuộc ướp sa tế'),(20,'Bò Nướng Lá Lốt',85000,4,'Bò cuộn lá lốt nướng mỡ chài'),(21,'Trà Đá',5000,5,'Trà đá mát lạnh'),(22,'Nước Suối Lavie',15000,5,'Nước khoáng đóng chai'),(23,'Nước Ép Dưa Hấu',35000,5,'Nước ép trái cây tươi'),(24,'Trà Đào Cam Sả',40000,5,'Trà đào giải nhiệt mùa hè'),(25,'Bia Heineken',25000,5,'Bia lon 330ml'),(32,'string',0,1,'string'),(33,'string',0,NULL,'string'),(34,'string',0,NULL,'string');
 /*!40000 ALTER TABLE `monan` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -462,33 +497,6 @@ DELIMITER ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
--- Table structure for table `nguoiquanly`
---
-
-DROP TABLE IF EXISTS `nguoiquanly`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `nguoiquanly` (
-  `MaNguoiQuanLy` int NOT NULL AUTO_INCREMENT,
-  `TenDangNhap` varchar(30) NOT NULL,
-  `MatKhau` varchar(30) NOT NULL,
-  `MaSoThue` char(12) NOT NULL,
-  PRIMARY KEY (`MaNguoiQuanLy`),
-  UNIQUE KEY `MaNguoiQuanLy_UNIQUE` (`MaNguoiQuanLy`),
-  CONSTRAINT `nguoiquanly_ibfk_1` FOREIGN KEY (`MaNguoiQuanLy`) REFERENCES `nhanvien` (`MaNhanVien`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `nguoiquanly`
---
-
-LOCK TABLES `nguoiquanly` WRITE;
-/*!40000 ALTER TABLE `nguoiquanly` DISABLE KEYS */;
-/*!40000 ALTER TABLE `nguoiquanly` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `nhanvien`
 --
 
@@ -496,13 +504,17 @@ DROP TABLE IF EXISTS `nhanvien`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `nhanvien` (
-  `MaNhanVien` int NOT NULL AUTO_INCREMENT,
   `MaChiNhanh` int NOT NULL,
+  `MaNhanVien` int NOT NULL AUTO_INCREMENT,
   `HoTen` varchar(30) NOT NULL,
   `SDT` char(11) NOT NULL,
   `DiaChi` varchar(30) NOT NULL,
+  `VaiTro` enum('NhanVien','QuanLy') NOT NULL DEFAULT 'NhanVien',
   `CaLam` datetime NOT NULL,
-  `Luong` int NOT NULL DEFAULT '0',
+  `Luong` int NOT NULL DEFAULT '1',
+  `MaSoThue` char(10) NOT NULL,
+  `TenDangNhap` varchar(30) NOT NULL,
+  `MatKhau` varchar(45) NOT NULL,
   PRIMARY KEY (`MaNhanVien`),
   KEY `nhanvien_ibfk_1` (`MaChiNhanh`),
   CONSTRAINT `nhanvien_ibfk_1` FOREIGN KEY (`MaChiNhanh`) REFERENCES `chinhanh` (`MaChiNhanh`),
@@ -516,7 +528,7 @@ CREATE TABLE `nhanvien` (
 
 LOCK TABLES `nhanvien` WRITE;
 /*!40000 ALTER TABLE `nhanvien` DISABLE KEYS */;
-INSERT INTO `nhanvien` VALUES (1,1,'Nguyễn Văn An','0901111111','Q1, TP.HCM','2026-05-12 08:00:00',8000000),(2,1,'Trần Thị Bình','0901111112','Q3, TP.HCM','2026-05-12 08:00:00',7500000),(3,1,'Lê Hoàng Cường','0901111113','Q4, TP.HCM','2026-05-12 14:00:00',6500000),(4,1,'Phạm Mai Dung','0901111114','Q1, TP.HCM','2026-05-12 14:00:00',7000000),(5,1,'Hoàng Trọng Ân','0901111115','Bình Thạnh, TP.HCM','2026-05-12 08:00:00',12000000),(6,2,'Vũ Đức Duy','0902222221','Q3, TP.HCM','2026-05-12 08:00:00',8500000),(7,2,'Đinh Thu Hà','0902222222','Q10, TP.HCM','2026-05-12 08:00:00',7200000),(8,2,'Bùi Khắc Huy','0902222223','Tân Bình, TP.HCM','2026-05-12 14:00:00',6800000),(9,2,'Ngô Thanh Hương','0902222224','Q3, TP.HCM','2026-05-12 14:00:00',7000000),(10,2,'Lý Quốc Bảo','0902222225','Phú Nhuận, TP.HCM','2026-05-12 08:00:00',11500000),(11,3,'Tô Tấn Phát','0903333331','Q10, TP.HCM','2026-05-12 08:00:00',8200000),(12,3,'Hồ Ngọc Mai','0903333332','Q5, TP.HCM','2026-05-12 08:00:00',7500000),(13,3,'Đỗ Văn Toàn','0903333333','Q11, TP.HCM','2026-05-12 14:00:00',6700000),(14,3,'Trịnh Tố Uyên','0903333334','Q10, TP.HCM','2026-05-12 14:00:00',7100000),(15,3,'Cao Đăng Khoa','0903333335','Tân Phú, TP.HCM','2026-05-12 08:00:00',11000000);
+INSERT INTO `nhanvien` VALUES (1,1,'Nguyễn Văn An','0901111111','Q1, TP.HCM','NhanVien','2026-05-12 08:00:00',8000000,'','',''),(1,2,'Trần Thị Bình','0901111112','Q3, TP.HCM','NhanVien','2026-05-12 08:00:00',7500000,'','',''),(1,3,'Lê Hoàng Cường','0901111113','Q4, TP.HCM','NhanVien','2026-05-12 14:00:00',6500000,'','',''),(1,4,'Phạm Mai Dung','0901111114','Q1, TP.HCM','NhanVien','2026-05-12 14:00:00',7000000,'','',''),(1,5,'Hoàng Trọng Ân','0901111115','Bình Thạnh, TP.HCM','NhanVien','2026-05-12 08:00:00',12000000,'','',''),(2,6,'Vũ Đức Duy','0902222221','Q3, TP.HCM','NhanVien','2026-05-12 08:00:00',8500000,'','',''),(2,7,'Đinh Thu Hà','0902222222','Q10, TP.HCM','NhanVien','2026-05-12 08:00:00',7200000,'','',''),(2,8,'Bùi Khắc Huy','0902222223','Tân Bình, TP.HCM','NhanVien','2026-05-12 14:00:00',6800000,'','',''),(2,9,'Ngô Thanh Hương','0902222224','Q3, TP.HCM','NhanVien','2026-05-12 14:00:00',7000000,'','',''),(2,10,'Lý Quốc Bảo','0902222225','Phú Nhuận, TP.HCM','NhanVien','2026-05-12 08:00:00',11500000,'','',''),(3,11,'Tô Tấn Phát','0903333331','Q10, TP.HCM','NhanVien','2026-05-12 08:00:00',8200000,'','',''),(3,12,'Hồ Ngọc Mai','0903333332','Q5, TP.HCM','NhanVien','2026-05-12 08:00:00',7500000,'','',''),(3,13,'Đỗ Văn Toàn','0903333333','Q11, TP.HCM','NhanVien','2026-05-12 14:00:00',6700000,'','',''),(3,14,'Trịnh Tố Uyên','0903333334','Q10, TP.HCM','NhanVien','2026-05-12 14:00:00',7100000,'','',''),(3,15,'Cao Đăng Khoa','0903333335','Tân Phú, TP.HCM','NhanVien','2026-05-12 08:00:00',11000000,'','','');
 /*!40000 ALTER TABLE `nhanvien` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -732,6 +744,23 @@ LOCK TABLES `theloaimon` WRITE;
 INSERT INTO `theloaimon` VALUES (1,'Món Mặn','Các món ăn chính với cơm'),(2,'Món Lẩu','Lẩu các loại cho nhiều người'),(3,'Cơm','Cơm chiên và cơm truyền thống'),(4,'Món Nướng','Hải sản và thịt nướng tẩm ướp'),(5,'Thức Uống','Nước giải khát và bia');
 /*!40000 ALTER TABLE `theloaimon` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Temporary view structure for view `thongkekinhphi`
+--
+
+DROP TABLE IF EXISTS `thongkekinhphi`;
+/*!50001 DROP VIEW IF EXISTS `thongkekinhphi`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `thongkekinhphi` AS SELECT 
+ 1 AS `MaChiNhanh`,
+ 1 AS `MaNhapKho`,
+ 1 AS `NgayGioTaoPhieu`,
+ 1 AS `GiaTri`,
+ 1 AS `MaNhanVien`,
+ 1 AS `HoTenNhanVien`*/;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Temporary view structure for view `tongkethoadon`
@@ -1230,6 +1259,45 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `thong_ke_kinh_phi` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `thong_ke_kinh_phi`(
+in p_MaChiNhanh int,
+in p_ThoiDiemBatDau datetime,
+in p_ThoiDiemKetThuc datetime,
+in p_PhamVi enum ('Ngay','Thang','Nam'),
+in p_UuTien enum('ChiNhanh','ThoiGian')
+)
+begin
+	select KP.MaChiNhanh,
+		case p_PhamVi
+			when 'Nam' then date_format(KP.NgayGioTaoPhieu,'%Y')
+			when 'Thang'then date_format(KP.NgayGioTaoPhieu,'%m-%Y')
+			else date_format(KP.NgayGioTaoPhieu, '%d-%m-%Y')
+		end as NgayGioTaoPhieu,
+		sum(KP.GiaTri) as TongGiaTri
+    from ThongKeKinhPhi KP
+    where (p_MaChiNhanh is null or KP.MaChiNhanh = p_MachiNhanh)
+    and (p_ThoiDiemBatDau is null or KP.NgayGioTaoPhieu >=p_ThoiDiemBatDau)
+    and (p_ThoiDiemKetThuc is null or KP.NgayGioTaoPhieu<=p_ThoiDiemKetThuc)
+    group by KP.MaChiNhanh, KP.NgayGioTaoPhieu
+    order by
+		case when p_UuTien='ChiNhanh' then KP.MaChiNhanh else KP.NgayGioTaoPhieu end asc,
+        case when p_UuTien='ChiNhanh' then KP.NgayGioTaoPhieu else KP.MaChiNhanh end asc;
+end ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `thong_ke_mon_an` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -1336,6 +1404,42 @@ DELIMITER ;
 /*!50001 SET collation_connection      = @saved_col_connection */;
 
 --
+-- Final view structure for view `dsbanan`
+--
+
+/*!50001 DROP VIEW IF EXISTS `dsbanan`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `dsbanan` AS select `cn`.`MaChiNhanh` AS `MaChiNhanh`,`ba`.`MaBan` AS `MaBan`,`ba`.`SoLuongChoNgoi` AS `SoLuongChoNgoi`,`ba`.`ViTri` AS `ViTri`,`ba`.`TinhTrangSuDung` AS `TinhTrangSuDung` from (`chinhanh` `cn` join `banan` `ba` on((`cn`.`MaChiNhanh` = `ba`.`MaChiNhanh`))) */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
+-- Final view structure for view `dsmonan`
+--
+
+/*!50001 DROP VIEW IF EXISTS `dsmonan`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `dsmonan` AS select `td`.`MaChiNhanh` AS `MaChiNhanh`,`ma`.`MaMon` AS `MaMon`,`ma`.`TenMon` AS `TenMon`,`ma`.`DonGia` AS `DonGia`,`ma`.`ThongTinMoTa` AS `ThongTinMon`,`tl`.`MaTheLoai` AS `MaTheLoai`,`tl`.`TenTheLoai` AS `TenTheLoai`,`tl`.`ThongTinMota` AS `ThongTinTheLoai` from ((`cungcapthucdon` `td` join `monan` `ma` on((`td`.`MaMonAn` = `ma`.`MaMon`))) left join `theloaimon` `tl` on((`ma`.`MaTheLoai` = `tl`.`MaTheLoai`))) */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
 -- Final view structure for view `dsnhanvien`
 --
 
@@ -1349,6 +1453,24 @@ DELIMITER ;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
 /*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
 /*!50001 VIEW `dsnhanvien` AS select `cn`.`MaChiNhanh` AS `MaChiNhanh`,`nv`.`HoTen` AS `HoTen`,`nv`.`SDT` AS `SDT`,`nv`.`DiaChi` AS `DiaChi`,`nv`.`CaLam` AS `CaLam`,`nv`.`Luong` AS `Luong` from (`nhanvien` `nv` join `chinhanh` `cn` on((`nv`.`MaChiNhanh` = `cn`.`MaChiNhanh`))) order by `cn`.`MaChiNhanh` */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
+-- Final view structure for view `thongkekinhphi`
+--
+
+/*!50001 DROP VIEW IF EXISTS `thongkekinhphi`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `thongkekinhphi` AS select `cn`.`MaChiNhanh` AS `MaChiNhanh`,`p`.`MaNhapKho` AS `MaNhapKho`,`p`.`NgayGioTaoPhieu` AS `NgayGioTaoPhieu`,`p`.`GiaTri` AS `GiaTri`,`nv`.`MaNhanVien` AS `MaNhanVien`,`nv`.`HoTen` AS `HoTenNhanVien` from ((`phieunhapkho` `p` join `nhanvien` `nv` on((`p`.`MaNhanVienKiemToan` = `nv`.`MaNhanVien`))) join `chinhanh` `cn` on((`nv`.`MaChiNhanh` = `cn`.`MaChiNhanh`))) */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
@@ -1380,4 +1502,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-05-14 23:49:30
+-- Dump completed on 2026-05-16 21:33:04

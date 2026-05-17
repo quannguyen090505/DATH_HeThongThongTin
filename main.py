@@ -1,82 +1,79 @@
-# file: main.py
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
+from fastapi.security import HTTPBearer
 import mysql.connector  # Phải import thư viện này ở đầu file
 from database import get_db_connection
 from schemas import *
+from security import verify_password, create_access_token, get_password_hash
+
+from routers import quan_ly, nhan_vien
 
 app = FastAPI(title="Hệ Thống F&B API")
+app.include_router(quan_ly.router)
+app.include_router(nhan_vien.router)
 
-# uvicorn main:app --reload
+# uvicorn routers/main:app --reload
+
+# API bao mat
 
 
-def error_complier(error: mysql.connector):
-    error_code = error.errno
-    if error_code == 1644:
-        message = error.msg
-    elif error_code == 3819:
-        # Lỗi CHECK Constraint
-        if "banan_chk_1" in error.msg:
-            message = "Lỗi: Số lượng chỗ ngồi phải lớn hon 0!"
-        elif "monduocgoi_chk_2" in error.msg:
-            message = "Lỗi: Số lượng món được gọi phải lớn hơn 0."
-        elif "nhanvien_chk_1" in error.msg:
-            message = "Lỗi: Mức lương phải lớn hơn 0!"
-        elif "phieudatban_chk_1" in error.msg:
-            message = "Lỗi: Ngày giờ nhận bàn phải sau ngày giờ hiện tại."
-        elif "phieunhapkho_chk_1" in error.msg:
-            message = "Lỗi: Giá trị phiếu nhập kho phải lớn hơn 0."
-    elif error_code == 1062:
-        # Lỗi UNIQUE (Trùng lặp)
-        message = "Lỗi: Dữ liệu này (SĐT hoặc Email) đã tồn tại trong hệ thống."
-    elif error_code == 1452:
-        # Lỗi Khóa ngoại (Tham chiếu sai)
-        if "banan_ibfk_1" in error.msg:
-            message = " Lỗi: Mã chi nhánh không hợp lệ."
-        elif "cungcapthucdon_ibfk_1" in error.msg:
-            message = "Lỗi: Mã chi nhánh không hợp lệ."
-        elif "cungcapthucdon_ibfk_2" in error.msg:
-            message = "Lỗi: Mã món ăn không hợp lệ."
-        elif "dattruocmon_ibfk_1" in error.msg:
-            message = "Lỗi: Mã phiếu đặt bàn không hợp lệ."
-        elif "dattruocmon_ibfk_2" in error.msg:
-            message = "Lỗi: Mã phiếu gọi món không hợp lệ."
-        elif "hoadon_ibfk_1" in error.msg:
-            message = "Lỗi: Mã phiếu gọi món không hợp lệ."
-        elif "hoadon_ibfk_2" in error.msg:
-            message = "Lỗi: Mã nhân viên không hợp lệ."
-        elif "monan_ibfk_1" in error.msg:
-            message = "Lỗi: Mã thể loại món không hợp lệ."
-        elif "goimon_ibfk_1" in error.msg:
-            message = "Lỗi: Mã bàn ăn không hợp lệ."
-        elif "goimon_ibfk_2" in error.msg:
-            message = "Lỗi: Mã phiếu gọi món không hợp lệ."
-        elif "nguoiquanly_ibfk_1" in error.msg:
-            message = "Lỗi: Mã người quản lý không hợp lệ."
-        elif "nhanvien_ibfk_1" in error.msg:
-            message = "Lỗi: Mã chi nhánh không hợp lệ."
-        elif "phieudatban_ibfk_1" in error.msg:
-            message = "Lỗi: Mã bàn ăn không hợp lệ."
-        elif "phieudatban_ibfk_2" in error.msg:
-            message = "Lỗi: Sđt khách không hợp lệ."
-        elif "phieudatban_ibfk_3" in error.msg:
-            message = "Lỗi: Mã nhân viên không hợp lệ."
-        elif "phieugoimon_ibfk_1" in error.msg:
-            message = "Lỗi: Mã bàn ăn không hợp lệ."
-        elif "phieugoimon_ibfk_2" in error.msg:
-            message = "Lỗi: Mã nhân viên không hợp lệ."
-        elif "phieugoimon_ibfk_3" in error.msg:
-            message = "Lỗi: Sđt khách không hợp lệ."
-        elif "phieunhapkho_ibfk_1" in error.msg:
-            message = "Lỗi: Mã nhân viên không hợp lệ."
-    else:
-        # Bắt các lỗi hệ thống khác
-        message = f"Lỗi cơ sở dữ liệu ({error_code}): {error.msg}"
-    raise HTTPException(status_code=400, detail=message)
+@app.post("/api/khach/dang-nhap")
+def khach_dang_nhap(request: DangNhapRequest):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("Select SDT, MatKhau from Khach where SDT=%s", (request.sdt,))
+        user = cursor.fetchone()
+        if not user or not verify_password(request.mat_khau, user["MatKhau"]):
+            raise HTTPException(status_code=401, detail="Sai sđt hoặc mật khẩu")
+        token = create_access_token(user_id=user["SDT"], role="Khach")
+        return {
+            "status": "success",
+            "message": "Đăng nhập thành công",
+            "access_token": token,
+            "token_type": "bearer",
+        }
+    finally:
+        cursor.close()
+        conn.close()
+
+
+security = HTTPBearer()
+SECRET_KEY = "dath_hethongthongtin"
+ALGORITHM = "HK252"
+
+
+@app.post("/api/tao-tai-khoan-khach")
+def tao_tai_khoan_khach(
+    request: TaoTaiKhoanRequest,
+    ho_ten: Optional[str] = None,
+):
+    conn = get_db_connection
+    try:
+        cursor = conn.cursor()
+        hashed_pw = get_password_hash(request.mat_khau)
+        sql = """
+            insert into Khach(SDT,MatKhau)
+            values(%s,%s,%s,%s,%s,%s,%s)
+        """
+        val = (ho_ten, request.sdt, request.mat_khau)
+        cursor.execute(sql, val)
+        conn.commit()
+        return {"status": "success", "message": "Tạo tài khoản thành công"}
+    except mysql.connector.Error as e:
+        conn.rollback()
+        if e.errno == 1062:
+            raise HTTPException(
+                status_code=400, detail="Số điện thoại này đã được đăng ký!"
+            )
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
 
 
 # cac API goi mon
 @app.post("/api/khach/goi-mon")
-def khach_goi_mon_tai_quan(request: KhachGoiMonTaiQuanRequest):
+def khach_goi_mon_tai_quan(request: GoiMonRequest):
     conn = get_db_connection()
     if not conn:
         raise HTTPException(status_code=500, detail="Lỗi kết nối Database")
@@ -102,7 +99,7 @@ def khach_goi_mon_tai_quan(request: KhachGoiMonTaiQuanRequest):
 
 
 @app.post("/app/khach/dat-mang-ve")
-def khach_dat_mon_mang_ve(request: KhachDatMonMangVeRequest):
+def khach_dat_mon_mang_ve(request: GoiMonRequest):
     conn = get_db_connection()
     if not conn:
         raise HTTPException(status_code=500, detail="Lỗi kết nối Database")
@@ -126,201 +123,111 @@ def khach_dat_mon_mang_ve(request: KhachDatMonMangVeRequest):
         conn.close()
 
 
-@app.post("/api/nhan-vien/goi-mon")
-def nhan_vien_goi_mon(request: NhanVienGoiMonRequest):
+# cac APi CRUD với các đối tượng
+# món ăn
+@app.get("/api/thong-tin-mon/{ma_chi_nhanh}/{ma_mon}")
+def thong_tin_mon(ma_chi_nhanh: int, ma_mon: int):
     conn = get_db_connection()
     try:
-        cursor = conn.cursor()
-        cursor.callproc(
-            "nhan_vien_goi_mon_tai_quan",
-            (
-                request.ma_ban_an,
-                request.ma_mon_an,
-                request.so_luong,
-                request.ma_nhan_vien,
-            ),
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            "SELECT TenMon,DonGia,ThongTinMon,TenTheLoai FROM ds_mon_an WHERE MaMon=%s and MaChiNhanh=%s;",
+            (ma_mon, ma_chi_nhanh),
         )
-        conn.commit()
-        return {"status": "success", "message": "Nhân viên đã chốt món thành công!"}
-    except Exception as e:
-        conn.rollback()
-        error_complier(e)
+        result = cursor.fetchone()
+        if not result:
+            conn.rollback()
+            raise HTTPException(status_code=404, detail="Mã món không hợp lệ")
+        return {"status": "success", "data": result}
     finally:
         cursor.close()
         conn.close()
 
 
-@app.post("/api/nhan-vien/dat-mon")
-def nhan_vien_dat_mon_truoc(request: NhanVienGoiMonRequest):
+@app.get("/api/thong-tin-the-loai-mon/{ma_the_loai}")
+def thong_tin_the_loai_mon(ma_the_loai: int):
     conn = get_db_connection()
     try:
-        cursor = conn.cursor()
-        cursor.callproc(
-            "nhan_vien_dat_mon_truoc",
-            (
-                request.ma_phieu_dat_ban,
-                request.ma_mon_an,
-                request.so_luong,
-                request.sdt_khach,
-                request.ma_nhan_vien,
-            ),
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            "SELECT TentheLoai,ThongTinMoTa FROM TheLoaiMon WHERE MaTheLoai=%s;",
+            (ma_the_loai,),
         )
-        conn.commit()
-        return {"status": "success", "message": "Nhân viên đã chốt món thành công!"}
-    except Exception as e:
-        conn.rollback()
-        error_complier(e)
+        result = cursor.fetchone()
+        if not result:
+            conn.rollback()
+            raise HTTPException(status_code=404, detail="Mã thể loại không hợp lệ")
+        return {"status": "success", "data": result}
     finally:
         cursor.close()
         conn.close()
 
 
-# API dat ban
-@app.post("/api/nhan-vien/dat-ban")
-def tao_phieu_dat_ban(request: DatBanRequest):
+@app.get("/api/thong_tin_ban_an/{ma_chi_nhanh}/{ma_ban_an}")
+def thong_tin_ban_an(ma_chi_nhanh: int, ma_ban_an: int):
     conn = get_db_connection()
     try:
-        cursor = conn.cursor()
-        cursor.callproc(
-            "tao_phieu_dat_ban",
-            (
-                request.ma_ban_an,
-                request.ngay_gio_nhan,
-                request.sdt_khach,
-                request.ma_nhan_vien,
-            ),
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            "select MaBan,SoLuongChoNgoi, Vitri,TinhTrangSuDung from BanAn where MabanAn=%s and MaChiNhanh=%s",
+            (ma_ban_an, ma_chi_nhanh),
         )
-        conn.commit()
-        return {"status": "success", "message": "Đặt bàn thành công!"}
-    except Exception as e:
-        conn.rollback()
-        error_complier(e)
-    finally:
-        cursor.close()
-        conn.close()
-
-
-# API thanh toan
-@app.post("/api/nhan-vien/thanh-toan")
-def thanh_toan_phieu_goi_mon(request: ThanhToanPhieuGoiMon):
-    conn = get_db_connection()
-    try:
-        cursor = conn.cursor()
-        cursor.callproc(
-            "thanh_toan_phieu_goi_mon",
-            (
-                request.ma_phieu_goi_mon,
-                request.phuong_thuoc_thanh_toan,
-                request.ma_nhan_vien,
-            ),
-        )
-        conn.commit()
-        return {"status": "success", "message": "thanh toán  thành công!"}
-    except Exception as e:
-        conn.rollback()
-        error_complier(e)
-    finally:
-        cursor.close()
-        conn.close()
-
-
-# cac APi bo sung doi tuong moi
-@app.post("/api/quan-ly/them-mon-moi")
-def them_mon_moi(request: ThemMonMoi):
-    conn = get_db_connection()
-    try:
-        cursor = conn.cursor()
-        cursor.callproc(
-            "them_mon_moi",
-            (
-                request.ten_mon,
-                request.don_gia,
-                request.thong_tin_mo_ta,
-                request.ma_the_loai,
-                request.ma_chi_nhanh,
-            ),
-        )
-        conn.commit()
-        return {"status": "success", "message": "thêm món mới thành công!"}
-
-    except Exception as e:
-        conn.rollback()
-        error_complier(e)
-    finally:
-        cursor.close()
-        conn.close()
-
-
-@app.post("/api/quan-ly/them-the-loai-mon")
-def them_them_loai_mon_moi(request: ThemTheLoaiMon):
-    conn = get_db_connection()
-    try:
-        cursor = conn.cursor()
-        cursor.callproc(
-            "them_the_loai_mon",
-            (
-                request.ten_the_loai,
-                request.thong_tin_mo_ta,
-            ),
-        )
-        conn.commit()
-        return {"status": "success", "message": "thêm thể loại món mới thành công"}
-    except Exception as e:
-        conn.rollback()
-        error_complier(e)
-    finally:
-        cursor.close()
-        conn.close()
-
-
-@app.post("/api/quan-ly/them-ban-an")
-def them_ban_an(request: ThemBanAn):
-    conn = get_db_connection()
-    try:
-        cursor = conn.cursor()
-        cursor.callproc(
-            "them_ban_an",
-            (
-                request.ma_chi_nhanh,
-                request.so_luong_cho_ngoi,
-                request.vi_tri,
-            ),
-        )
-        cursor.commit()
-        return {"status": "success", "message": "thêm bàn ăn mới thành công"}
-    except Exception as e:
-        conn.rollback()
-        error_complier(e)
-    finally:
-        cursor.close()
-        conn.close()
-
-
-@app.post("/api/quan-ly/them-chi-nhanh")
-def them_chi_nhanh(request: ThemChiNhanh):
-    conn = get_db_connection()
-    try:
-        cursor = conn.cursor()
-        cursor.callproc(
-            "them_chi_nhanh",
-            (
-                request.dia_chi,
-                request.sdt_quan,
-                request.email_quan,
-                request.gio_mo_cua,
-            ),
-        )
-        cursor.commit()
-        return {"status": "success", "message": "thêm chi nhánh mới thành công"}
-    except Exception as e:
-        conn.rollback()
-        raise HTTPException(status_code=400, detail=str(e))
+        result = cursor.fetchone()
+        if not result:
+            conn.rollback()
+            raise HTTPException(
+                status_code=404, detail="Mã bàn ăn hoặc mã chi nhánh không hợp lệ"
+            )
+        return {"status": "success", "data": result}
     finally:
         cursor.close()
         conn.close()
 
 
 # cac API truy xuat du lieu
+@app.get("/api/ds-ban-an/{ma_chi_nhanh}")
+def danh_sach_ban_an(ma_chi_nhanh: int):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            "select MaBan, SoLuongChoNgoi,ViTri,TinhTrangSuDung from DsBanAn where MaChiNhanh=%s;",
+            (ma_chi_nhanh,),
+        )
+        result = cursor.fetchall()
+        if not result:
+            return {"status": "success", "message": "Danh sách bàn trống", "data": []}
+        return {
+            "status": "success",
+            "ma_chi_nhanh": ma_chi_nhanh,
+            "data": result,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@app.get("/api/thuc-don/{ma_chi_nhanh}")
+def thuc_don(ma_chi_nhanh: int):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            "select TenMon,DonGia from DsMonAn where MaChiNhanh=%s", (ma_chi_nhanh,)
+        )
+        result = cursor.fetchall()
+        if not result:
+            return {"status": "success", "message": "Thực đơn trống"}
+        return {"status": "success", "ma_chi_nhanh": ma_chi_nhanh, "data": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
+
+
 @app.get("/api/khach/ban/{ma_ban_an}/truy-xuat-phieu-goi-mon")
 def khach_truy_xuat_phieu_goi_mon(ma_ban_an: int):
     conn = get_db_connection()
@@ -351,160 +258,6 @@ def khach_truy_xuat_phieu_goi_mon(ma_ban_an: int):
             "data": danh_sach_mon,
         }
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-        conn.close()
-
-
-@app.get("/api/nhanvien/truy-xuat-phieu-goi-mon/")
-def nhan_vien_truy_xuat_phieu_goi_mon(
-    ma_ban_an: Optional[int] = None,
-    tinh_trang_phieu: Optional[str] = None,
-    thanh_toan: Optional[bool] = None,
-):
-    conn = get_db_connection()
-    try:
-        cursor = conn.cursor(dictionary=True)
-        cursor.callproc(
-            "truy_xuat_phieu_goi_mon",
-            (
-                ma_ban_an,
-                tinh_trang_phieu,
-                thanh_toan,
-            ),
-        )
-        danh_sach_mon = []
-        for result in cursor.stored_results():
-            danh_sach_mon = result.fetchall()
-        if not danh_sach_mon:
-            return {
-                "status": "success",
-                "message": "Danh sách phiếu gọi món trống ",
-                "data": [],
-            }
-
-        return {
-            "status": "success",
-            "ma_ban_an": ma_ban_an,
-            "tong_tien": sum(mon["ThanhTien"] for mon in danh_sach_mon),
-            "data": danh_sach_mon,
-        }
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-        conn.close()
-
-
-@app.get("/api/quan-ly/truy-xuat-danh-sach-nv/")
-def truy_xuat_danh_sach_nv(ma_chi_nhanh: Optional[int] = None):
-    conn = get_db_connection()
-    try:
-        cursor = conn.cursor()
-        cursor.callproc(
-            "truy_xuat_ds_nv",
-            (ma_chi_nhanh,),
-        )
-        result = []
-        for res in cursor.stored_results():
-            result = res.fetchall()
-        if not result:
-            return {
-                "status": "success",
-                "message": "danh sách nhân viên trống",
-                "data": [],
-            }
-        return {
-            "status": "success",
-            "data": result,
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-        conn.close()
-
-
-@app.get("/api/quan-ly/thong-ke-doanh-so/")
-def thong_ke_doanh_so(
-    ma_chi_nhanh: Optional[int] = None,
-    thoi_gian_bat_dau: Optional[str] = None,
-    thoi_gian_ket_thuc: Optional[str] = None,
-    doanh_so_toi_thieu: Optional[int] = None,
-    doanh_so_toi_da: Optional[int] = None,
-    pham_vi: Optional[str] = None,
-    uu_tien: Optional[str] = None,
-):
-    conn = get_db_connection()
-    try:
-        cursor = conn.cursor()
-        cursor.callproc(
-            "thong_ke_doanh_so",
-            (
-                ma_chi_nhanh,
-                thoi_gian_bat_dau,
-                thoi_gian_ket_thuc,
-                doanh_so_toi_thieu,
-                doanh_so_toi_da,
-                pham_vi,
-                uu_tien,
-            ),
-        )
-        result = []
-        for res in cursor.stored_results():
-            result = res.fetchall()
-        if not result:
-            return {
-                "status": "success",
-                "message": "danh sách hóa đơn trống",
-                "data": [],
-            }
-        return {
-            "status": "success",
-            "data": result,
-        }
-    except Exception as e:
-        return HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-        conn.close()
-
-
-@app.get("/api/quan-ly/thong-ke-mon-an")
-def thong_ke_mon_an(
-    ma_chi_nhanh: Optional[int] = None,
-    thoi_gian_bat_dau: Optional[str] = None,
-    thoi_gian_ket_thuc: Optional[str] = None,
-    pham_vi: Optional[str] = None,
-):
-    conn = get_db_connection()
-    try:
-        cursor = conn.cursor()
-        cursor.callproc(
-            "thong_ke_mon_an",
-            (
-                ma_chi_nhanh,
-                thoi_gian_bat_dau,
-                thoi_gian_ket_thuc,
-                pham_vi,
-            ),
-        )
-        result = []
-        for res in cursor.stored_results():
-            result = res.fetchall()
-        if not result:
-            return {
-                "status": "success",
-                "message": "danh sách món bán ra trống",
-                "data": [],
-            }
-        return {
-            "status": "success",
-            "data": result,
-        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     finally:
