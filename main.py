@@ -185,23 +185,41 @@ def thong_tin_ban_an(ma_chi_nhanh: int, ma_ban_an: int):
 
 
 # cac API truy xuat du lieu
+@app.get("/api/ds-ban-an")
 @app.get("/api/ds-ban-an/{ma_chi_nhanh}")
-def danh_sach_ban_an(ma_chi_nhanh: int):
+def danh_sach_ban_an(ma_chi_nhanh: Optional[int] = None):
     conn = get_db_connection()
     try:
         cursor = conn.cursor(dictionary=True)
-        cursor.execute(
-            "select MaBan, SoLuongChoNgoi,ViTri,TinhTrangSuDung from DsBanAn where MaChiNhanh=%s;",
-            (ma_chi_nhanh,),
-        )
-        result = cursor.fetchall()
-        if not result:
-            return {"status": "success", "message": "Danh sách bàn trống", "data": []}
-        return {
-            "status": "success",
-            "ma_chi_nhanh": ma_chi_nhanh,
-            "data": result,
-        }
+        if ma_chi_nhanh is not None:
+            cursor.execute(
+                "select MaBan, SoLuongChoNgoi,ViTri,TinhTrangSuDung from dsbanan where MaChiNhanh=%s;",
+                (ma_chi_nhanh,),
+            )
+            result = cursor.fetchall()
+            return {
+                "status": "success",
+                "ma_chi_nhanh": ma_chi_nhanh,
+                "data": result,
+            }
+        else:
+            cursor.execute(
+                "select MaChiNhanh, MaBan, SoLuongChoNgoi,ViTri,TinhTrangSuDung from dsbanan;",
+            )
+            result = cursor.fetchall()
+            from collections import defaultdict
+            grouped = defaultdict(list)
+            for row in result:
+                grouped[row["MaChiNhanh"]].append({
+                    "MaBan": row["MaBan"],
+                    "SoLuongChoNgoi": row["SoLuongChoNgoi"],
+                    "ViTri": row["ViTri"],
+                    "TinhTrangSuDung": row["TinhTrangSuDung"]
+                })
+            return {
+                "status": "success",
+                "data": dict(grouped),
+            }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     finally:
@@ -254,6 +272,47 @@ def khach_truy_xuat_phieu_goi_mon(ma_ban_an: int):
         return {
             "status": "success",
             "ma_phieu": ma_ban_an,
+            "tong_tien": sum(mon["ThanhTien"] for mon in danh_sach_mon),
+            "data": danh_sach_mon,
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@app.get("/api/nhanvien/truy-xuat-phieu-goi-mon/")
+def nhanvien_truy_xuat_phieu_goi_mon_alias(
+    ma_ban_an: Optional[int] = None,
+    tinh_trang_phieu: Optional[str] = None,
+    thanh_toan: Optional[bool] = None,
+):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.callproc(
+            "truy_xuat_phieu_goi_mon",
+            (
+                ma_ban_an,
+                tinh_trang_phieu,
+                thanh_toan,
+            ),
+        )
+        danh_sach_mon = []
+        for result in cursor.stored_results():
+            danh_sach_mon = result.fetchall()
+        if not danh_sach_mon:
+            return {
+                "status": "success",
+                "message": "Danh sách phiếu gọi món trống ",
+                "data": [],
+            }
+
+        return {
+            "status": "success",
+            "ma_ban_an": ma_ban_an,
             "tong_tien": sum(mon["ThanhTien"] for mon in danh_sach_mon),
             "data": danh_sach_mon,
         }

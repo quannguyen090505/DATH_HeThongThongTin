@@ -269,6 +269,8 @@ def them_chi_nhanh(
 
 
 @router.get("/truy-xuat-danh-sach-nv/")
+@router.get("/truy-xuat-ds-nhan-vien/")
+@router.get("/danh-sach-nhan-vien/")
 def truy_xuat_danh_sach_nv(
     ma_chi_nhanh: Optional[int] = None,
 ):
@@ -276,7 +278,7 @@ def truy_xuat_danh_sach_nv(
     try:
         cursor = conn.cursor(dictionary=True)
         cursor.callproc(
-            "truy_xuat_ds_nv",
+            "truy_xuat_ds_nhan_vien",
             (ma_chi_nhanh,),
         )
         result = []

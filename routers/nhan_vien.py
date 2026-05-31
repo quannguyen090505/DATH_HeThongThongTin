@@ -190,3 +190,35 @@ def nhan_vien_truy_xuat_phieu_goi_mon(
     finally:
         cursor.close()
         conn.close()
+
+
+@router.get("/danh-sach-nhan-vien/")
+@router.get("/truy-xuat-ds-nhan-vien/")
+def truy_xuat_danh_sach_nv(
+    ma_chi_nhanh: Optional[int] = None,
+):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.callproc(
+            "truy_xuat_ds_nhan_vien",
+            (ma_chi_nhanh,),
+        )
+        result = []
+        for res in cursor.stored_results():
+            result = res.fetchall()
+        if not result:
+            return {
+                "status": "success",
+                "message": "danh sách nhân viên trống",
+                "data": [],
+            }
+        return {
+            "status": "success",
+            "data": result,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
