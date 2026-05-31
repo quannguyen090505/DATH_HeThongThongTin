@@ -44,7 +44,7 @@ CREATE TABLE `banan` (
 
 LOCK TABLES `banan` WRITE;
 /*!40000 ALTER TABLE `banan` DISABLE KEYS */;
-INSERT INTO `banan` VALUES (1,1,'DaThanhToan','Tang 1',4,1),(2,1,'DaThanhToan','Tang 1',4,1),(3,1,'DaThanhToan','Tang 1',4,1),(4,1,'DaThanhToan','Tang 1',4,1),(5,1,'DaThanhToan','Tang 1',4,1),(6,1,'BanTrong','Tang 1',4,1),(7,2,'DaThanhToan','Tang 1',4,1),(8,2,'DaThanhToan','Tang 1',4,1),(9,2,'DaThanhToan','Tang 1',4,1),(10,2,'DaThanhToan','Tang 1',4,1),(11,2,'BanTrong','Tang 1',4,1),(12,2,'BanTrong','Tang 1',4,1),(13,2,'BanTrong','Tang 1',4,1),(14,3,'DaThanhToan','Tang 1',4,1),(15,3,'DaThanhToan','Tang 1',4,1),(16,3,'DaThanhToan','Tang 1',4,1),(17,3,'DaThanhToan','Tang 1',4,1),(18,3,'BanTrong','Tang 1',4,1),(19,3,'BanTrong','Tang 2',4,1),(20,3,'BanTrong','Tang 2',4,1),(21,3,'BanTrong','Tang 2',4,1),(22,3,'BanTrong','Tang 2',4,1),(23,3,'BanTrong','Tang 2',4,1),(24,3,'BanTrong','Tang 1',4,1);
+INSERT INTO `banan` VALUES (1,1,'DaThanhToan','Tang 1',4,1),(2,1,'DaThanhToan','Tang 1',4,1),(3,1,'DaThanhToan','Tang 1',4,1),(4,1,'DaThanhToan','Tang 1',4,1),(5,1,'DaThanhToan','Tang 1',4,1),(6,1,'DaThanhToan','Tang 1',4,1),(7,2,'DaThanhToan','Tang 1',4,1),(8,2,'DaThanhToan','Tang 1',4,1),(9,2,'DaThanhToan','Tang 1',4,1),(10,2,'DaThanhToan','Tang 1',4,1),(11,2,'DaThanhToan','Tang 1',4,1),(12,2,'DaThanhToan','Tang 1',4,1),(13,2,'BanTrong','Tang 1',4,1),(14,3,'DaThanhToan','Tang 1',4,1),(15,3,'DaThanhToan','Tang 1',4,1),(16,3,'DaThanhToan','Tang 1',4,1),(17,3,'DaThanhToan','Tang 1',4,1),(18,3,'DaThanhToan','Tang 1',4,1),(19,3,'BanTrong','Tang 2',4,1),(20,3,'BanTrong','Tang 2',4,1),(21,3,'BanTrong','Tang 2',4,1),(22,3,'BanTrong','Tang 2',4,1),(23,3,'BanTrong','Tang 2',4,1),(24,3,'BanTrong','Tang 1',4,1);
 /*!40000 ALTER TABLE `banan` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -124,34 +124,7 @@ CREATE TABLE `cungcapthucdon` (
 
 LOCK TABLES `cungcapthucdon` WRITE;
 /*!40000 ALTER TABLE `cungcapthucdon` DISABLE KEYS */;
-INSERT INTO `cungcapthucdon` (`MaChiNhanh`, `MaMonAn`, `DonGia`, `CoSan`) VALUES
-(1, 1, 55000, 1),
-(1, 2, 65000, 1),
-(1, 3, 75000, 1),
-(1, 4, 250000, 1),
-(1, 5, 220000, 1),
-(1, 6, 45000, 1),
-(1, 7, 50000, 1),
-(1, 8, 30000, 1),
-(1, 9, 35000, 1),
-(2, 1, 65000, 1),
-(2, 2, 75000, 0),
-(2, 3, 85000, 1),
-(2, 4, 280000, 1),
-(2, 5, 250000, 0),
-(2, 6, 55000, 1),
-(2, 7, 60000, 1),
-(2, 8, 40000, 1),
-(2, 9, 45000, 1),
-(3, 1, 0, 0),
-(3, 2, 0, 0),
-(3, 3, 0, 0),
-(3, 4, 0, 0),
-(3, 5, 0, 0),
-(3, 6, 45000, 1),
-(3, 7, 50000, 1),
-(3, 8, 30000, 1),
-(3, 9, 35000, 1);
+INSERT INTO `cungcapthucdon` VALUES (1,1,85000,1),(1,2,90000,1),(1,3,95000,1),(1,4,100000,1),(1,5,105000,1),(1,6,110000,1),(1,7,115000,1),(1,8,120000,1),(1,9,125000,1),(1,10,130000,1),(1,11,135000,1),(1,12,140000,1),(1,13,145000,1),(1,14,150000,1),(1,15,155000,1),(1,16,160000,1),(1,17,165000,1),(1,18,170000,1),(1,19,175000,1),(1,20,180000,1),(2,1,95000,1),(2,2,100000,1),(2,3,105000,1),(2,4,110000,1),(2,5,115000,1),(2,6,120000,1),(2,7,125000,1),(2,8,130000,1),(2,9,135000,1),(2,10,140000,1),(2,11,145000,1),(2,12,150000,1),(2,13,155000,1),(2,14,160000,1),(2,15,165000,1),(2,16,170000,1),(2,17,175000,1),(2,18,180000,1),(2,19,185000,1),(2,20,190000,1),(2,21,195000,1),(2,22,200000,1),(2,23,205000,1),(2,24,210000,1),(2,25,215000,1),(3,1,90000,1),(3,2,95000,1),(3,3,100000,1),(3,4,105000,1),(3,5,110000,1),(3,6,115000,1),(3,7,120000,1),(3,8,125000,1),(3,9,130000,1),(3,10,135000,1),(3,11,140000,1),(3,12,145000,1),(3,13,150000,1),(3,14,155000,1),(3,15,160000,1),(3,16,165000,1),(3,17,170000,1),(3,18,175000,1),(3,19,180000,1),(3,20,185000,1),(3,21,190000,1),(3,22,195000,1),(3,23,200000,1),(3,24,205000,1),(3,25,210000,1),(3,26,215000,1),(3,27,220000,1),(3,28,225000,1),(3,29,230000,1),(3,30,235000,1);
 /*!40000 ALTER TABLE `cungcapthucdon` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -178,6 +151,7 @@ CREATE TABLE `dattruocmon` (
 
 LOCK TABLES `dattruocmon` WRITE;
 /*!40000 ALTER TABLE `dattruocmon` DISABLE KEYS */;
+INSERT INTO `dattruocmon` VALUES (1,1),(2,2),(3,3),(4,4),(5,5);
 /*!40000 ALTER TABLE `dattruocmon` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -191,9 +165,9 @@ UNLOCK TABLES;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `hoan_tat_dat_mon_truoc` AFTER INSERT ON `dattruocmon` FOR EACH ROW begin
 	declare v_GiaTriHoaDon decimal(18,2);
-    set v_GiaTriHoaDon = GiatriPhieuAn(p_MaPhieuGoiMon);
+    set v_GiaTriHoaDon = gia_tri_phieu_goi_mon(new.MaPhieuGoiMon);
     update PhieuDatBan 
-    set TienCoc=p_GiaTriHoaDon*0.3
+    set TienCoc=v_GiaTriHoaDon*0.3
     where MaPhieuDatBan=new.MaPhieuDatBan;
 end */;;
 DELIMITER ;
@@ -280,7 +254,7 @@ CREATE TABLE `hoadon` (
   KEY `hoadon_ibfk_2_idx` (`MaNhanVien`),
   CONSTRAINT `hoadon_ibfk_1` FOREIGN KEY (`MaPhieuGoiMon`) REFERENCES `phieugoimon` (`MaPhieuGoiMon`),
   CONSTRAINT `hoadon_ibfk_2` FOREIGN KEY (`MaNhanVien`) REFERENCES `nhanvien` (`MaNhanVien`)
-) ENGINE=InnoDB AUTO_INCREMENT=207 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -289,41 +263,9 @@ CREATE TABLE `hoadon` (
 
 LOCK TABLES `hoadon` WRITE;
 /*!40000 ALTER TABLE `hoadon` DISABLE KEYS */;
-INSERT INTO `hoadon` VALUES (1,1,'2026-05-14 09:10:00',1,130000,'TienMat'),(2,2,'2026-05-14 10:20:00',2,150000,'ChuyenKhoan'),(3,3,'2026-05-14 11:05:00',1,120000,'TienMat'),(4,4,'2026-05-14 12:40:00',3,120000,'TheTinDung'),(5,5,'2026-05-14 13:15:00',2,230000,'ChuyenKhoan'),(6,6,'2026-05-14 13:50:00',1,120000,'TienMat'),(7,7,'2026-05-14 14:30:00',3,250000,'ChuyenKhoan'),(8,8,'2026-05-14 15:45:00',2,140000,'TienMat'),(9,9,'2026-05-14 16:20:00',1,75000,'ChuyenKhoan'),(10,10,'2026-05-14 19:15:00',3,300000,'TheTinDung'),(101,101,'2026-05-15 12:45:00',6,360000,'TienMat'),(102,102,'2026-05-16 13:10:00',7,350000,'ChuyenKhoan'),(103,103,'2026-05-17 13:00:00',11,350000,'ChuyenKhoan'),(104,104,'2026-05-18 13:45:00',12,210000,'TienMat'),(201,201,'2026-05-15 20:30:00',1,15000000,'ChuyenKhoan'),(202,202,'2026-05-20 21:00:00',2,21000000,'TheTinDung'),(203,203,'2026-05-16 20:45:00',6,14000000,'ChuyenKhoan'),(204,204,'2026-05-21 21:30:00',7,18500000,'TheTinDung'),(205,205,'2026-05-17 20:30:00',11,17000000,'ChuyenKhoan'),(206,206,'2026-05-22 22:00:00',12,23000000,'TheTinDung');
+INSERT INTO `hoadon` VALUES (1,1,'2026-05-01 20:30:00',1,345000,'TienMat'),(2,2,'2026-05-05 21:15:00',2,1025000,'ChuyenKhoan'),(3,3,'2026-05-10 19:45:00',6,500000,'TheTinDung'),(4,4,'2026-05-15 21:00:00',7,580000,'TienMat'),(5,5,'2026-05-20 21:30:00',11,900000,'ChuyenKhoan'),(6,6,'2026-05-02 13:45:00',1,280000,'TienMat'),(7,7,'2026-05-03 19:20:00',2,240000,'ChuyenKhoan'),(8,8,'2026-05-04 20:30:00',3,1875000,'TheTinDung'),(9,9,'2026-05-06 21:15:00',4,100000,'TienMat'),(10,10,'2026-05-07 12:30:00',6,975000,'ChuyenKhoan'),(11,11,'2026-05-08 14:10:00',7,170000,'TienMat'),(12,12,'2026-05-09 20:20:00',8,400000,'ChuyenKhoan'),(13,13,'2026-05-11 21:45:00',9,140000,'TheTinDung'),(14,14,'2026-05-12 19:50:00',11,940000,'ChuyenKhoan'),(15,15,'2026-05-13 20:30:00',12,110000,'TienMat'),(16,16,'2026-05-14 22:15:00',13,135000,'ChuyenKhoan'),(17,17,'2026-05-16 12:45:00',14,1230000,'TheTinDung'),(18,18,'2026-05-17 14:00:00',1,345000,'TienMat'),(19,19,'2026-05-18 19:30:00',2,115000,'ChuyenKhoan'),(20,20,'2026-05-19 21:10:00',6,1690000,'TheTinDung'),(21,21,'2026-05-21 21:40:00',7,100000,'TienMat'),(22,22,'2026-05-22 19:20:00',11,465000,'ChuyenKhoan'),(23,23,'2026-05-23 21:00:00',12,285000,'TheTinDung'),(24,24,'2026-05-24 13:15:00',1,240000,'TienMat'),(25,25,'2026-05-25 20:00:00',6,825000,'ChuyenKhoan'),(26,26,'2026-05-26 20:20:00',11,565000,'TheTinDung'),(27,27,'2026-05-27 21:30:00',2,250000,'TienMat'),(28,31,'2026-05-02 10:15:00',1,165000,'TienMat'),(29,32,'2026-05-04 11:45:00',2,405000,'ChuyenKhoan'),(30,33,'2026-05-07 14:20:00',6,145000,'TienMat'),(31,34,'2026-05-09 16:40:00',7,1420000,'TheTinDung'),(32,35,'2026-05-11 18:30:00',11,180000,'ChuyenKhoan'),(33,1001,'2026-05-02 20:00:00',1,15150000,'ChuyenKhoan'),(34,1002,'2026-05-10 20:30:00',2,18090000,'TheTinDung'),(35,1003,'2026-05-20 21:00:00',3,12000000,'ChuyenKhoan'),(36,1004,'2026-05-28 21:30:00',4,22060000,'TienMat'),(37,2001,'2026-05-05 20:00:00',6,25300000,'TheTinDung'),(38,2002,'2026-05-15 20:30:00',7,17020000,'ChuyenKhoan'),(39,2003,'2026-05-25 21:00:00',8,18990000,'TienMat'),(40,3001,'2026-05-03 20:00:00',11,13960000,'ChuyenKhoan'),(41,3002,'2026-05-12 20:30:00',12,28020000,'TheTinDung'),(42,3003,'2026-05-22 21:00:00',13,15970000,'ChuyenKhoan');
 /*!40000 ALTER TABLE `hoadon` ENABLE KEYS */;
 UNLOCK TABLES;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `giam_gia_hoa_don` BEFORE INSERT ON `hoadon` FOR EACH ROW begin
-	declare v_GiaTriHoaDon decimal(18,2);
-    declare v_SDTKhach varchar(11);
-    declare v_DiemTichLuy int;
-    
-    set v_GiaTriHoaDon =  gia_tri_phieu_goi_mon(new.MaPhieuGoiMon);
-    
-    select SDTKhach into v_SDTKhach
-    from PhieuGoiMon
-    where MaPhieuGoiMon=new.MaPhieuGoiMon;
-    select DiemTichLuy into v_DiemTichLuy
-    from Khach
-    where SDT=v_SDTKhach;
-    if v_DiemTichLuy is not null and v_DiemTichLuy>5000
-    then 
-		set new.GiaTri =p_GiaTriHoaDon*(1- v_DiemTichLuy*0.0001);
-    end if;
-end */;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
 /*!50003 SET @saved_col_connection = @@collation_connection */ ;
@@ -396,7 +338,7 @@ CREATE TABLE `khach` (
 
 LOCK TABLES `khach` WRITE;
 /*!40000 ALTER TABLE `khach` DISABLE KEYS */;
-INSERT INTO `khach` VALUES ('0901234560','temp',0,NULL),('0901234567','Nguyễn Hoàng Nam',510,'$2b$12$ZIbljZ0ECeKx9xuQLdnqNuBtyc/IKJ9UfddaEXXmdt8iecd/Dv3eW'),('0909090909','Trần Thị Hồng',650,'$2b$12$ZIbljZ0ECeKx9xuQLdnqNuBtyc/IKJ9UfddaEXXmdt8iecd/Dv3eW'),('0911223344','Lê Thanh Hải',0,'$2b$12$ZIbljZ0ECeKx9xuQLdnqNuBtyc/IKJ9UfddaEXXmdt8iecd/Dv3eW'),('0912345678','Phạm Minh Tuấn',120,'$2b$12$ZIbljZ0ECeKx9xuQLdnqNuBtyc/IKJ9UfddaEXXmdt8iecd/Dv3eW'),('0987654321','Phan Hoàng My',600,'$2b$12$ZIbljZ0ECeKx9xuQLdnqNuBtyc/IKJ9UfddaEXXmdt8iecd/Dv3eW'),('12345678910','ddd',0,NULL);
+INSERT INTO `khach` VALUES ('0901234560','temp',0,NULL),('0901234567','Nguyễn Hoàng Nam',1500,'$2b$12$ZIbljZ0ECeKx9xuQLdnqNuBtyc/IKJ9UfddaEXXmdt8iecd/Dv3eW'),('0909090909','Trần Thị Hồng',3055,'$2b$12$ZIbljZ0ECeKx9xuQLdnqNuBtyc/IKJ9UfddaEXXmdt8iecd/Dv3eW'),('0911223344','Lê Thanh Hải',785,'$2b$12$ZIbljZ0ECeKx9xuQLdnqNuBtyc/IKJ9UfddaEXXmdt8iecd/Dv3eW'),('0912345678','Phạm Minh Tuấn',2255,'$2b$12$ZIbljZ0ECeKx9xuQLdnqNuBtyc/IKJ9UfddaEXXmdt8iecd/Dv3eW'),('0987654321','Phan Hoàng My',3370,'$2b$12$ZIbljZ0ECeKx9xuQLdnqNuBtyc/IKJ9UfddaEXXmdt8iecd/Dv3eW'),('12345678910','ddd',0,NULL);
 /*!40000 ALTER TABLE `khach` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -416,7 +358,7 @@ CREATE TABLE `monan` (
   PRIMARY KEY (`MaMon`),
   KEY `monan_ibfk_1_idx` (`MaTheLoai`),
   CONSTRAINT `monan_ibfk_1` FOREIGN KEY (`MaTheLoai`) REFERENCES `theloaimon` (`MaTheLoai`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -425,16 +367,7 @@ CREATE TABLE `monan` (
 
 LOCK TABLES `monan` WRITE;
 /*!40000 ALTER TABLE `monan` DISABLE KEYS */;
-INSERT INTO `monan` (`TenMon`, `HinhAnh`, `ThongTinMoTa`, `MaTheLoai`) VALUES
-('Thịt Kho Tộ', 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&w=500', 'Thịt heo ba chỉ kho tiêu đậm đà', 1),
-('Cá Lóc Kho', 'https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&w=500', 'Cá lóc đồng kho mặn ngọt', 1),
-('Gà Chiên Nước Mắm', 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&w=500', 'Cánh gà chiên giòn rụm, đậm vị mắm tỏi', 1),
-('Lẩu Thái Hải Sản', 'https://images.unsplash.com/photo-1555126634-323283e090fa?auto=format&w=500', 'Lẩu chua cay mực, tôm, nghêu', 2),
-('Lẩu Bò Nấm', 'https://images.unsplash.com/photo-1548943487-a2e4f4d662af?auto=format&w=500', 'Lẩu bò Mỹ cuộn nấm kim châm', 2),
-('Cơm Tấm Sườn Bì', 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&w=500', 'Cơm tấm sườn nướng than hoa', 3),
-('Cơm Chiên Hải Sản', 'https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&w=500', 'Cơm chiên giòn với tôm và mực', 3),
-('Nước Ép Dưa Hấu', 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&w=500', 'Nước ép dưa hấu nguyên chất không đường', 4),
-('Trà Đào Cam Sả', 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&w=500', 'Trà đào giải nhiệt mùa hè', 4);
+INSERT INTO `monan` VALUES (1,'Bò Lúc Lắc Khoai Tây','https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500','Bò mềm, khoai tây chiên giòn',1),(2,'Bò Nướng Tảng','https://images.unsplash.com/photo-1544025162-d76694265947?w=500','Bò nướng tảng sốt tiêu xanh',1),(3,'Bò Xào Sate','https://images.unsplash.com/photo-1600891964092-4316c288032e?w=500','Bò xào cay nồng',1),(4,'Bò Né Trứng Ốp La','https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=500','Bò né chảo gang xèo xèo',1),(5,'Thăn Bò Áp Chảo','https://images.unsplash.com/photo-1600891964943-4316c288032e?w=500','Thăn bò Mỹ áp chảo sốt vang',1),(6,'Gỏi Bò Bóp Thấu','https://images.unsplash.com/photo-1534080564583-6be75777b70a?w=500','Gỏi bò chua ngọt khai vị',1),(7,'Gà Nướng Muối Ớt','https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=500','Gà nướng nguyên con cay nồng',2),(8,'Sườn Heo Nướng BBQ','https://images.unsplash.com/photo-1544025162-d76694265947?w=500','Sườn heo nướng mật ong',2),(9,'Cánh Gà Chiên Mắm','https://images.unsplash.com/photo-1569058242253-1df69ce8eb5c?w=500','Cánh gà chiên giòn rụm',2),(10,'Ba Chỉ Heo Quay','https://images.unsplash.com/photo-1516684732162-798a0062be99?w=500','Heo quay da giòn',2),(11,'Gà Hấp Lá Chanh','https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=500','Gà ta hấp lá chanh thơm lừng',2),(12,'Giò Heo Hầm Thuốc Bắc','https://images.unsplash.com/photo-1548943487-a2e4f4d662af?w=500','Giò heo hầm bồi bổ sức khỏe',2),(13,'Tôm Hùm Phô Mai','https://images.unsplash.com/photo-1559742811-822873691fc8?w=500','Tôm hùm bỏ lò phô mai',3),(14,'Mực Ống Hấp Hành','https://images.unsplash.com/photo-1599487405270-45c7ebc508ce?w=500','Mực hấp gừng hành',3),(15,'Hàu Nướng Mỡ Hành','https://images.unsplash.com/photo-1615141982883-c7ad0e69fd62?w=500','Hàu nướng than hoa',3),(16,'Cua Hoàng Đế Hấp','https://images.unsplash.com/photo-1553659971-f01207815844?w=500','Cua hấp sả tươi',3),(17,'Bạch Tuộc Nhúng Mẻ','https://images.unsplash.com/photo-1535399831218-d5bd36d1a6b3?w=500','Bạch tuộc giòn sần sật',3),(18,'Nghêu Hấp Thái','https://images.unsplash.com/photo-1565557618462-23114d59f6b9?w=500','Nghêu hấp cay xé lưỡi',3),(19,'Lẩu Thái Hải Sản','https://images.unsplash.com/photo-1555126634-323283e090fa?w=500','Lẩu chua cay tôm mực',4),(20,'Lẩu Bò Nhúng Giấm','https://images.unsplash.com/photo-1548943487-a2e4f4d662af?w=500','Lẩu bò nhúng giấm chua thanh',4),(21,'Lẩu Nấm Chim Câu','https://images.unsplash.com/photo-1512058564366-18510be2db19?w=500','Lẩu nấm thanh đạm',4),(22,'Lẩu Gà Lá Giang','https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=500','Lẩu gà ta lá giang',4),(23,'Lẩu Cá Tầm','https://images.unsplash.com/photo-1580476262798-bddd9f4b7369?w=500','Lẩu cá tầm măng chua',4),(24,'Lẩu Riêu Cua Bắp Bò','https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500','Lẩu riêu cua đồng xịn',4),(25,'Trà Đào Cam Sả','https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=500','Trà đào giải nhiệt',5),(26,'Nước Ép Dưa Hấu','https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500','Nước ép tươi 100%',5),(27,'Bia Heineken','https://images.unsplash.com/photo-1614316315201-14036f0224d0?w=500','Bia nhập khẩu',5),(28,'Bia Tiger Nâu','https://images.unsplash.com/photo-1614316315201-14036f0224d0?w=500','Bia chai lạnh',5),(29,'Coca Cola','https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500','Nước ngọt lon',5),(30,'Nước Suối Lavie','https://images.unsplash.com/photo-1548839140-29a749e1abc5?w=500','Nước suối tinh khiết',5);
 /*!40000 ALTER TABLE `monan` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -470,14 +403,14 @@ CREATE TABLE `monduocgoi` (
   `MaPhieuGoiMon` int NOT NULL,
   `SoLuong` int DEFAULT '0',
   `DonGiaMon` int NOT NULL DEFAULT '0',
-  `TinhTrang` enum('GoiMon','DoiLenMon','DaPhucVu') NOT NULL DEFAULT 'GoiMon',
+  `TinhTrang` enum('DatMonTruoc','GoiMon','DoiLenMon','DaPhucVu') NOT NULL DEFAULT 'GoiMon',
   PRIMARY KEY (`MaGoiMon`),
   KEY `goimon_ibfk_2_idx` (`MaPhieuGoiMon`),
   KEY `goimon_ibfk_1` (`MaMonAn`),
   CONSTRAINT `goimon_ibfk_1` FOREIGN KEY (`MaMonAn`) REFERENCES `monan` (`MaMon`) ON UPDATE CASCADE,
   CONSTRAINT `goimon_ibfk_2` FOREIGN KEY (`MaPhieuGoiMon`) REFERENCES `phieugoimon` (`MaPhieuGoiMon`) ON UPDATE CASCADE,
   CONSTRAINT `monduocgoi_chk_2` CHECK ((`SoLuong` > 0))
-) ENGINE=InnoDB AUTO_INCREMENT=131 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=88 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -486,30 +419,9 @@ CREATE TABLE `monduocgoi` (
 
 LOCK TABLES `monduocgoi` WRITE;
 /*!40000 ALTER TABLE `monduocgoi` DISABLE KEYS */;
-INSERT INTO `monduocgoi` VALUES (5,1,1,2,55000,'DaPhucVu'),(6,2,1,1,65000,'DaPhucVu'),(7,3,2,1,75000,'DaPhucVu'),(8,1,3,1,55000,'DaPhucVu'),(9,4,3,2,85000,'DaPhucVu'),(10,5,3,1,45000,'DaPhucVu'),(11,6,4,3,250000,'DaPhucVu'),(12,7,5,1,220000,'DaPhucVu'),(13,8,5,2,200000,'DaPhucVu'),(14,2,6,4,65000,'DaPhucVu'),(15,1,7,2,55000,'DaPhucVu'),(16,3,7,1,75000,'DaPhucVu'),(17,9,8,1,180000,'DaPhucVu'),(18,10,8,2,190000,'DaPhucVu'),(19,5,8,2,45000,'DaPhucVu'),(20,8,9,5,200000,'DaPhucVu'),(21,4,10,4,85000,'DaPhucVu'),(22,7,10,1,220000,'DaPhucVu'),(23,1,11,1,55000,'DoiLenMon'),(24,3,11,1,75000,'GoiMon'),(25,2,12,2,65000,'GoiMon'),(27,3,39,2,75000,'GoiMon'),(28,4,39,2,85000,'GoiMon'),(29,4,40,6,85000,'GoiMon'),(30,8,40,5,200000,'GoiMon'),(31,3,40,1,75000,'GoiMon'),(32,4,42,1,85000,'GoiMon'),(33,3,42,1,75000,'GoiMon'),(101,1,101,2,55000,'DaPhucVu'),(102,6,101,1,250000,'DaPhucVu'),(103,3,102,3,75000,'DaPhucVu'),(104,25,102,5,25000,'DaPhucVu'),(105,4,103,2,85000,'DaPhucVu'),(106,9,103,1,180000,'DaPhucVu'),(107,18,104,1,150000,'DaPhucVu'),(108,22,104,4,15000,'DaPhucVu'),(109,6,201,40,250000,'DaPhucVu'),(110,7,201,20,220000,'DaPhucVu'),(111,17,201,5,120000,'DaPhucVu'),(112,6,202,50,250000,'DaPhucVu'),(113,8,202,30,200000,'DaPhucVu'),(114,18,202,10,150000,'DaPhucVu'),(115,16,202,10,90000,'DaPhucVu'),(116,21,202,20,5000,'DaPhucVu'),(117,6,203,40,250000,'DaPhucVu'),(118,9,203,20,180000,'DaPhucVu'),(119,24,203,10,40000,'DaPhucVu'),(120,6,204,50,250000,'DaPhucVu'),(121,10,204,20,190000,'DaPhucVu'),(122,7,204,10,220000,'DaPhucVu'),(123,6,205,40,250000,'DaPhucVu'),(124,8,205,30,200000,'DaPhucVu'),(125,16,205,10,90000,'DaPhucVu'),(126,21,205,20,5000,'DaPhucVu'),(127,6,206,60,250000,'DaPhucVu'),(128,7,206,30,220000,'DaPhucVu'),(129,17,206,10,120000,'DaPhucVu'),(130,25,206,8,25000,'DaPhucVu');
+INSERT INTO `monduocgoi` VALUES (1,1,1,2,85000,'DaPhucVu'),(2,19,1,1,175000,'DaPhucVu'),(3,7,2,1,125000,'DaPhucVu'),(4,27,2,4,225000,'DaPhucVu'),(5,13,3,2,155000,'DaPhucVu'),(6,20,3,1,190000,'DaPhucVu'),(7,2,4,1,100000,'DaPhucVu'),(8,30,4,2,240000,'DaPhucVu'),(9,14,5,3,160000,'DaPhucVu'),(10,25,5,2,210000,'DaPhucVu'),(11,3,6,1,95000,'DaPhucVu'),(12,21,6,1,185000,'DaPhucVu'),(13,8,7,2,120000,'DaPhucVu'),(14,15,8,5,155000,'DaPhucVu'),(15,28,8,5,220000,'DaPhucVu'),(16,4,9,1,100000,'DaPhucVu'),(17,9,10,2,135000,'DaPhucVu'),(18,29,10,3,235000,'DaPhucVu'),(19,16,11,1,170000,'DaPhucVu'),(20,5,12,2,105000,'DaPhucVu'),(21,22,12,1,190000,'DaPhucVu'),(22,10,13,1,140000,'DaPhucVu'),(23,17,14,3,170000,'DaPhucVu'),(24,26,14,2,215000,'DaPhucVu'),(25,6,15,1,110000,'DaPhucVu'),(26,11,16,1,135000,'DaPhucVu'),(27,18,17,2,175000,'DaPhucVu'),(28,27,17,4,220000,'DaPhucVu'),(29,1,18,2,85000,'DaPhucVu'),(30,19,18,1,175000,'DaPhucVu'),(31,7,19,1,115000,'DaPhucVu'),(32,13,20,2,155000,'DaPhucVu'),(33,28,20,6,230000,'DaPhucVu'),(34,2,21,1,100000,'DaPhucVu'),(35,14,22,3,155000,'DaPhucVu'),(36,3,23,1,100000,'DaPhucVu'),(37,20,23,1,185000,'DaPhucVu'),(38,8,24,2,120000,'DaPhucVu'),(39,15,25,5,165000,'DaPhucVu'),(40,4,26,1,105000,'DaPhucVu'),(41,29,26,2,230000,'DaPhucVu'),(42,9,27,2,125000,'DaPhucVu'),(43,16,28,1,170000,'GoiMon'),(44,25,28,2,215000,'GoiMon'),(45,5,29,2,110000,'DoiLenMon'),(46,10,30,1,130000,'DaPhucVu'),(47,30,30,3,235000,'DaPhucVu'),(48,17,31,1,165000,'DaPhucVu'),(49,6,32,2,110000,'DaPhucVu'),(50,21,32,1,185000,'DaPhucVu'),(51,11,33,1,145000,'DaPhucVu'),(52,18,34,3,180000,'DaPhucVu'),(53,26,34,4,220000,'DaPhucVu'),(54,1,35,2,90000,'DaPhucVu'),(55,7,36,1,125000,'DaPhucVu'),(56,13,37,1,145000,'DaPhucVu'),(57,22,37,1,190000,'DaPhucVu'),(58,2,38,2,100000,'DaPhucVu'),(59,14,39,3,155000,'DaPhucVu'),(60,27,39,2,220000,'DaPhucVu'),(61,3,40,1,95000,'DaPhucVu'),(62,8,41,2,130000,'DaPhucVu'),(63,15,42,4,160000,'DaPhucVu'),(64,28,42,6,230000,'DaPhucVu'),(65,4,43,1,100000,'DaPhucVu'),(66,9,44,2,135000,'GoiMon'),(67,16,45,1,165000,'DoiLenMon'),(68,19,1001,50,175000,'DaPhucVu'),(69,16,1001,40,160000,'DaPhucVu'),(70,24,1002,60,200000,'DaPhucVu'),(71,13,1002,42,145000,'DaPhucVu'),(72,20,1003,40,180000,'DaPhucVu'),(73,14,1003,32,150000,'DaPhucVu'),(74,19,1004,80,175000,'DaPhucVu'),(75,15,1004,52,155000,'DaPhucVu'),(76,24,2001,80,210000,'DaPhucVu'),(77,16,2001,50,170000,'DaPhucVu'),(78,19,2002,60,185000,'DaPhucVu'),(79,14,2002,37,160000,'DaPhucVu'),(80,20,2003,60,190000,'DaPhucVu'),(81,15,2003,46,165000,'DaPhucVu'),(82,19,3001,50,180000,'DaPhucVu'),(83,14,3001,32,155000,'DaPhucVu'),(84,24,3002,90,205000,'DaPhucVu'),(85,16,3002,58,165000,'DaPhucVu'),(86,20,3003,50,185000,'DaPhucVu'),(87,15,3003,42,160000,'DaPhucVu');
 /*!40000 ALTER TABLE `monduocgoi` ENABLE KEYS */;
 UNLOCK TABLES;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `bo_sung_don_gia` BEFORE INSERT ON `monduocgoi` FOR EACH ROW begin
-	declare v_DonGia int;
-	select DonGia into v_DonGia
-    from MonAn
-    where MaMon=new.MaMonAn;
-    set new.DonGiaMon=v_DonGia;
-end */;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
 /*!50003 SET @saved_col_connection = @@collation_connection */ ;
@@ -596,7 +508,7 @@ CREATE TABLE `nhanvien` (
 
 LOCK TABLES `nhanvien` WRITE;
 /*!40000 ALTER TABLE `nhanvien` DISABLE KEYS */;
-INSERT INTO `nhanvien` VALUES (1,1,'Nguyễn Văn An','0901111111','Q1, TP.HCM','NhanVien','2026-05-12 08:00:00',8000000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(1,2,'Trần Thị Bình','0901111112','Q3, TP.HCM','NhanVien','2026-05-12 08:00:00',7500000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(1,3,'Lê Hoàng Cường','0901111113','Q4, TP.HCM','NhanVien','2026-05-12 14:00:00',6500000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(1,4,'Phạm Mai Dung','0901111114','Q1, TP.HCM','NhanVien','2026-05-12 14:00:00',7000000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(1,5,'Hoàng Trọng Ân','0901111115','Bình Thạnh, TP.HCM','NhanVien','2026-05-12 08:00:00',12000000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(2,6,'Vũ Đức Duy','0902222221','Q3, TP.HCM','NhanVien','2026-05-12 08:00:00',8500000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(2,7,'Đinh Thu Hà','0902222222','Q10, TP.HCM','NhanVien','2026-05-12 08:00:00',7200000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(2,8,'Bùi Khắc Huy','0902222223','Tân Bình, TP.HCM','NhanVien','2026-05-12 14:00:00',6800000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(2,9,'Ngô Thanh Hương','0902222224','Q3, TP.HCM','NhanVien','2026-05-12 14:00:00',7000000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(2,10,'Lý Quốc Bảo','0902222225','Phú Nhuận, TP.HCM','NhanVien','2026-05-12 08:00:00',11500000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(3,11,'Tô Tấn Phá','0903333331','Q10, TP.HCM','NhanVien','2026-05-12 08:00:00',8200000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,''),(3,12,'Hồ Ngọc Mai','0903333332','Q5, TP.HCM','NhanVien','2026-05-12 08:00:00',7500000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(3,13,'Đỗ Văn Toàn','0903333333','Q11, TP.HCM','NhanVien','2026-05-12 14:00:00',6700000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(3,14,'Trịnh Tố Uyên','0903333334','Q10, TP.HCM','NhanVien','2026-05-12 14:00:00',7100000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(3,15,'Cao Đăng Khoa','0903333335','Tân Phú, TP.HCM','NhanVien','2026-05-12 08:00:00',11000000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(1,16,'Trần Trọng Quản','0922334455','Quận 1, TP.HCM','QuanLy','2026-05-23 08:00:00',15000000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(2,17,'Lê Thị Điều Hành','0933445566','Quận 10, TP.HCM','QuanLy','2026-05-23 08:00:00',16000000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(3,18,'Phạm Minh Trí','0944556677','Thủ Đức, TP.HCM','QuanLy','2026-05-23 08:00:00',15500000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL);
+INSERT INTO `nhanvien` VALUES (1,1,'Nguyễn Văn An','0901111111','Q1, TP.HCM','NhanVien','2026-05-12 08:00:00',8000000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(1,2,'Trần Thị Bình','0901111112','Q3, TP.HCM','NhanVien','2026-05-12 08:00:00',7500000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(1,3,'Lê Hoàng Cường','0901111113','Q4, TP.HCM','NhanVien','2026-05-12 14:00:00',6500000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(1,4,'Phạm Mai Dung','0901111114','Q1, TP.HCM','NhanVien','2026-05-12 14:00:00',7000000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(1,5,'Hoàng Trọng Ân','0901111115','Bình Thạnh, TP.HCM','NhanVien','2026-05-12 08:00:00',12000000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(2,6,'Vũ Đức Duy','0902222221','Q3, TP.HCM','NhanVien','2026-05-12 08:00:00',8500000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(2,7,'Đinh Thu Hà','0902222222','Q10, TP.HCM','NhanVien','2026-05-12 08:00:00',7200000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(2,8,'Bùi Khắc Huy','0902222223','Tân Bình, TP.HCM','NhanVien','2026-05-12 14:00:00',6800000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(2,9,'Ngô Thanh Hương','0902222224','Q3, TP.HCM','NhanVien','2026-05-12 14:00:00',7000000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(2,10,'Lý Quốc Bảo','0902222225','Phú Nhuận, TP.HCM','NhanVien','2026-05-12 08:00:00',11500000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(3,11,'Tô Tấn Phát','0903333331','Q10, TP.HCM','NhanVien','2026-05-12 08:00:00',8200000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,''),(3,12,'Hồ Ngọc Mai','0903333332','Q5, TP.HCM','NhanVien','2026-05-12 08:00:00',7500000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(3,13,'Đỗ Văn Toàn','0903333333','Q11, TP.HCM','NhanVien','2026-05-12 14:00:00',6700000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(3,14,'Trịnh Tố Uyên','0903333334','Q10, TP.HCM','NhanVien','2026-05-12 14:00:00',7100000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(3,15,'Cao Đăng Khoa','0903333335','Tân Phú, TP.HCM','NhanVien','2026-05-12 08:00:00',11000000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(1,16,'Trần Trọng Quản','0922334455','Quận 1, TP.HCM','QuanLy','2026-05-23 08:00:00',15000000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(2,17,'Lê Thị Điều Hành','0933445566','Quận 10, TP.HCM','QuanLy','2026-05-23 08:00:00',16000000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL),(3,18,'Phạm Minh Trí','0944556677','Thủ Đức, TP.HCM','QuanLy','2026-05-23 08:00:00',15500000,'$2b$12$.amLsBOHcrYXpA1cm/FTpeV2ROhV7c07igkLMmFg8x6idWsYF4vHO',1,NULL);
 /*!40000 ALTER TABLE `nhanvien` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -624,7 +536,7 @@ CREATE TABLE `phieudatban` (
   CONSTRAINT `phieudatban_ibfk_2` FOREIGN KEY (`SDTKhach`) REFERENCES `khach` (`SDT`),
   CONSTRAINT `phieudatban_ibfk_3` FOREIGN KEY (`MaNhanVienPhucVu`) REFERENCES `nhanvien` (`MaNhanVien`),
   CONSTRAINT `phieudatban_chk_1` CHECK ((`NgayGioNhanBan` >= `NgayGioTaoPhieu`))
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -633,6 +545,7 @@ CREATE TABLE `phieudatban` (
 
 LOCK TABLES `phieudatban` WRITE;
 /*!40000 ALTER TABLE `phieudatban` DISABLE KEYS */;
+INSERT INTO `phieudatban` VALUES (1,1,'2026-05-01 10:00:00','2026-05-01 19:00:00','DaNhanban',103500,'0901234567',1),(2,2,'2026-05-05 09:00:00','2026-05-05 20:00:00','DaNhanban',307500,'0909090909',2),(3,7,'2026-05-10 14:00:00','2026-05-10 18:30:00','DaNhanban',150000,'0911223344',6),(4,8,'2026-05-15 11:00:00','2026-05-15 19:30:00','DaNhanban',174000,'0912345678',7),(5,14,'2026-05-20 15:00:00','2026-05-20 20:00:00','DaNhanban',270000,'0987654321',11);
 /*!40000 ALTER TABLE `phieudatban` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -648,7 +561,7 @@ DELIMITER ;;
 if exists(
 select 1
 from PhieuDatban
-where MaBanAn=new.MaBanAn and abs(timestampdiff(minute,NgayGioNhanBan,new.NgayGioNhanBan))<180 and (TinhTrang='ChoNhanBan' or TinhTrang='DaNhanBan'))
+where  MaBanAn=new.MaBanAn and abs(timestampdiff(minute,NgayGioNhanBan,new.NgayGioNhanBan))<180 and TinhTrang IN ('ChoNhanBan', 'DaNhanBan'))
 then
 signal sqlstate '45000' set message_text="Trung lich dat ban tuong ung";
 end if;
@@ -671,7 +584,7 @@ DELIMITER ;;
 if exists(
 select 1
 from PhieuDatban
-where MaBanAn=new.MaBanAn and abs(timestampdiff(minute,NgayGioNhanBan,new.NgayGioNhanBan))<180 and (TinhTrang='ChoNhanBan' or TinhTrang='DaNhanBan'))
+where MaBanAn=new.MaBanAn and MaPhieuDatBan!=new.MaPhieuDatBan and  abs(timestampdiff(minute,NgayGioNhanBan,new.NgayGioNhanBan))<180 and TinhTrang IN ('ChoNhanBan', 'DaNhanBan'))
 then
 signal sqlstate '45000' set message_text="Trung lich dat ban tuong ung";
 end if;
@@ -704,7 +617,7 @@ CREATE TABLE `phieugoimon` (
   CONSTRAINT `phieugoimon_ibfk_1` FOREIGN KEY (`MaBanAn`) REFERENCES `banan` (`MaBan`),
   CONSTRAINT `phieugoimon_ibfk_2` FOREIGN KEY (`MaNhanVienPhucVu`) REFERENCES `nhanvien` (`MaNhanVien`),
   CONSTRAINT `phieugoimon_ibfk_3` FOREIGN KEY (`SDTKhach`) REFERENCES `khach` (`SDT`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=207 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3004 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -713,7 +626,7 @@ CREATE TABLE `phieugoimon` (
 
 LOCK TABLES `phieugoimon` WRITE;
 /*!40000 ALTER TABLE `phieugoimon` DISABLE KEYS */;
-INSERT INTO `phieugoimon` VALUES (1,1,NULL,1,'2026-05-14 08:30:00',0,'DaPhucVu'),(2,2,'0901234567',2,'2026-05-14 09:15:00',1,'DaPhucVu'),(3,3,NULL,1,'2026-05-14 10:00:00',0,'DaPhucVu'),(4,4,'0912345678',3,'2026-05-14 11:30:00',0,'DaPhucVu'),(5,5,NULL,2,'2026-05-14 12:00:00',0,'DaPhucVu'),(6,1,NULL,1,'2026-05-14 12:45:00',1,'DaPhucVu'),(7,2,'0987654321',3,'2026-05-14 13:10:00',0,'DaPhucVu'),(8,3,NULL,2,'2026-05-14 14:20:00',0,'DaPhucVu'),(9,4,NULL,1,'2026-05-14 15:30:00',0,'DaPhucVu'),(10,5,'0909090909',3,'2026-05-14 18:00:00',1,'DaPhucVu'),(11,1,NULL,2,'2026-05-14 19:30:00',0,'GoiMon'),(12,2,'0911223344',1,'2026-05-14 19:45:00',0,'GoiMon'),(39,NULL,'0901234567',NULL,'2026-05-27 00:41:09',0,'GoiMon'),(40,NULL,'0901234560',NULL,'2026-05-27 01:01:26',0,'GoiMon'),(42,NULL,'12345678910',NULL,'2026-05-28 16:02:21',0,'YeuCauThanhToan'),(101,7,'0901234567',6,'2026-05-15 11:30:00',0,'DaPhucVu'),(102,8,'0909090909',7,'2026-05-16 12:00:00',0,'DaPhucVu'),(103,14,'0987654321',11,'2026-05-17 11:45:00',0,'DaPhucVu'),(104,15,NULL,12,'2026-05-18 12:30:00',0,'DaPhucVu'),(201,1,NULL,1,'2026-05-15 18:00:00',0,'DaPhucVu'),(202,2,NULL,2,'2026-05-20 19:00:00',0,'DaPhucVu'),(203,9,NULL,6,'2026-05-16 18:30:00',0,'DaPhucVu'),(204,10,NULL,7,'2026-05-21 19:30:00',0,'DaPhucVu'),(205,16,NULL,11,'2026-05-17 18:00:00',0,'DaPhucVu'),(206,17,NULL,12,'2026-05-22 20:00:00',0,'DaPhucVu');
+INSERT INTO `phieugoimon` VALUES (1,1,'0901234567',1,'2026-05-01 19:00:00',1,'DaPhucVu'),(2,2,'0909090909',2,'2026-05-05 20:00:00',1,'DaPhucVu'),(3,7,'0911223344',6,'2026-05-10 18:30:00',1,'DaPhucVu'),(4,8,'0912345678',7,'2026-05-15 19:30:00',1,'DaPhucVu'),(5,14,'0987654321',11,'2026-05-20 20:00:00',1,'DaPhucVu'),(6,3,NULL,1,'2026-05-02 12:30:00',0,'DaPhucVu'),(7,4,'0901234567',2,'2026-05-03 18:00:00',0,'DaPhucVu'),(8,5,NULL,3,'2026-05-04 19:15:00',0,'DaPhucVu'),(9,6,NULL,4,'2026-05-06 20:30:00',0,'DaPhucVu'),(10,9,'0909090909',6,'2026-05-07 11:00:00',0,'DaPhucVu'),(11,10,NULL,7,'2026-05-08 13:20:00',0,'DaPhucVu'),(12,11,NULL,8,'2026-05-09 19:00:00',0,'DaPhucVu'),(13,12,'0911223344',9,'2026-05-11 20:45:00',0,'DaPhucVu'),(14,15,NULL,11,'2026-05-12 18:30:00',0,'DaPhucVu'),(15,16,NULL,12,'2026-05-13 19:10:00',0,'DaPhucVu'),(16,17,'0912345678',13,'2026-05-14 21:00:00',0,'DaPhucVu'),(17,18,NULL,14,'2026-05-16 11:30:00',0,'DaPhucVu'),(18,1,NULL,1,'2026-05-17 12:45:00',0,'DaPhucVu'),(19,2,NULL,2,'2026-05-18 18:20:00',0,'DaPhucVu'),(20,7,'0987654321',6,'2026-05-19 19:30:00',0,'DaPhucVu'),(21,8,NULL,7,'2026-05-21 20:15:00',0,'DaPhucVu'),(22,14,NULL,11,'2026-05-22 18:00:00',0,'DaPhucVu'),(23,15,NULL,12,'2026-05-23 19:40:00',0,'DaPhucVu'),(24,3,'0901234567',1,'2026-05-24 12:00:00',0,'DaPhucVu'),(25,9,NULL,6,'2026-05-25 18:45:00',0,'DaPhucVu'),(26,16,NULL,11,'2026-05-26 19:10:00',0,'DaPhucVu'),(27,4,NULL,2,'2026-05-27 20:20:00',0,'DaPhucVu'),(28,10,'0909090909',7,'2026-05-28 11:15:00',0,'GoiMon'),(29,17,NULL,12,'2026-05-29 12:30:00',0,'ChoLenMon'),(30,5,NULL,3,'2026-05-30 19:00:00',0,'YeuCauThanhToan'),(31,NULL,'0901234567',1,'2026-05-02 10:00:00',0,'DaPhucVu'),(32,NULL,'0909090909',2,'2026-05-04 11:30:00',0,'DaPhucVu'),(33,NULL,'0911223344',6,'2026-05-07 14:00:00',0,'DaPhucVu'),(34,NULL,'0912345678',7,'2026-05-09 16:20:00',0,'DaPhucVu'),(35,NULL,'0987654321',11,'2026-05-11 18:10:00',0,'DaPhucVu'),(36,NULL,'0901234567',12,'2026-05-13 10:45:00',0,'DaPhucVu'),(37,NULL,'0909090909',1,'2026-05-15 15:30:00',0,'DaPhucVu'),(38,NULL,'0911223344',6,'2026-05-18 19:00:00',0,'DaPhucVu'),(39,NULL,'0912345678',11,'2026-05-20 20:15:00',0,'DaPhucVu'),(40,NULL,'0987654321',2,'2026-05-22 17:40:00',0,'DaPhucVu'),(41,NULL,'0901234567',7,'2026-05-24 11:15:00',0,'DaPhucVu'),(42,NULL,'0909090909',12,'2026-05-26 13:00:00',0,'DaPhucVu'),(43,NULL,'0911223344',1,'2026-05-28 14:30:00',0,'DaPhucVu'),(44,NULL,'0912345678',6,'2026-05-29 18:20:00',0,'GoiMon'),(45,NULL,'0987654321',11,'2026-05-30 19:45:00',0,'ChoLenMon'),(1001,1,NULL,1,'2026-05-02 18:00:00',0,'DaPhucVu'),(1002,2,NULL,2,'2026-05-10 18:30:00',0,'DaPhucVu'),(1003,3,NULL,3,'2026-05-20 19:00:00',0,'DaPhucVu'),(1004,4,NULL,4,'2026-05-28 19:30:00',0,'DaPhucVu'),(2001,7,NULL,6,'2026-05-05 18:00:00',0,'DaPhucVu'),(2002,8,NULL,7,'2026-05-15 18:30:00',0,'DaPhucVu'),(2003,9,NULL,8,'2026-05-25 19:00:00',0,'DaPhucVu'),(3001,14,NULL,11,'2026-05-03 18:00:00',0,'DaPhucVu'),(3002,15,NULL,12,'2026-05-12 18:30:00',0,'DaPhucVu'),(3003,16,NULL,13,'2026-05-22 19:00:00',0,'DaPhucVu');
 /*!40000 ALTER TABLE `phieugoimon` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -776,7 +689,7 @@ CREATE TABLE `phieunhapkho` (
   KEY `phieunhapkho_ibfk_1_idx` (`MaNhanVienKiemToan`),
   CONSTRAINT `phieunhapkho_ibfk_1` FOREIGN KEY (`MaNhanVienKiemToan`) REFERENCES `nhanvien` (`MaNhanVien`),
   CONSTRAINT `phieunhapkho_chk_1` CHECK ((`GiaTri` > 0))
-) ENGINE=InnoDB AUTO_INCREMENT=107 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -785,7 +698,7 @@ CREATE TABLE `phieunhapkho` (
 
 LOCK TABLES `phieunhapkho` WRITE;
 /*!40000 ALTER TABLE `phieunhapkho` DISABLE KEYS */;
-INSERT INTO `phieunhapkho` VALUES (101,16,'2026-05-15 07:00:00',12000000,'Nhập rau củ quả CN1'),(102,16,'2026-05-20 07:00:00',18000000,'Nhập hải sản CN1'),(103,17,'2026-05-16 07:30:00',11500000,'Nhập thịt bò, heo CN2'),(104,17,'2026-05-21 07:30:00',16000000,'Nhập hải sản CN2'),(105,18,'2026-05-17 08:00:00',13000000,'Nhập rau củ quả CN3'),(106,18,'2026-05-22 08:00:00',19000000,'Nhập hải sản tươi CN3');
+INSERT INTO `phieunhapkho` VALUES (1,16,'2026-05-02 07:00:00',12500000,'Nhập thịt bò & gia vị CN1'),(2,16,'2026-05-10 07:30:00',15000000,'Nhập hải sản tươi CN1'),(3,16,'2026-05-20 08:00:00',9000000,'Nhập rau củ quả CN1'),(4,16,'2026-05-28 07:15:00',18000000,'Nhập bia & nước giải khát CN1'),(5,17,'2026-05-05 07:45:00',21000000,'Nhập thịt & hải sản CN2'),(6,17,'2026-05-15 08:10:00',14500000,'Nhập rau củ quả CN2'),(7,17,'2026-05-25 07:20:00',16000000,'Nhập bia & nước ngọt CN2'),(8,18,'2026-05-03 08:30:00',11000000,'Nhập rau củ quả CN3'),(9,18,'2026-05-12 07:50:00',25000000,'Nhập tôm hùm, cua hoàng đế CN3'),(10,18,'2026-05-22 08:45:00',13500000,'Nhập nước giải khát CN3');
 /*!40000 ALTER TABLE `phieunhapkho` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -827,7 +740,7 @@ CREATE TABLE `theloaimon` (
   `ThongTinMota` varchar(30) DEFAULT NULL,
   `CoSan` int NOT NULL DEFAULT '1',
   PRIMARY KEY (`MaTheLoai`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -836,7 +749,7 @@ CREATE TABLE `theloaimon` (
 
 LOCK TABLES `theloaimon` WRITE;
 /*!40000 ALTER TABLE `theloaimon` DISABLE KEYS */;
-INSERT INTO `theloaimon` VALUES (1,'Món Mặn','Các món ăn chính với cơm',1),(2,'Món Lẩu','Lẩu các loại cho nhiều người',1),(3,'Cơm','Cơm chiên và cơm truyền thống',1),(4,'Món Nướng','Hải sản và thịt nướng tẩm ướp',1),(5,'Thức Uống','Nước giải khát và bia',1);
+INSERT INTO `theloaimon` VALUES (1,'Món Bò','Các món từ thịt bò cao cấp',1),(2,'Món Gà & Heo','Thịt gia cầm và heo',1),(3,'Hải Sản','Hải sản tươi sống',1),(4,'Lẩu','Lẩu cho 2-4 người ăn',1),(5,'Thức Uống','Nước giải khát, bia, trà',1);
 /*!40000 ALTER TABLE `theloaimon` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1623,4 +1536,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-05-31 15:53:39
+-- Dump completed on 2026-05-31 21:30:18
