@@ -209,7 +209,7 @@ def khach_yeu_cau_thanh_toan(request:ThanhToanRequest):
 
 # cac APi CRUD với các đối tượng
 # món ăn
-@app.get("/api/thong-tin-thuc-don/")
+@app.get("/api/thong-tin-thuc-don")
 def thuc_don(ma_chi_nhanh: Optional[int]=None,ma_mon_an:Optional[int]=None):
     conn = get_db_connection()
     try:

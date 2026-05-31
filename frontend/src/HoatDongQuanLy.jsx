@@ -252,10 +252,10 @@ const HoatDongQuanLy = () => {
   const layDanhSachMon = async () => {
     try {
       const MaChiNhanh = localStorage.getItem("ma_chi_nhanh");
-      const res = await api.get("/api/thong-tin-thuc-don/", {
+      const res = await api.get("/api/thong-tin-thuc-don", {
         params: { ma_chi_nhanh: MaChiNhanh },
       });
-      setDsMonAn(res.data.data);
+      setDsMonAn(Array.isArray(res.data.data) ? res.data.data : []);
     } catch (error) {
       message.error("Lỗi khi tải danh sách thực đơn!");
     }
