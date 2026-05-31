@@ -53,8 +53,8 @@ def chinh_sua_thong_tin_mon_an(
     try:
         cursor = conn.cursor()
         cursor.execute(
-            "update CungCapThucDon set DonGia=%s,ThongTinMoTa=%s where MaChiNhanh=%s and MaMonAn=%s;",
-            (request.don_gia,request.thong_tin_mo_ta, ma_chi_nhanh, ma_mon_an),
+            "update CungCapThucDon set DonGia=%s where MaChiNhanh=%s and MaMonAn=%s;",
+            (request.don_gia, ma_chi_nhanh, ma_mon_an),
         )
         conn.commit()
         return {

@@ -280,7 +280,6 @@ const HoatDongQuanLy = () => {
       const MaChiNhanh = localStorage.getItem("ma_chi_nhanh");
       const payload = {
         don_gia: values.DonGia,
-        thong_tin_mo_ta: values.ThongTinMoTa || "",
       };
 
       if (monDangSua) {
@@ -299,6 +298,7 @@ const HoatDongQuanLy = () => {
       layDanhSachMon();
     } catch (error) {
       message.error("Có lỗi xảy ra khi lưu!");
+      console.error("Chi tiết lỗi 422:", error.response?.data);
     }
   };
   const ChinhSuaTrangThaiMonAn = async (record, TrangThaiMoi) => {
@@ -1372,18 +1372,6 @@ const HoatDongQuanLy = () => {
                                 `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                               }
                             />
-                          </Form.Item>
-                          <Form.Item name="ThongTinMoTa" label="Mô tả ngắn">
-                            <Input.TextArea
-                              rows={3}
-                              placeholder="Mô tả nguyên liệu, hương vị..."
-                            />
-                          </Form.Item>
-                          <Form.Item
-                            name="HinhAnh"
-                            label="Đường dẫn hình ảnh (URL)"
-                          >
-                            <Input placeholder="https://link-hinh-anh-mon-an.png" />
                           </Form.Item>
                         </Form>
                       </Modal>

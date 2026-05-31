@@ -33,7 +33,7 @@ class DatBanRequest(BaseModel):
 class MonAnRequest(BaseModel):
     ten_mon: Optional[str]=None
     don_gia: int
-    hinh_anh: str
+    hinh_anh: Optional[str]=None
     thong_tin_mo_ta: Optional[str] = None
     ma_the_loai:Optional[int]=None
 
