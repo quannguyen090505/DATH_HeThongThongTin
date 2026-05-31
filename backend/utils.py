@@ -2,7 +2,7 @@ from fastapi import HTTPException
 import mysql.connector
 
 
-def error_complier(error: mysql.connector):
+def error_complier(error: mysql.connector.Error):
     error_code = error.errno
     if error_code == 1644:
         message = error.msg

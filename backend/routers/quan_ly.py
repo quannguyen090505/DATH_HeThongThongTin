@@ -13,76 +13,24 @@ router = APIRouter(
     dependencies=[Depends(kiem_tra_quyen_quan_ly)],
 )
 
-
-@router.post("/tao-tai-khoan-nhan-vien")
-def tao_tai_khoan_nv(
-    ho_ten: str,
-    dia_chi: str,
-    vai_tro: str,
-    ca_lam: str,
-    luong: int,
-    request: TaoTaiKhoanRequest,
-):
-    conn = get_db_connection
-    try:
-        cursor = conn.cursor()
-        hashed_pw = get_password_hash(request.mat_khau)
-        sql = """
-            insert into NhanVien(HoTen,DiaChi,VaiTro,CaLam,Luong,SDT,MatKhau)
-            values(%s,%s,%s,%s,%s,%s,%s)
-        """
-        val = (ho_ten, dia_chi, vai_tro, ca_lam, luong, request.sdt, request.mat_khau)
-        cursor.execute(sql, val)
-        conn.commit()
-        return {"status": "success", "message": "Tạo tài khoản thành công"}
-    except mysql.connector.Error as e:
-        conn.rollback()
-        if e.errno == 1062:
-            raise HTTPException(
-                status_code=400, detail="Số điện thoại này đã được đăng ký!"
-            )
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-        conn.close()
-
-
-@router.post("/them-mon-moi")
+@router.post("/them-mon-moi/{ma_chi_nhanh}")
 def them_mon_moi(
+    ma_chi_nhanh:int,
     request: MonAnRequest,
 ):
     conn = get_db_connection()
     try:
         cursor = conn.cursor(dictionary=True)
-        sql = """
-                INSERT INTO MonAn (TenMon,DonGia,ThongTinMoTa)
-                VALUES(%s,%s,%s);
-        """
-        val = (
+        cursor.callproc("them_mon_moi", (
             request.ten_mon,
             request.don_gia,
             request.thong_tin_mo_ta,
-        )
-        cursor.execute(sql, val)
+            request.hinh_anh,
+            request.ma_the_loai,
+            ma_chi_nhanh,
+        ))
         conn.commit()
         ma_mon_an = cursor.lastrowid
-        if not request.ma_chi_nhanh:
-            sql = """
-                INSERT INTO CungCapThucDon(MaMonAn,MaChiNhanh)
-                VALUES(%s,%s);
-            """
-            val = (ma_mon_an, request.ma_chi_nhanh)
-            cursor.execute(sql, val)
-            conn.commit()
-        if not request.ma_the_loai:
-            sql = """
-                INSERT INTO ThuocTheLoai(MaMonAn,MaTheLoai)
-                VALUES(%s,%s)
-            """
-            val = (ma_mon_an, request.ma_the_loai)
-            cursor.execute(sql, val)
-            conn.commit()
-
         return {
             "status": "success",
             "message": "thêm món mới thành công!",
@@ -95,39 +43,24 @@ def them_mon_moi(
         cursor.close()
         conn.close()
 
-
-@router.put("/chinh-sua-mon/{ma_chi_nhanh}/{ma_mon}")
-def chinh_sua_mon(
+@router.put("/chinh-sua-thong-tin-mon-an/{ma_chi_nhanh}/{ma_mon_an}")
+def chinh_sua_thong_tin_mon_an(
     ma_chi_nhanh: int,
-    ma_mon: int,
+    ma_mon_an: int,
     request: MonAnRequest,
 ):
     conn = get_db_connection()
     try:
         cursor = conn.cursor()
-        sql = """
-            update MonAn
-            set TenMon=%s,DonGia=%s,ThongTinMoTa=%s, MaTheLoai=%s
-            where MaMon=%s ;
-        """
-        val = (
-            request.ten_mon,
-            request.don_gia,
-            request.thong_tin_mo_ta,
-            request.ma_the_loai,
-            ma_mon,
+        cursor.execute(
+            "update CungCapThucDon set DonGia=%s,ThongTinMoTa=%s where MaChiNhanh=%s and MaMonAn=%s;",
+            (request.don_gia,request.thong_tin_mo_ta, ma_chi_nhanh, ma_mon_an),
         )
-        cursor.execute(sql, val)
-        if not request.ma_chi_nhanh and request.ma_chi_nhanh != ma_chi_nhanh:
-            cursor.execute(
-                "update CungCapThucDon set MaChiNhanh=%s where MaChiNhanh=%s and MaMonAn=%s;",
-                (request.ma_chi_nhanh, ma_chi_nhanh, ma_mon),
-            )
         conn.commit()
         return {
             "status": "success",
             "message": "Thay đổi thông tin món ăn thành công",
-            "ma_mon_an": ma_mon,
+            "ma_mon_an": ma_mon_an,
         }
     except Exception as e:
         conn.rollback()
@@ -136,8 +69,25 @@ def chinh_sua_mon(
         cursor.close()
         conn.close()
 
+@router.put("/chinh-trang-thai-mon-an/{ma_chi_nhanh}/{ma_mon_an}/{trang_thai}")
+def chinh_trang_thai_mon(ma_chi_nhanh:int, ma_mon_an:int, trang_thai:int):
+    conn=get_db_connection()
+    try:
+        cursor=conn.cursor()
+        cursor.execute("update CungCapThucDon set CoSan= %s where MaChiNhanh=%s and MaMonAn=%s",(trang_thai,ma_chi_nhanh,ma_mon_an,))
+        conn.commit()
+        return{
+            "status":"success",
+            "message": "Đã cập nhật trạng thái món ăn thành công",
+            "ma_mon_an":ma_mon_an,
+        }
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
 
-# thể loại món
 @router.post("/them-the-loai-mon")
 def them_them_loai_mon_moi(
     request: TheLoaiMonRequest,
@@ -157,7 +107,6 @@ def them_them_loai_mon_moi(
     finally:
         cursor.close()
         conn.close()
-
 
 @router.put("/chinh-sua-the-loai/{ma_the_loai}")
 def chinh_sua_the_loai(
@@ -186,9 +135,7 @@ def chinh_sua_the_loai(
         cursor.close()
         conn.close()
 
-
-# bàn ăn
-@router.post("/them-ban-an/")
+@router.post("/them-ban-an")
 def them_ban_an(
     request: BanAnRequest,
 ):
@@ -199,7 +146,7 @@ def them_ban_an(
             "insert into banan(MachiNhanh,SoLuongCHoNgoi,ViTri) values(%s,%s,%s);",
             (request.ma_chi_nhanh, request.so_luong_cho_ngoi, request.vi_tri),
         )
-        cursor.commit()
+        conn.commit()
         return {"status": "success", "message": "thêm bàn ăn mới thành công"}
     except Exception as e:
         conn.rollback()
@@ -207,7 +154,6 @@ def them_ban_an(
     finally:
         cursor.close()
         conn.close()
-
 
 @router.put("/chinh-sua-ban-an/{ma_chi_nhanh}/{ma_ban_an}")
 def chinh_sua_ban_an(
@@ -241,6 +187,23 @@ def chinh_sua_ban_an(
         cursor.close()
         conn.close()
 
+@router.put("/chinh-trang-thai-ban-an/{ma_chi_nhanh}/{ma_ban}/{trang_thai}")
+def chinh_trang_thai_ban_an(ma_chi_nhanh: int, ma_ban: int, trang_thai: int):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE banan SET CoSan = %s WHERE MaChiNhanh = %s AND MaBan = %s",
+            (trang_thai, ma_chi_nhanh, ma_ban,)
+        )
+        conn.commit()
+        return {"status": "success", "message": "Cập nhật trạng thái bàn thành công!"}
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
 
 @router.post("/them-chi-nhanh")
 def them_chi_nhanh(
@@ -267,17 +230,45 @@ def them_chi_nhanh(
         cursor.close()
         conn.close()
 
+@router.post("/tao-tai-khoan-nhan-vien")
+def tao_tai_khoan_nv(
+    ThongTinReqest:NhanVienRequest,
+    TaiKhoanRequest: TaoTaiKhoanRequest,
+):
+    conn = get_db_connection
+    try:
+        cursor = conn.cursor()
+        hashed_pw = get_password_hash(TaiKhoanRequest.mat_khau)
+        sql = """
+            insert into NhanVien(HoTen,DiaChi,VaiTro,CaLam,Luong,SDT,MatKhau)
+            values(%s,%s,%s,%s,%s,%s,%s)
+        """
+        val = (ThongTinReqest.ho_ten, ThongTinReqest.dia_chi, ThongTinReqest.vai_tro, ThongTinReqest.ca_lam, ThongTinReqest.luong, TaiKhoanRequest.sdt, TaiKhoanRequest.mat_khau)
+        cursor.execute(sql, val)
+        conn.commit()
+        return {"status": "success", "message": "Tạo tài khoản thành công"}
+    except mysql.connector.Error as e:
+        conn.rollback()
+        if e.errno == 1062:
+            raise HTTPException(
+                status_code=400, detail="Số điện thoại này đã được đăng ký!"
+            )
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
 
 @router.get("/truy-xuat-danh-sach-nv/")
 def truy_xuat_danh_sach_nv(
     ma_chi_nhanh: Optional[int] = None,
+    ma_nhan_vien:Optional[int]=None,
 ):
     conn = get_db_connection()
     try:
         cursor = conn.cursor(dictionary=True)
         cursor.callproc(
             "truy_xuat_ds_nv",
-            (ma_chi_nhanh,),
+            (ma_chi_nhanh,ma_nhan_vien,),
         )
         result = []
         for res in cursor.stored_results():
@@ -293,6 +284,46 @@ def truy_xuat_danh_sach_nv(
             "data": result,
         }
     except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
+
+@router.put("/chinh-sua-nv/{ma_chi_nhanh}/{ma_nhan_vien}")
+def chinh_sua_thong_tin_nv(ma_chi_nhanh:int,ma_nhan_vien:int,request:NhanVienRequest):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        sql = """
+            UPDATE NhanVien 
+            SET HoTen = %s, SDT = %s, DiaChi = %s, VaiTro=%s,CaLam = %s ,Luong=%s,AnhThe=%s
+            WHERE MaNhanVien = %s AND MaChiNhanh = %s
+        """
+        cursor.execute(sql, (request.ho_ten, request.sdt, request.dia_chi, request.vai_tro,request.ca_lam,request.luong,request.anh_the, ma_nhan_vien, ma_chi_nhanh))
+        conn.commit()
+        return {"status": "success", "message": "Cập nhật thông tin nhân viên thành công!"}
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
+
+@router.put("/chinh-trang-thai-nv/{ma_chi_nhanh}/{ma_nhan_vien}/{tinh_trang_lam_viec}")
+def chinh_trang_thai_nv(ma_chi_nhanh:int,ma_nhan_vien:int,tinh_trang_lam_viec:int):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        sql = """
+            UPDATE NhanVien 
+            SET TinhTrangLamViec=%s
+            WHERE MaNhanVien = %s AND MaChiNhanh = %s
+        """
+        cursor.execute(sql, (tinh_trang_lam_viec, ma_nhan_vien, ma_chi_nhanh))
+        conn.commit()
+        return {"status": "success", "message": "Cập nhật thông tin nhân viên thành công!"}
+    except Exception as e:
+        conn.rollback()
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         cursor.close()
@@ -343,13 +374,14 @@ def thong_ke_doanh_so(
         cursor.close()
         conn.close()
 
-
 @router.get("/thong-ke-mon-an")
 def thong_ke_mon_an(
     ma_chi_nhanh: Optional[int] = None,
     thoi_gian_bat_dau: Optional[str] = None,
     thoi_gian_ket_thuc: Optional[str] = None,
     pham_vi: Optional[str] = None,
+    gioi_han:Optional[int]=None,
+    uu_tien:Optional[str]=None,
 ):
     conn = get_db_connection()
     try:
@@ -361,6 +393,8 @@ def thong_ke_mon_an(
                 thoi_gian_bat_dau,
                 thoi_gian_ket_thuc,
                 pham_vi,
+                gioi_han,
+                uu_tien,
             ),
         )
         result = []
@@ -381,7 +415,6 @@ def thong_ke_mon_an(
     finally:
         cursor.close()
         conn.close()
-
 
 @router.get("/thong-ke-kinh-phi")
 def thong_ke_kinh_phi(

@@ -14,34 +14,6 @@ router = APIRouter(
 )
 
 
-@router.post("/dang-nhap")
-def nhan_vien_dang_nhap(request: DangNhapRequest):
-    conn = get_db_connection()
-    try:
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute(
-            "SELECT MaNhanVien, TenDangNhap, MatKhau FROM NhanVien WHERE sdt = %s",
-            (request.sdt,),
-        )
-        user = cursor.fetchone()
-        if not user or not verify_password(request.mat_khau, user["MatKhau"]):
-            raise HTTPException(status_code=401, detail="Sai sđt hoặc mật khẩu")
-        token = (
-            create_access_token(user_id=user["MaNhanVien"], role="NhanVien")
-            if user["VaiTro"] != "QuanLy"
-            else create_access_token(user_id=user["MaNhanVien"], role="QuanLy")
-        )
-        return {
-            "status": "success",
-            "message": "Đăng nhập thành công",
-            "access_token": token,
-            "token_type": "bearer",
-        }
-    finally:
-        cursor.close()
-        conn.close()
-
-
 @router.post("/goi-mon")
 def nhan_vien_goi_mon(
     request: GoiMonRequest,

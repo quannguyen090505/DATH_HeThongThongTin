@@ -9,14 +9,15 @@ class DangNhapRequest(BaseModel):
 
 class TaoTaiKhoanRequest(BaseModel):
     sdt: str
-    mat_khau: str
+    ho_ten: Optional[str]=None
+    mat_khau: Optional[str]=None
 
 
 class GoiMonRequest(BaseModel):
     ma_mon_an: int
     so_luong: int
-    ma_ban_an: Optional[int] = None
     sdt_khach: Optional[str] = None
+    ma_ban_an: Optional[int] = None
 
 
 class NhanVienDatMonRequest(GoiMonRequest):
@@ -30,12 +31,15 @@ class DatBanRequest(BaseModel):
 
 
 class MonAnRequest(BaseModel):
-    ten_mon: str
+    ten_mon: Optional[str]=None
     don_gia: int
-    thong_tin_mo_ta: str
-    ma_the_loai: Optional[int] = None
-    ma_chi_nhanh: Optional[int] = None
+    hinh_anh: str
+    thong_tin_mo_ta: Optional[str] = None
+    ma_the_loai:Optional[int]=None
 
+class ThanhToanRequest(BaseModel):
+    sdt_khach:int
+    phuong_thuc_thanh_toan:str
 
 class TheLoaiMonRequest(BaseModel):
     ten_the_loai: str
@@ -58,3 +62,12 @@ class ThemChiNhanhRequest(BaseModel):
 class ThanhToanPhieuGoiMonRequest(BaseModel):
     ma_phieu_goi_mon: int
     phuong_thuoc_thanh_toan: str
+
+class NhanVienRequest(BaseModel):
+    ho_ten:str
+    sdt:str
+    dia_chi:Optional[str]=None
+    vai_tro:str
+    ca_lam:Optional[str]=None
+    luong:Optional[int]=None
+    anh_the:Optional[str]=None

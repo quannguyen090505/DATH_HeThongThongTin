@@ -8,7 +8,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 security = HTTPBearer()
 SECRET_KEY = "dath_hethongthongtin"
-ALGORITHM = "HK252"
+ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
 
@@ -24,9 +24,8 @@ def verify_password(plain_password: str, hashed_password: str):
 
 def create_access_token(user_id: int, role: str):
     """Tạo thẻ VIP (Token) chứa ID và Quyền (Khách hay Nhân Viên)"""
-    expire = datetime + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
-    # BÍ KÍP: Nhét cả Role vào payload để biết ai đang gọi API
     payload = {
         "sub": str(user_id),
         "role": role,
@@ -47,7 +46,7 @@ def kiem_tra_quyen_quan_ly(
         user_id = payload.get("sub")
         role = payload.get("role")
 
-        if role != 'QuanLy"':
+        if role != 'QuanLy':
             raise HTTPException(
                 status_code=403, detail="Chỉ quản lý mới có quyền gọi API này!"
             )
