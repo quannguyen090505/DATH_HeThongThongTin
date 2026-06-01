@@ -3,3 +3,5 @@
 - da xay dung trang HoatDongQuanLy, de thu nghiem mo http://localhost:5173/dang-nhap-noi-bo tien hanh dang nhap theo sdt cua quan ly bat ki voi mk: nhanvien123
 -  trang hien thi dau tien se la cac chuc nang co ban cua nhan vien ma quan ly co the su dung (chua co)
 -  nhan vao 'Hoat dong quan ly' de mo trang chua cac chuc nang cua quan ly
+- kiem tra lai cac api nam trong backend/main.py, day la cac api dung chung, hay kiem tra lai dinh dang va tham so dau vao yeu cau cua api
+- 
