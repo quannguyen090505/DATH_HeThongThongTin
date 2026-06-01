@@ -14,34 +14,6 @@ router = APIRouter(
 )
 
 
-@router.post("/dang-nhap")
-def nhan_vien_dang_nhap(request: DangNhapRequest):
-    conn = get_db_connection()
-    try:
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute(
-            "SELECT MaNhanVien, TenDangNhap, MatKhau FROM NhanVien WHERE sdt = %s",
-            (request.sdt,),
-        )
-        user = cursor.fetchone()
-        if not user or not verify_password(request.mat_khau, user["MatKhau"]):
-            raise HTTPException(status_code=401, detail="Sai sđt hoặc mật khẩu")
-        token = (
-            create_access_token(user_id=user["MaNhanVien"], role="NhanVien")
-            if user["VaiTro"] != "QuanLy"
-            else create_access_token(user_id=user["MaNhanVien"], role="QuanLy")
-        )
-        return {
-            "status": "success",
-            "message": "Đăng nhập thành công",
-            "access_token": token,
-            "token_type": "bearer",
-        }
-    finally:
-        cursor.close()
-        conn.close()
-
-
 @router.post("/goi-mon")
 def nhan_vien_goi_mon(
     request: GoiMonRequest,
@@ -185,38 +157,6 @@ def nhan_vien_truy_xuat_phieu_goi_mon(
             "data": danh_sach_mon,
         }
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-        conn.close()
-
-
-@router.get("/danh-sach-nhan-vien/")
-@router.get("/truy-xuat-ds-nhan-vien/")
-def truy_xuat_danh_sach_nv(
-    ma_chi_nhanh: Optional[int] = None,
-):
-    conn = get_db_connection()
-    try:
-        cursor = conn.cursor(dictionary=True)
-        cursor.callproc(
-            "truy_xuat_ds_nhan_vien",
-            (ma_chi_nhanh,),
-        )
-        result = []
-        for res in cursor.stored_results():
-            result = res.fetchall()
-        if not result:
-            return {
-                "status": "success",
-                "message": "danh sách nhân viên trống",
-                "data": [],
-            }
-        return {
-            "status": "success",
-            "data": result,
-        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     finally:

@@ -1,38 +1,31 @@
 from fastapi import Depends, HTTPException, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-import bcrypt
+from passlib.context import CryptContext
 import jwt
 from datetime import datetime, timedelta
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 security = HTTPBearer()
 SECRET_KEY = "dath_hethongthongtin"
-ALGORITHM = "HK252"
+ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
 
-def get_password_hash(password: str) -> str:
-    """Dùng khi Đăng ký / Tạo mới User (Sử dụng trực tiếp thư viện bcrypt)"""
-    password_bytes = password.encode('utf-8')
-    salt = bcrypt.gensalt()
-    hashed = bcrypt.hashpw(password_bytes, salt)
-    return hashed.decode('utf-8')
+def get_password_hash(password: str):
+    """Dùng khi Đăng ký / Tạo mới User"""
+    return pwd_context.hash(password)
 
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Dùng khi Đăng nhập (Sử dụng trực tiếp thư viện bcrypt)"""
-    password_bytes = plain_password.encode('utf-8')
-    hashed_bytes = hashed_password.encode('utf-8')
-    try:
-        return bcrypt.checkpw(password_bytes, hashed_bytes)
-    except Exception:
-        return False
+def verify_password(plain_password: str, hashed_password: str):
+    """Dùng khi Đăng nhập"""
+    return pwd_context.verify(plain_password, hashed_password)
 
 
 def create_access_token(user_id: int, role: str):
     """Tạo thẻ VIP (Token) chứa ID và Quyền (Khách hay Nhân Viên)"""
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
-    # BÍ KÍP: Nhét cả Role vào payload để biết ai đang gọi API
     payload = {
         "sub": str(user_id),
         "role": role,

@@ -5,10 +5,10 @@ from mysql.connector import Error
 def get_db_connection():
     try:
         connection = mysql.connector.connect(
-            host="127.0.0.1",
-            database="dath_hethongthongtin",
-            user="dungpham",
-            password="123",
+            host="...",
+            database="...",  # Đổi lại tên DB
+            user="root",
+            password="...",  # Đổi lại mật khẩu MySQL đang dùng
         )
         return connection
     except Error as e:
