@@ -14,8 +14,8 @@ router = APIRouter(
 )
 
 @router.post("/them-mon-moi/{ma_chi_nhanh}")
-def them_mon_moi(
-    ma_chi_nhanh:int,
+def them_mon_moi(# cho phep 1 chi nhanh chu dong them mon moi vao kho mon an chung ?,
+    ma_chi_nhanh:int,# set CoSan =1 doi voi chi nhanh do, con cac chi nhanh khac thi CoSan=0
     request: MonAnRequest,
 ):
     conn = get_db_connection()

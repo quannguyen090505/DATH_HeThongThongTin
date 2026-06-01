@@ -70,7 +70,7 @@ def kiem_tra_quyen_nhan_vien(
         user_id = payload.get("sub")
         role = payload.get("role")
 
-        if role == 'Khach"':
+        if role == 'Khach':
             raise HTTPException(
                 status_code=403, detail="Chỉ nhân viên mới có quyền gọi API này!"
             )

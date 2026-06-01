@@ -267,12 +267,12 @@ def thong_tin_ban_an(ma_chi_nhanh: int, ma_ban_an: int):
 
 # cac API truy xuat du lieu
 @app.get("/api/ds-ban-an/{ma_chi_nhanh}")
-def danh_sach_ban_an(ma_chi_nhanh: int):
+def danh_sach_ban_an(ma_chi_nhanh: int): #ma_chi_nhanh: Optional[int]=None
     conn = get_db_connection()
     try:
         cursor = conn.cursor(dictionary=True)
         cursor.execute(
-            "select MaBan, SoLuongChoNgoi,ViTri,TinhTrangSuDung, CoSan from DsBanAn where MaChiNhanh=%s;",
+            "select MaBan, SoLuongChoNgoi,ViTri,TinhTrangSuDung, CoSan from DsBanAn where MaChiNhanh=%s;", #(%s is null or %s=MaChiNhanh)
             (ma_chi_nhanh,),
         )
         result = cursor.fetchall()
