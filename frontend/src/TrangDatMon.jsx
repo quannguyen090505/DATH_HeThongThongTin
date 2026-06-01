@@ -15,75 +15,134 @@ import {
   Checkbox,
   Space,
   Divider,
+  InputNumber,
+  Alert,
+  Tag
 } from "antd";
 import {
   ShoppingCartOutlined,
   CloseOutlined,
   UserOutlined,
+  EnvironmentOutlined,
+  ShopOutlined,
+  InfoCircleOutlined
 } from "@ant-design/icons";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { useTempStore } from "./store";
+import AppHeader from "./AppHeader";
 import api from "./api";
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 
 const TrangDatMon = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  
+  // Extract URL parameters
+  const maChiNhanh = searchParams.get("chiNhanh") || "1";
+  const maBanAn = searchParams.get("ban"); // null if takeaway, number if dine-in table
+
   const [ThucDon, setThucDon] = useState([]);
+  const [thongTinChiNhanh, setThongTinChiNhanh] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   const [isCartVisible, setIsCartVisible] = useState(false);
   const [isCheckoutVisible, setIsCheckoutVisible] = useState(false);
 
+  // Checkout states
   const [Sdt, setSdt] = useState("");
   const [TrangThaiSdt, setTrangThaiSdt] = useState(null);
   const [HoTen, setHoTen] = useState("");
   const [TaoTaiKhoan, setTaoTaiKhoan] = useState(false);
   const [PhuongThucThanhToan, setPhuongThucThanhToan] = useState("tien_mat");
 
+  // Zustand Actions & State
   const PhieuGoiMon = useTempStore((state) => state.PhieuGoiMon);
   const ThemMon = useTempStore((state) => state.ThemMon);
   const XoaMon = useTempStore((state) => state.XoaMon);
   const TangSoLuong = useTempStore((state) => state.TangSoLuong);
   const GiamSoLuong = useTempStore((state) => state.GiamSoLuong);
+  const CapNhatSoLuong = useTempStore((state) => state.CapNhatSoLuong);
   const XoaPhieuGoiMon = useTempStore((state) => state.XoaPhieuGoiMon);
+
   useEffect(() => {
-    /*const userInfoString = localStorage.getItem("user_info"); 
-    if (userInfoString) {
-      const user = JSON.parse(userInfoString);
-      if (user.SDT) {
-        setSdt(user.SDT);
-        setTrangThaiSdt('hop_le'); 
+    // 1. Pre-fill customer session details if logged in
+    const savedSession = localStorage.getItem("khach_session");
+    if (savedSession) {
+      try {
+        const parsed = JSON.parse(savedSession);
+        if (parsed.sdt) {
+          setSdt(parsed.sdt);
+          setHoTen(parsed.hoTen || "");
+          setTrangThaiSdt("hop_le");
+        }
+      } catch (e) {
+        console.error("Lỗi đọc session:", e);
       }
     }
-      */
-    const fetchThucDon = async () => {
+
+    // 2. Fetch branch details
+    const fetchChiNhanh = async () => {
       try {
-        const response = await api.get("/api/thuc-don/1");
-        setThucDon(response.data.data || response.data);
-      } catch (error) {
-        console.error("Lỗi khi thực đơn:", error);
+        const res = await api.get(`/api/thong-tin-chi-nhanh/?ma_chi_nhanh=${maChiNhanh}`);
+        if (res.data.data && res.data.data.length > 0) {
+          setThongTinChiNhanh(res.data.data[0]);
+        }
+      } catch (err) {
+        console.error("Lỗi lấy thông tin chi nhánh:", err);
       }
     };
+
+    // 3. Fetch menu dynamically for the branch
+    const fetchThucDon = async () => {
+      setLoading(true);
+      try {
+        const response = await api.get("/api/thong-tin-thuc-don", {
+          params: { ma_chi_nhanh: maChiNhanh }
+        });
+        
+        // Map MaMonAn -> MaMon
+        const mapped = (response.data.data || []).map(item => ({
+          ...item,
+          MaMon: item.MaMonAn !== undefined ? item.MaMonAn : item.MaMon
+        }));
+        
+        setThucDon(mapped);
+      } catch (error) {
+        console.error("Lỗi tải thực đơn:", error);
+        message.error("Lỗi tải thực đơn chi nhánh. Vui lòng chọn lại!");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchChiNhanh();
     fetchThucDon();
-  }, []);
+  }, [maChiNhanh]);
+
   const TongTien = PhieuGoiMon.reduce(
     (tong, item) => tong + item.DonGia * item.SoLuong,
     0,
   );
+
   const CuaSoThanhToan = () => {
     if (PhieuGoiMon.length === 0) {
-      message.warning("Phiếu gọi món trống!");
+      message.warning("Phiếu gọi món của bạn đang trống!");
       return;
     }
     setIsCartVisible(false);
     setIsCheckoutVisible(true);
   };
+
   const KiemTraSDT = async () => {
-    if (!Sdt || Sdt.length < 9) {
+    if (!Sdt || Sdt.length < 9 || Sdt.length > 11) {
       setTrangThaiSdt(null);
       message.error("Vui lòng nhập SĐT hợp lệ!");
       return;
     }
     try {
       const response = await api.get(`/api/kiem-tra-sdt-khach/${Sdt}`);
-      if (response.data.data == 1) {
+      if (response.data.data === 1) {
         setTrangThaiSdt("hop_le");
       } else {
         setTrangThaiSdt("khong_ton_tai");
@@ -95,50 +154,83 @@ const TrangDatMon = () => {
 
   const ChotPhieuGoiMon = async () => {
     if (!Sdt || Sdt.length < 9) {
-      message.error("Vui lòng nhập SĐT hợp lệ trước khi đặt!");
+      message.error("Vui lòng nhập SĐT hợp lệ trước khi đặt món!");
       return;
     }
     if (TrangThaiSdt === "khong_ton_tai" && TaoTaiKhoan && !HoTen.trim()) {
-      message.error("Vui lòng nhập Họ Tên để tạo tài khoản!");
+      message.error("Vui lòng nhập Họ Tên để đăng ký tài khoản!");
       return;
     }
+
     try {
+      // 1. Tạo tài khoản khách mới nếu chưa tồn tại và check tích chọn
       if (TrangThaiSdt === "khong_ton_tai" && TaoTaiKhoan) {
         await api.post(`/api/tao-tai-khoan-khach`, {
           sdt: Sdt,
           ho_ten: HoTen,
+          mat_khau: "khach123"
         });
+        message.success("Đã tạo tài khoản thành viên thành công!");
       }
-      for (const item of PhieuGoiMon) {
-        await api.post("/api/khach/dat-mang-ve", {
-          ma_mon_an: item.MaMon,
-          so_luong: item.SoLuong,
-          sdt_khach: Sdt,
-        });
+
+      // 2. Gửi lệnh đặt các món ăn dựa trên chế độ gọi món
+      if (maBanAn) {
+        // LUỒNG GỌI MÓN TẠI BÀN (Dine-in)
+        for (const item of PhieuGoiMon) {
+          await api.post("/api/khach/goi-mon", {
+            ma_mon_an: item.MaMon,
+            so_luong: item.SoLuong,
+            sdt_khach: Sdt,
+            ma_ban_an: parseInt(maBanAn)
+          });
+        }
+        message.success("Món ăn của bạn đã được gửi xuống bếp chuẩn bị!");
+      } else {
+        // LUỒNG ĐẶT MÓN MANG VỀ (Takeaway)
+        for (const item of PhieuGoiMon) {
+          await api.post("/api/khach/dat-mang-ve", {
+            ma_mon_an: item.MaMon,
+            so_luong: item.SoLuong,
+            sdt_khach: Sdt
+          });
+        }
+        message.success("Đặt món mang về thành công! Nhà hàng đang chuẩn bị món.");
       }
-      await api.post("api/khach/yeu-cau-thanh-toan", {
-        sdt_khach: Sdt,
-        phuong_thuc_thanh_toan: PhuongThucThanhToan,
+
+      // 3. Gửi yêu cầu thanh toán
+      await api.post("/api/khach/yeu-cau-thanh-toan", {
+        sdt_khach: parseInt(Sdt), // convert to int as schema expects int
+        phuong_thuc_thanh_toan: PhuongThucThanhToan
       });
+
+      message.success("Đã gửi yêu cầu thanh toán và chốt hóa đơn thành công!");
       setIsCheckoutVisible(false);
-      XoaPhieuGoiMon();
+      XoaPhieuGoiMon(); // clear local cart
+      
+      // Navigate to homepage after successful ordering
+      setTimeout(() => {
+        navigate("/");
+      }, 1500);
+
     } catch (error) {
-      message.error("Lỗi khi chốt đơn! Vui lòng thử lại.");
+      console.error(error);
+      message.error("Lỗi khi chốt đơn hàng! Vui lòng kiểm tra và thử lại.");
     }
   };
 
   const cotPhieuGoiMon = [
     {
-      title: "Tên món",
+      title: "Tên món ăn",
       dataIndex: "TenMon",
       key: "TenMon",
-      width: 140, // Thu hẹp cột tên món
-      ellipsis: true, // Nếu tên món dài quá nó sẽ tự biến thành dấu "..."
+      width: 220,
+      ellipsis: true,
+      render: (text) => <Text strong>{text}</Text>
     },
     {
-      title: "SL",
+      title: "Số lượng",
       key: "SoLuong",
-      width: 110, // Nới rộng cột này để chứa 2 nút bấm
+      width: 140,
       align: "center",
       render: (_, record) => (
         <div
@@ -146,21 +238,31 @@ const TrangDatMon = () => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            gap: "8px",
+            gap: "6px",
           }}
         >
           <Button
             size="small"
             onClick={() => GiamSoLuong(record)}
-            disabled={record.SoLuong <= 1} // Tự mờ đi nếu số lượng là 1 (chặn giảm tiếp)
+            disabled={record.SoLuong <= 1}
           >
             -
           </Button>
-          <span
-            style={{ fontWeight: "bold", width: "20px", textAlign: "center" }}
-          >
-            {record.SoLuong}
-          </span>
+          
+          {/* Chỉnh sửa số lượng trực tiếp bằng bàn phím */}
+          <InputNumber
+            min={1}
+            max={99}
+            value={record.SoLuong}
+            onChange={(val) => {
+              if (val !== null && val >= 1) {
+                CapNhatSoLuong(record.MaMon, val);
+              }
+            }}
+            style={{ width: "55px", textAlign: "center" }}
+            controls={false}
+          />
+          
           <Button size="small" onClick={() => TangSoLuong(record)}>
             +
           </Button>
@@ -168,7 +270,13 @@ const TrangDatMon = () => {
       ),
     },
     {
-      title: "Tiền",
+      title: "Đơn giá",
+      dataIndex: "DonGia",
+      key: "DonGia",
+      render: (val) => `${val.toLocaleString()}đ`
+    },
+    {
+      title: "Thành tiền",
       key: "thanhTien",
       render: (_, record) =>
         `${(record.DonGia * record.SoLuong).toLocaleString()}đ`,
@@ -176,7 +284,7 @@ const TrangDatMon = () => {
     {
       title: "",
       key: "hanhDong",
-      width: 40,
+      width: 50,
       align: "center",
       render: (_, record) => (
         <CloseOutlined
@@ -186,87 +294,169 @@ const TrangDatMon = () => {
             fontSize: "16px",
             fontWeight: "bold",
           }}
-          onClick={() => XoaMon(record.MaMon)}
+          onClick={() => XoaMon(record.MaMon)} // store.js has been enhanced to handle MaMon direct input
         />
       ),
     },
   ];
+
   return (
     <div
-      style={{ background: "#f5f5f5", minHeight: "100vh", padding: "30px 0" }}
+      style={{ 
+        background: "linear-gradient(180deg, #f4f6f9 0%, #ebedf2 100%)", 
+        minHeight: "100vh", 
+        paddingBottom: "80px",
+        fontFamily: "'Outfit', 'Inter', sans-serif"
+      }}
     >
-      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 20px" }}>
-        <Title level={2} style={{ textAlign: "center", marginBottom: "30px" }}>
-          Hệ Thống Đặt Món F&B
+      {/* Global Header */}
+      <AppHeader />
+
+      <div style={{ maxWidth: "1200px", margin: "30px auto", padding: "0 20px" }}>
+        
+        {/* Ordering Status Banner */}
+        <div style={{ marginBottom: "25px" }}>
+          {maBanAn ? (
+            <Alert
+              message={
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "10px" }}>
+                  <span>
+                    <ShopOutlined /> Bạn đang gọi món tại <Text strong style={{ color: "#1890ff", fontSize: "1.1rem" }}>Bàn số {maBanAn}</Text> - {" "}
+                    <Text strong>{thongTinChiNhanh?.TenChiNhanh || `Chi nhánh ${maChiNhanh}`}</Text>
+                  </span>
+                  <Tag color="blue" icon={<InfoCircleOutlined />}>Gọi tại bàn ăn (Dine-in)</Tag>
+                </div>
+              }
+              type="info"
+              showIcon
+              style={{ borderRadius: "12px", border: "1px solid #91d5ff", padding: "12px 20px" }}
+            />
+          ) : (
+            <Alert
+              message={
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "10px" }}>
+                  <span>
+                    <EnvironmentOutlined /> Đang đặt món mang về tại: {" "}
+                    <Text strong>{thongTinChiNhanh?.TenChiNhanh || `Chi nhánh ${maChiNhanh}`}</Text>
+                  </span>
+                  <Tag color="orange">Đặt mang về (Takeaway)</Tag>
+                </div>
+              }
+              type="warning"
+              showIcon
+              style={{ borderRadius: "12px", border: "1px solid #ffe58f", padding: "12px 20px" }}
+            />
+          )}
+        </div>
+
+        <Title level={2} style={{ textAlign: "center", marginBottom: "35px", fontWeight: 800 }}>
+          THỰC ĐƠN ĐẶT MÓN HẤP DẪN
         </Title>
 
-        <Row gutter={[24, 24]}>
-          {ThucDon.map((mon) => (
-            <Col xs={8} sm={8} md={6} lg={6} xl={6} key={mon.MaMon}>
-              <Card
-                hoverable
-                bodyStyle={{ padding: "15px", textAlign: "center" }}
-                style={{ borderRadius: "10px", overflow: "hidden" }}
-              >
-                <Title
-                  level={5}
-                  style={{
-                    marginTop: 0,
-                    marginBottom: "10px",
-                    height: "45px",
+        {loading ? (
+          <div style={{ display: "flex", justifyContent: "center", padding: "100px 0" }}>
+            <Badge status="processing" text="Đang tải thực đơn chi nhánh..." style={{ fontSize: "1.2rem" }} />
+          </div>
+        ) : (
+          <Row gutter={[20, 20]}>
+            {ThucDon.map((mon) => (
+              <Col xs={12} sm={8} md={6} lg={6} xl={6} key={mon.MaMon}>
+                <Card
+                  hoverable
+                  bodyStyle={{ padding: "15px", textAlign: "center" }}
+                  style={{ 
+                    borderRadius: "14px", 
                     overflow: "hidden",
+                    border: "1px solid rgba(0,0,0,0.05)",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.02)"
                   }}
-                >
-                  {mon.TenMon}
-                </Title>
-                <img
-                  alt={mon.TenMon}
-                  src={
-                    mon.HinhAnh ||
-                    "https://via.placeholder.com/200?text=Chưa+có+hình"
+                  cover={
+                    <div style={{ height: "150px", overflow: "hidden", position: "relative" }}>
+                      <img
+                        alt={mon.TenMon}
+                        src={mon.HinhAnh || "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500"}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover"
+                        }}
+                      />
+                      {!mon.CoSan && (
+                        <div style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          width: "100%",
+                          height: "100%",
+                          background: "rgba(0,0,0,0.6)",
+                          color: "#fff",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontWeight: "bold",
+                          fontSize: "1.1rem"
+                        }}>
+                          HẾT HÀNG
+                        </div>
+                      )}
+                    </div>
                   }
-                  style={{
-                    width: "100%",
-                    height: "140px",
-                    objectFit: "cover",
-                    borderRadius: "8px",
-                    marginBottom: "10px",
-                  }}
-                />
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
                 >
-                  <span
+                  <Title
+                    level={5}
                     style={{
-                      color: "red",
-                      fontWeight: "bold",
-                      fontSize: "16px",
-                      alignItems: "center",
+                      marginTop: 0,
+                      marginBottom: "10px",
+                      height: "44px",
+                      overflow: "hidden",
+                      fontWeight: 700,
+                      fontSize: "0.95rem"
                     }}
                   >
-                    {mon.DonGia.toLocaleString()} đ
-                  </span>
-                  <Button
-                    type="primary"
-                    shape="circle"
-                    size="large"
+                    {mon.TenMon}
+                  </Title>
+                  
+                  <div
                     style={{
-                      backgroundColor: "#52c41a",
-                      borderColor: "#52c41a",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginTop: "15px"
                     }}
-                    icon={<ShoppingCartOutlined style={{ fontSize: "20px" }} />}
-                    onClick={() => ThemMon(mon)}
-                  />
-                </div>
-              </Card>
-            </Col>
-          ))}
-        </Row>
+                  >
+                    <span
+                      style={{
+                        color: "#ff4d4f",
+                        fontWeight: 800,
+                        fontSize: "1.1rem",
+                      }}
+                    >
+                      {mon.DonGia.toLocaleString()} đ
+                    </span>
+                    <Button
+                      type="primary"
+                      shape="circle"
+                      size="large"
+                      style={{
+                        backgroundColor: "#52c41a",
+                        borderColor: "#52c41a",
+                        boxShadow: "0 2px 8px rgba(82,196,26,0.3)"
+                      }}
+                      disabled={!mon.CoSan}
+                      icon={<ShoppingCartOutlined style={{ fontSize: "20px" }} />}
+                      onClick={() => {
+                        ThemMon(mon);
+                        message.success(`Đã thêm ${mon.TenMon} vào giỏ!`);
+                      }}
+                    />
+                  </div>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        )}
 
+        {/* Floating Shopping Cart Trigger */}
         <FloatButton
           icon={
             <Badge count={PhieuGoiMon.length} size="large" offset={[5, -5]}>
@@ -277,67 +467,77 @@ const TrangDatMon = () => {
           }
           type="primary"
           style={{
-            width: "60px",
-            height: "60px",
+            width: "65px",
+            height: "65px",
             bottom: "50px",
             right: "50px",
-            backgroundColor: "#fa8c16",
+            backgroundColor: "#ff7a45",
           }}
           onClick={() => setIsCartVisible(true)}
         />
 
+        {/* Visual Shopping Cart Drawer Modal */}
         <Modal
           title={
-            <Title
-              level={3}
-              style={{ textAlign: "center", margin: 0, color: "#fa8c16" }}
-            >
-              PHIẾU GỌI MÓN
-            </Title>
+            <div style={{ textAlign: "center" }}>
+              <Title level={3} style={{ margin: 0, color: "#ff7a45" }}>
+                <ShoppingCartOutlined /> CHI TIẾT GIỎ HÀNG
+              </Title>
+              <Text type="secondary">
+                {maBanAn ? `Gọi món phục vụ tại Bàn #${maBanAn}` : "Đặt món mang về tận nhà"}
+              </Text>
+            </div>
           }
           open={isCartVisible}
           onCancel={() => setIsCartVisible(false)}
-          footer={null} // Tắt phần footer mặc định của Modal
-          width={650}
+          footer={null}
+          width={700}
           centered
+          bodyStyle={{ padding: "20px 10px" }}
         >
           <Table
             dataSource={PhieuGoiMon}
             columns={cotPhieuGoiMon}
             rowKey="MaMon"
             pagination={false}
-            size="small"
+            size="middle"
+            style={{ marginTop: "10px" }}
           />
 
-          <div style={{ marginTop: "20px", textAlign: "right" }}>
-            <Title level={3} style={{ color: "#d9363e" }}>
-              Tổng cộng: {TongTien.toLocaleString()} đ
-            </Title>
-          </div>
+          <Divider style={{ margin: "20px 0" }} />
 
-          <Row gutter={10} style={{ marginTop: "20px" }}>
-            <Col span={8}>
-              <Button
-                type="primary"
-                block
-                size="large"
-                onClick={CuaSoThanhToan}
-                style={{ backgroundColor: "#1890ff" }}
-              >
-                XÁC NHẬN ĐẶT MÓN
-              </Button>
-            </Col>
-          </Row>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 10px" }}>
+            <Title level={3} style={{ color: "#ff4d4f", margin: 0 }}>
+              Tổng tiền: {TongTien.toLocaleString()} đ
+            </Title>
+            
+            <Button
+              type="primary"
+              size="large"
+              onClick={CuaSoThanhToan}
+              disabled={PhieuGoiMon.length === 0}
+              style={{ 
+                backgroundColor: "#1890ff", 
+                height: "46px", 
+                borderRadius: "23px",
+                padding: "0 30px",
+                fontWeight: "bold"
+              }}
+            >
+              TIẾN HÀNH ĐẶT MÓN
+            </Button>
+          </div>
         </Modal>
 
+        {/* Checkout Details Modal */}
         <Modal
           title={
-            <Title
-              level={3}
-              style={{ textAlign: "center", margin: 0, color: "#1890ff" }}
-            >
-              THÔNG TIN ĐẶT MÓN
-            </Title>
+            <div style={{ textAlign: "center" }}>
+              <Title level={3} style={{ margin: 0, color: "#1890ff" }}>
+                THÔNG TIN GIAO DỊCH
+              </Title>
+              <Text type="secondary">Vui lòng cung cấp số điện thoại để nhận điểm tích lũy</Text>
+            </div>
           }
           open={isCheckoutVisible}
           onCancel={() => setIsCheckoutVisible(false)}
@@ -354,14 +554,14 @@ const TrangDatMon = () => {
             }}
           >
             <div>
-              <Text strong>Số điện thoại đặt hàng:</Text>
+              <Text strong>Số điện thoại liên lạc:</Text>
               <Input
-                placeholder="Nhập SĐT..."
+                placeholder="Nhập số điện thoại..."
                 allowClear
                 size="large"
                 value={Sdt}
                 onChange={(e) => {
-                  setSdt(e.target.value);
+                  setSdt(e.target.value.replace(/[^0-9]/g, ""));
                   setTrangThaiSdt(null);
                 }}
                 onBlur={KiemTraSDT}
@@ -372,36 +572,37 @@ const TrangDatMon = () => {
               {TrangThaiSdt === "khong_ton_tai" && (
                 <div
                   style={{
-                    marginTop: "10px",
-                    padding: "10px",
+                    marginTop: "15px",
+                    padding: "15px",
                     background: "#fffbe6",
                     border: "1px solid #ffe58f",
-                    borderRadius: "5px",
+                    borderRadius: "8px",
                   }}
                 >
                   <Checkbox
                     checked={TaoTaiKhoan}
                     onChange={(e) => setTaoTaiKhoan(e.target.checked)}
+                    style={{ marginBottom: "10px" }}
                   >
-                    Tạo tài khoản thành viên với SĐT mới
+                    Tạo tài khoản thành viên mới với SĐT này
                   </Checkbox>
                   {TaoTaiKhoan && (
                     <Input
-                      placeholder="Nhập Họ và Tên..."
+                      placeholder="Nhập Họ và Tên của bạn..."
                       value={HoTen}
                       onChange={(e) => setHoTen(e.target.value)}
-                      style={{ marginTop: "10px" }}
+                      size="large"
+                      style={{ marginTop: "8px" }}
                     />
                   )}
                 </div>
               )}
               {TrangThaiSdt === "hop_le" && (
-                <Text
-                  type="success"
-                  style={{ display: "block", marginTop: "5px" }}
-                >
-                  ✅ SĐT hợp lệ. Nhận ưu đãi thành viên!
-                </Text>
+                <div style={{ marginTop: "8px", display: "flex", alignItems: "center", gap: "5px" }}>
+                  <Text type="success" strong>
+                    ✅ Số điện thoại hợp lệ. Đã liên kết tài khoản thành viên!
+                  </Text>
+                </div>
               )}
             </div>
 
@@ -413,15 +614,15 @@ const TrangDatMon = () => {
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: "10px",
-                  marginTop: "8px",
+                  gap: "12px",
+                  marginTop: "10px",
                 }}
               >
                 <Radio value="tien_mat">
-                  Thanh toán tiền mặt khi nhận hàng
+                  Thanh toán tiền mặt / Trực tiếp tại quầy
                 </Radio>
                 <Radio value="chuyen_khoan">
-                  Chuyển khoản ngân hàng (Mã QR)
+                  Chuyển khoản Ngân hàng (Quét mã QR)
                 </Radio>
                 <Radio value="momo">Ví điện tử MoMo</Radio>
               </Radio.Group>
@@ -432,7 +633,7 @@ const TrangDatMon = () => {
             <div style={{ textAlign: "center" }}>
               <Title
                 level={4}
-                style={{ color: "#d9363e", marginBottom: "15px" }}
+                style={{ color: "#ff4d4f", marginBottom: "20px" }}
               >
                 Cần thanh toán: {TongTien.toLocaleString()} đ
               </Title>
@@ -442,12 +643,16 @@ const TrangDatMon = () => {
                 block
                 style={{
                   backgroundColor: "#52c41a",
+                  borderColor: "#52c41a",
                   height: "50px",
                   fontSize: "18px",
+                  fontWeight: "bold",
+                  borderRadius: "25px",
+                  boxShadow: "0 4px 12px rgba(82,196,26,0.3)"
                 }}
                 onClick={ChotPhieuGoiMon}
               >
-                XÁC NHẬN THÔNG TIN ĐẶT MÓN
+                XÁC NHẬN CHỐT ĐƠN HÀNG
               </Button>
             </div>
           </div>
@@ -456,4 +661,5 @@ const TrangDatMon = () => {
     </div>
   );
 };
+
 export default TrangDatMon;
