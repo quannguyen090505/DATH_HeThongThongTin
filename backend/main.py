@@ -294,7 +294,7 @@ def thong_tin_chi_nhanh(ma_chi_nhanh:Optional[int]=None):
     conn=get_db_connection()
     try:
         cursor=conn.cursor(dictionary=True)
-        cursor.execute("select * from chinhanh where MaChiNhanh=%s;",(ma_chi_nhanh,))
+        cursor.execute("select * from chinhanh where (%s is null or MaChiNhanh=%s);",(ma_chi_nhanh,ma_chi_nhanh))
         result=cursor.fetchall()
         if not result:
             return {"status":"success","message":"danh sách chi nhanh trống"}
