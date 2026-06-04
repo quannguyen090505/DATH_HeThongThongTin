@@ -9,15 +9,21 @@ import {
   Tag,
   Divider,
   Space,
+  Spin,
+  message
 } from "antd";
 import {
   EnvironmentOutlined,
   TeamOutlined,
   PhoneOutlined,
   ShoppingOutlined,
+  QrcodeOutlined,
+  ArrowRightOutlined,
+  EyeOutlined
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import api from "./api"; // Nhớ đảm bảo ông đã import api
+import AppHeader from "./AppHeader";
+import api from "./api";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -26,29 +32,49 @@ const TrangChu = () => {
   const [danhSachChiNhanh, setDanhSachChiNhanh] = useState([]);
   const [monDuocChon, setMonDuocChon] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchDanhSachChiNhanh = async () => {
+      setLoading(true);
       try {
-        const responseChiNhanh = await api.get("/api/thong-tin-chi-nhanh");
-        const danhSachCN = responseChiNhanh.data.data;
+        const responseChiNhanh = await api.get("/api/thong-tin-chi-nhanh/");
+        const danhSachCN = responseChiNhanh.data.data || [];
 
         const dataHoanChinh = await Promise.all(
           danhSachCN.map(async (chiNhanh) => {
-            const responseThucDon = await api.get(
-              `/api/thuc-don/${chiNhanh.MaChiNhanh}`,
-            );
-            const thucDonCuaCN = responseThucDon.data.data;
-            return {
-              ...chiNhanh,
-              ThucDon: thucDonCuaCN,
-            };
-          }),
+            try {
+              // Sửa API: gọi đúng API lấy thực đơn
+              const responseThucDon = await api.get("/api/thong-tin-thuc-don", {
+                params: { ma_chi_nhanh: chiNhanh.MaChiNhanh }
+              });
+              
+              // Ánh xạ MaMonAn -> MaMon để đồng bộ với frontend
+              const thucDonCuaCN = (responseThucDon.data.data || []).map(mon => ({
+                ...mon,
+                MaMon: mon.MaMonAn !== undefined ? mon.MaMonAn : mon.MaMon
+              }));
+
+              return {
+                ...chiNhanh,
+                ThucDon: thucDonCuaCN.slice(0, 4), // Chỉ hiển thị tối đa 4 món nổi bật ở trang chủ
+              };
+            } catch (err) {
+              console.error(`Lỗi tải thực đơn chi nhánh ${chiNhanh.MaChiNhanh}:`, err);
+              return {
+                ...chiNhanh,
+                ThucDon: []
+              };
+            }
+          })
         );
 
         setDanhSachChiNhanh(dataHoanChinh);
       } catch (error) {
         console.error("Lỗi khi tải dữ liệu hệ thống:", error);
+        message.error("Không thể kết nối đến máy chủ để tải dữ liệu!");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -61,123 +87,339 @@ const TrangChu = () => {
   };
 
   const chuyenTrangDatMon = (maChiNhanh) => {
-    navigate(`/dat-mang-ve?chiNhanh=${maChiNhanh}`);
+    navigate(`/dat-mon?chiNhanh=${maChiNhanh}`);
   };
 
   return (
     <div
       style={{
-        background: "#ffffff",
+        background: "linear-gradient(180deg, #f9fbfd 0%, #f4f7f6 100%)",
         minHeight: "100vh",
-        paddingBottom: "50px",
+        paddingBottom: "80px",
+        fontFamily: "'Outfit', 'Inter', sans-serif"
       }}
     >
+      {/* Global Navigation Header */}
+      <AppHeader />
+
+      {/* Hero Banner Section */}
       <div
         style={{
-          padding: "20px 40px",
-          borderBottom: "1px solid #ccc",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          background: "linear-gradient(135deg, #1890ff 0%, #1d39c4 100%)",
+          color: "#fff",
+          padding: "80px 20px",
+          textAlign: "center",
+          boxShadow: "0 4px 20px rgba(24,144,255,0.15)",
+          marginBottom: "40px",
+          position: "relative",
+          overflow: "hidden"
         }}
       >
-        <Title level={2} style={{ margin: 0 }}>
-          Trang chủ hệ thống
-        </Title>
-        <div style={{ display: "flex", gap: "30px", alignItems: "center" }}>
-          <Text>CƠ SỞ</Text>
-          <Text>LIÊN HỆ</Text>
+        {/* Visual elements */}
+        <div style={{
+          position: "absolute",
+          width: "300px",
+          height: "300px",
+          background: "rgba(255,255,255,0.05)",
+          borderRadius: "50%",
+          top: "-50px",
+          right: "-50px"
+        }} />
+        <div style={{
+          position: "absolute",
+          width: "200px",
+          height: "200px",
+          background: "rgba(255,255,255,0.05)",
+          borderRadius: "50%",
+          bottom: "-50px",
+          left: "-50px"
+        }} />
+
+        <div style={{ maxWidth: "800px", margin: "0 auto" }}>
+          <Title level={1} style={{ color: "#fff", fontWeight: 800, fontSize: "2.8rem", marginBottom: "15px" }}>
+            Trải Nghiệm Ẩm Thực Đỉnh Cao
+          </Title>
+          <Paragraph style={{ color: "rgba(255,255,255,0.85)", fontSize: "1.2rem", marginBottom: "30px" }}>
+            Hệ thống nhà hàng Gourmet F&B mang đến những món ăn hảo hạng, nguyên liệu tươi sạch chuẩn 5 sao cùng quy trình phục vụ số hóa hiện đại bậc nhất.
+          </Paragraph>
+          <Space size="large">
+            <Button
+              type="primary"
+              size="large"
+              icon={<ShoppingOutlined />}
+              onClick={() => navigate("/dat-mon")}
+              style={{
+                backgroundColor: "#52c41a",
+                borderColor: "#52c41a",
+                height: "50px",
+                padding: "0 30px",
+                fontWeight: "bold",
+                borderRadius: "25px",
+                fontSize: "16px",
+                boxShadow: "0 4px 14px rgba(82,196,26,0.3)"
+              }}
+            >
+              Đặt Mang Về Ngay
+            </Button>
+            <Button
+              type="default"
+              size="large"
+              ghost
+              icon={<QrcodeOutlined />}
+              onClick={() => {
+                // Scroll to branch list or trigger QR in header
+                document.getElementById("chi-nhanh-section")?.scrollIntoView({ behavior: "smooth" });
+              }}
+              style={{
+                height: "50px",
+                padding: "0 30px",
+                fontWeight: "bold",
+                borderRadius: "25px",
+                fontSize: "16px",
+                borderWidth: "2px"
+              }}
+            >
+              Tìm Bàn Gọi Món
+            </Button>
+          </Space>
         </div>
       </div>
 
       <div
-        style={{ maxWidth: "1200px", margin: "40px auto", padding: "0 20px" }}
+        id="chi-nhanh-section"
+        style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 20px" }}
       >
-        {danhSachChiNhanh.map((chiNhanh) => (
-          <div key={chiNhanh.MaChiNhanh} style={{ marginBottom: "60px" }}>
-            <Title level={3}>{chiNhanh.TenChiNhanh}</Title>
+        <div style={{ textAlign: "center", marginBottom: "50px" }}>
+          <Title level={2} style={{ fontWeight: 800 }}>Các Chi Nhánh Hệ Thống</Title>
+          <Text type="secondary" style={{ fontSize: "1.1rem" }}>
+            Chọn chi nhánh gần nhất để đặt món mang về hoặc quét QR gọi món tại bàn ăn
+          </Text>
+        </div>
 
-            <Card style={{ marginBottom: "20px", border: "1px solid #000" }}>
-              <Title level={2}>{chiNhanh.TenDayDu}</Title>
-
-              <Space style={{ marginBottom: "20px" }}>
-                <Tag>ĐANG MỞ</Tag>
-                <Text>HOẠT ĐỘNG TỪ {chiNhanh.GioMoCua}</Text>
-              </Space>
-
-              <Row gutter={40} style={{ marginBottom: "20px" }}>
-                <Col>
-                  <Text>Chi nhánh </Text>
-                  <Text strong>
-                    <EnvironmentOutlined /> {chiNhanh.MaChiNhanh}
-                  </Text>
-                </Col>
-                <Col>
-                  <Text>Sức chứa: </Text>
-                  <Text strong>
-                    <TeamOutlined /> {chiNhanh.SucChua}
-                  </Text>
-                </Col>
-                <Col>
-                  <Text>Địa chỉ: </Text>
-                  <Text strong>{chiNhanh.DiaChi}</Text>
-                </Col>
-              </Row>
-
-              <Space size="middle">
-                <Button
-                  icon={<ShoppingOutlined />}
-                  onClick={() => chuyenTrangDatMon(chiNhanh.MaChiNhanh)}
-                >
-                  Mua Mang Về Ngay
-                </Button>
-                <Button icon={<PhoneOutlined />}>{chiNhanh.Hotline}</Button>
-              </Space>
-            </Card>
-
-            <div>
-              <Title level={4}>Thực Đơn Nổi Bật</Title>
-              <Row gutter={[16, 16]}>
-                {chiNhanh.ThucDon?.map((mon) => (
-                  <Col xs={24} sm={12} md={8} lg={6} key={mon.MaMon}>
-                    <Card
-                      hoverable
-                      onClick={() => moChiTietMon(mon)}
-                      style={{ border: "1px solid #ccc" }}
-                    >
-                      <Title level={5}>{mon.TenMon}</Title>
-                      <Text strong>{mon.DonGia.toLocaleString()} đ</Text>
-                    </Card>
-                  </Col>
-                ))}
-              </Row>
-            </div>
-
-            <Divider style={{ borderColor: "#000", borderWidth: "2px" }} />
+        {loading ? (
+          <div style={{ display: "flex", justifyContent: "center", padding: "100px 0" }}>
+            <Spin size="large" tip="Đang tải dữ liệu nhà hàng..." />
           </div>
-        ))}
+        ) : (
+          danhSachChiNhanh.map((chiNhanh) => (
+            <div 
+              key={chiNhanh.MaChiNhanh} 
+              style={{ 
+                marginBottom: "60px",
+                background: "#fff",
+                borderRadius: "16px",
+                boxShadow: "0 4px 15px rgba(0,0,0,0.03)",
+                padding: "30px",
+                border: "1px solid rgba(0, 0, 0, 0.04)"
+              }}
+            >
+              {/* Branch Details Card */}
+              <Row gutter={[24, 24]} align="middle">
+                <Col xs={24} md={16}>
+                  <Space direction="vertical" size="small">
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+                      <Title level={3} style={{ margin: 0, fontWeight: 700 }}>
+                        {chiNhanh.TenChiNhanh || `Chi nhánh ${chiNhanh.MaChiNhanh}`}
+                      </Title>
+                      <Tag color="green" style={{ borderRadius: "10px", fontWeight: "bold", padding: "2px 10px" }}>
+                        ĐANG HOẠT ĐỘNG
+                      </Tag>
+                    </div>
+                    
+                    <Text type="secondary" style={{ display: "block", marginBottom: "15px" }}>
+                      Thời gian mở cửa: {chiNhanh.GioMoCua ? new Date(chiNhanh.GioMoCua).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "08:00"} - 22:00
+                    </Text>
+
+                    <Row gutter={[20, 10]}>
+                      <Col xs={24} sm={12}>
+                        <Space>
+                          <EnvironmentOutlined style={{ color: "#1890ff" }} />
+                          <Text strong>Địa chỉ:</Text>
+                          <Text>{chiNhanh.DiaChi}</Text>
+                        </Space>
+                      </Col>
+                      <Col xs={24} sm={12}>
+                        <Space>
+                          <PhoneOutlined style={{ color: "#1890ff" }} />
+                          <Text strong>Hotline:</Text>
+                          <Text>{chiNhanh.SDT || "1900 xxxx"}</Text>
+                        </Space>
+                      </Col>
+                    </Row>
+                  </Space>
+                </Col>
+                
+                <Col xs={24} md={8} style={{ display: "flex", justifyContent: "md-flex-end", gap: "12px", flexWrap: "wrap" }}>
+                  <Button
+                    type="primary"
+                    icon={<ShoppingOutlined />}
+                    onClick={() => chuyenTrangDatMon(chiNhanh.MaChiNhanh)}
+                    style={{
+                      height: "46px",
+                      borderRadius: "23px",
+                      fontWeight: "bold",
+                      backgroundColor: "#1890ff",
+                      flex: 1,
+                      minWidth: "150px"
+                    }}
+                  >
+                    Đặt Mang Về
+                  </Button>
+                  
+                  <Button
+                    icon={<QrcodeOutlined />}
+                    onClick={() => {
+                      // Redirect to ordering table 1 of this branch as mock scanner
+                      navigate(`/dat-mon?chiNhanh=${chiNhanh.MaChiNhanh}&ban=1`);
+                      message.success("Đang vào giao diện gọi món tại Bàn số 1 của chi nhánh này.");
+                    }}
+                    style={{
+                      height: "46px",
+                      borderRadius: "23px",
+                      fontWeight: "bold",
+                      borderColor: "#52c41a",
+                      color: "#52c41a",
+                      flex: 1,
+                      minWidth: "150px"
+                    }}
+                  >
+                    Gọi Tại Bàn #1
+                  </Button>
+                </Col>
+              </Row>
+
+              <Divider style={{ margin: "25px 0" }} />
+
+              {/* Branch Dishes */}
+              <div>
+                <Title level={4} style={{ marginBottom: "20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span>Thực Đơn Nổi Bật</span>
+                  <Button 
+                    type="link" 
+                    icon={<ArrowRightOutlined />} 
+                    onClick={() => chuyenTrangDatMon(chiNhanh.MaChiNhanh)}
+                    style={{ padding: 0 }}
+                  >
+                    Xem tất cả thực đơn
+                  </Button>
+                </Title>
+                
+                <Row gutter={[16, 16]}>
+                  {chiNhanh.ThucDon && chiNhanh.ThucDon.length > 0 ? (
+                    chiNhanh.ThucDon.map((mon) => (
+                      <Col xs={24} sm={12} md={8} lg={6} key={mon.MaMon}>
+                        <Card
+                          hoverable
+                          onClick={() => moChiTietMon(mon)}
+                          cover={
+                            <div style={{ overflow: "hidden", height: "150px", borderTopLeftRadius: "12px", borderTopRightRadius: "12px" }}>
+                              <img
+                                alt={mon.TenMon}
+                                src={mon.HinhAnh || "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500"}
+                                style={{
+                                  width: "100%",
+                                  height: "100%",
+                                  objectFit: "cover",
+                                  transition: "transform 0.3s ease"
+                                }}
+                                className="food-img"
+                              />
+                            </div>
+                          }
+                          style={{ 
+                            borderRadius: "12px", 
+                            overflow: "hidden", 
+                            border: "1px solid rgba(0, 0, 0, 0.05)",
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.02)"
+                          }}
+                        >
+                          <Card.Meta
+                            title={
+                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "10px" }}>
+                                <Text strong style={{ fontSize: "1rem" }}>{mon.TenMon}</Text>
+                              </div>
+                            }
+                            description={
+                              <div style={{ marginTop: "5px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                <Text type="danger" strong style={{ fontSize: "1.1rem" }}>
+                                  {mon.DonGia.toLocaleString()} đ
+                                </Text>
+                                <Button size="small" type="text" icon={<EyeOutlined />} />
+                              </div>
+                            }
+                          />
+                        </Card>
+                      </Col>
+                    ))
+                  ) : (
+                    <div style={{ width: "100%", textAlign: "center", padding: "20px 0", color: "#8c8c8c" }}>
+                      Không có thực đơn hiển thị hoặc thực đơn trống.
+                    </div>
+                  )}
+                </Row>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
+      {/* Styled image hover effect */}
+      <style>{`
+        .food-img:hover {
+          transform: scale(1.08);
+        }
+      `}</style>
+
+      {/* Dish Details Modal */}
       <Modal
-        title="Chi Tiết Món Ăn"
+        title={null}
         open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         footer={[
-          <Button key="back" onClick={() => setIsModalVisible(false)}>
+          <Button key="back" type="primary" shape="round" onClick={() => setIsModalVisible(false)} style={{ height: "40px", padding: "0 24px" }}>
             Đóng lại
           </Button>,
         ]}
         centered
+        width={480}
+        bodyStyle={{ padding: 0 }}
       >
         {monDuocChon && (
           <div>
-            <Title level={3}>{monDuocChon.TenMon}</Title>
-            <Title level={4}>{monDuocChon.DonGia.toLocaleString()} VNĐ</Title>
-            <Divider />
-            <Text strong>Mô tả chi tiết:</Text>
-            <Paragraph style={{ marginTop: "10px" }}>
-              {monDuocChon.ThongTinMon || "Món ăn chưa có mô tả."}
-            </Paragraph>
+            <div style={{ height: "240px", overflow: "hidden", borderTopLeftRadius: "8px", borderTopRightRadius: "8px", position: "relative" }}>
+              <img
+                alt={monDuocChon.TenMon}
+                src={monDuocChon.HinhAnh || "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500"}
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+              <div style={{
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                width: "100%",
+                background: "linear-gradient(0deg, rgba(0,0,0,0.8) 0%, transparent 100%)",
+                padding: "20px",
+                color: "#fff"
+              }}>
+                <Title level={3} style={{ color: "#fff", margin: 0, fontWeight: 700 }}>{monDuocChon.TenMon}</Title>
+              </div>
+            </div>
+            
+            <div style={{ padding: "24px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" }}>
+                <Text type="secondary" style={{ fontSize: "1rem" }}>Đơn giá món ăn:</Text>
+                <Title level={3} style={{ color: "#ff4d4f", margin: 0, fontWeight: 800 }}>
+                  {monDuocChon.DonGia.toLocaleString()} VNĐ
+                </Title>
+              </div>
+              
+              <Divider style={{ margin: "15px 0" }} />
+              
+              <Text strong style={{ fontSize: "1.05rem", display: "block", marginBottom: "8px" }}>Mô tả chi tiết món:</Text>
+              <Paragraph style={{ color: "#595959", lineHeight: "1.6" }}>
+                {monDuocChon.ThongTinMon || "Món ăn hảo hạng được chế biến bởi bếp trưởng chuyên nghiệp của hệ thống Gourmet F&B, đem đến hương vị tươi ngon đậm đà khó cưỡng."}
+              </Paragraph>
+            </div>
           </div>
         )}
       </Modal>

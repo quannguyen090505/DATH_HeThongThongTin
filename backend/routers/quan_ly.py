@@ -53,7 +53,7 @@ def chinh_sua_thong_tin_mon_an(
     try:
         cursor = conn.cursor()
         cursor.execute(
-            "update CungCapThucDon set DonGia=%s where MaChiNhanh=%s and MaMonAn=%s;",
+            "update cungcapthucdon set DonGia=%s where MaChiNhanh=%s and MaMonAn=%s;",
             (request.don_gia, ma_chi_nhanh, ma_mon_an),
         )
         conn.commit()
@@ -74,7 +74,7 @@ def chinh_trang_thai_mon(ma_chi_nhanh:int, ma_mon_an:int, trang_thai:int):
     conn=get_db_connection()
     try:
         cursor=conn.cursor()
-        cursor.execute("update CungCapThucDon set CoSan= %s where MaChiNhanh=%s and MaMonAn=%s",(trang_thai,ma_chi_nhanh,ma_mon_an,))
+        cursor.execute("update cungcapthucdon set CoSan= %s where MaChiNhanh=%s and MaMonAn=%s",(trang_thai,ma_chi_nhanh,ma_mon_an,))
         conn.commit()
         return{
             "status":"success",
@@ -96,7 +96,7 @@ def them_them_loai_mon_moi(
     try:
         cursor = conn.cursor()
         cursor.execute(
-            "insert into TheLoaiMon(TenTheLoai,ThongTinMota) values(%s,%s);",
+            "insert into theloaimon(TenTheLoai,ThongTinMota) values(%s,%s);",
             (request.ten_the_loai, request.thong_tin_mo_ta),
         )
         conn.commit()
@@ -117,7 +117,7 @@ def chinh_sua_the_loai(
     try:
         cursor = conn.cursor()
         cursor.execute(
-            "Update TheLoaiMon set TenTheLoai=%s,ThongTinMoTa=%s where MaTheLoai=%s",
+            "Update theloaimon set TenTheLoai=%s,ThongTinMoTa=%s where MaTheLoai=%s",
             (request.ten_the_loai, request.thong_tin_mo_ta, ma_the_loai),
         )
         conn.commit()
@@ -165,7 +165,7 @@ def chinh_sua_ban_an(
     try:
         cursor = conn.cursor()
         cursor.execute(
-            "update BanAn set MaChiNhanh=%s,ViTri=%s,SoLuongChoNgoi=%s where MaBan=%s and MaChiNhanh=%s",
+            "update banan set MaChiNhanh=%s,ViTri=%s,SoLuongChoNgoi=%s where MaBan=%s and MaChiNhanh=%s",
             (
                 request.ma_chi_nhanh,
                 request.vi_tri,
@@ -240,7 +240,7 @@ def tao_tai_khoan_nv(
         cursor = conn.cursor()
         hashed_pw = get_password_hash(TaiKhoanRequest.mat_khau)
         sql = """
-            insert into NhanVien(HoTen,DiaChi,VaiTro,CaLam,Luong,SDT,MatKhau)
+            insert into nhanvien(HoTen,DiaChi,VaiTro,CaLam,Luong,SDT,MatKhau)
             values(%s,%s,%s,%s,%s,%s,%s)
         """
         val = (ThongTinReqest.ho_ten, ThongTinReqest.dia_chi, ThongTinReqest.vai_tro, ThongTinReqest.ca_lam, ThongTinReqest.luong, TaiKhoanRequest.sdt, TaiKhoanRequest.mat_khau)
@@ -295,7 +295,7 @@ def chinh_sua_thong_tin_nv(ma_chi_nhanh:int,ma_nhan_vien:int,request:NhanVienReq
     try:
         cursor = conn.cursor()
         sql = """
-            UPDATE NhanVien 
+            UPDATE nhanvien 
             SET HoTen = %s, SDT = %s, DiaChi = %s, VaiTro=%s,CaLam = %s ,Luong=%s,AnhThe=%s
             WHERE MaNhanVien = %s AND MaChiNhanh = %s
         """
@@ -315,7 +315,7 @@ def chinh_trang_thai_nv(ma_chi_nhanh:int,ma_nhan_vien:int,tinh_trang_lam_viec:in
     try:
         cursor = conn.cursor()
         sql = """
-            UPDATE NhanVien 
+            UPDATE nhanvien 
             SET TinhTrangLamViec=%s
             WHERE MaNhanVien = %s AND MaChiNhanh = %s
         """

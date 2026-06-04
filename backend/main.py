@@ -30,7 +30,7 @@ def khach_dang_nhap(request: DangNhapRequest):
     conn = get_db_connection()
     try:
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("Select 1 from Khach where SDT=%s", (request.sdt,))
+        cursor.execute("Select SDT from khach where SDT=%s", (request.sdt,))
         result = cursor.fetchone()
         if not result:
             raise HTTPException(status_code=401, detail="Số điện thoại chưa đăng ký")
@@ -53,7 +53,7 @@ def nhan_vien_dang_nhap(request: DangNhapRequest):
     try:
         cursor = conn.cursor(dictionary=True)
         cursor.execute(
-            "SELECT MaNhanVien, VaiTro, MatKhau, MaChiNhanh FROM NhanVien WHERE sdt = %s",
+            "SELECT MaNhanVien, VaiTro, MatKhau, MaChiNhanh FROM nhanvien WHERE sdt = %s",
             (request.sdt,),
         )
         user = cursor.fetchone()
@@ -85,7 +85,7 @@ def tao_tai_khoan_khach(request:TaoTaiKhoanRequest):
     try:
         cursor = conn.cursor()
         sql = """
-            insert into Khach(SDT,HoTen)
+            insert into khach(SDT,HoTen)
             values(%s,%s)
         """
         val = (request.sdt, request.ho_ten)
@@ -114,7 +114,7 @@ def kiem_tra_sdt(sdt_khach: str):
         raise HTTPException(status_code=500, detail="Lỗi kết nối Database")
     try:
         cursor = conn.cursor()
-        cursor.execute("select 1 from Khach where SDT=%s;", (sdt_khach,))
+        cursor.execute("select 1 from khach where SDT=%s;", (sdt_khach,))
         result = cursor.fetchone()
         if not result:
             return {"status": "success", "data": 0}
@@ -252,7 +252,7 @@ def thong_tin_ban_an(ma_chi_nhanh: int, ma_ban_an: int):
     try:
         cursor = conn.cursor(dictionary=True)
         cursor.execute(
-            "select MaBan,SoLuongChoNgoi, Vitri,TinhTrangSuDung from BanAn where MabanAn=%s and MaChiNhanh=%s",
+            "select MaBan,SoLuongChoNgoi, Vitri,TinhTrangSuDung from banan where MabanAn=%s and MaChiNhanh=%s",
             (ma_ban_an, ma_chi_nhanh),
         )
         result = cursor.fetchone()
@@ -272,7 +272,7 @@ def danh_sach_ban_an(ma_chi_nhanh: int): #ma_chi_nhanh: Optional[int]=None
     try:
         cursor = conn.cursor(dictionary=True)
         cursor.execute(
-            "select MaBan, SoLuongChoNgoi,ViTri,TinhTrangSuDung, CoSan from DsBanAn where MaChiNhanh=%s;", #(%s is null or %s=MaChiNhanh)
+            "select MaBan, SoLuongChoNgoi,ViTri,TinhTrangSuDung, CoSan from dsbanan where MaChiNhanh=%s;", #(%s is null or %s=MaChiNhanh)
             (ma_chi_nhanh,),
         )
         result = cursor.fetchall()
@@ -294,7 +294,7 @@ def thong_tin_chi_nhanh(ma_chi_nhanh:Optional[int]=None):
     conn=get_db_connection()
     try:
         cursor=conn.cursor(dictionary=True)
-        cursor.execute("select * from ChiNhanh where MaChiNhanh=%s;",(ma_chi_nhanh,))
+        cursor.execute("select * from chinhanh where (%s is null or MaChiNhanh=%s);",(ma_chi_nhanh,ma_chi_nhanh))
         result=cursor.fetchall()
         if not result:
             return {"status":"success","message":"danh sách chi nhanh trống"}

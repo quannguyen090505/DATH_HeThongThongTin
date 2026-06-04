@@ -1,0 +1,7 @@
+
+.venv/
+venv/
+__pycache__/
+backend/database.py
+
+test_endpoints.py
