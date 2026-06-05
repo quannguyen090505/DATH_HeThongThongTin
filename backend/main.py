@@ -62,8 +62,8 @@ def nhan_vien_dang_nhap(request: DangNhapRequest):
         if not verify_password(request.mat_khau, user["MatKhau"]):
             raise HTTPException(status_code=401, detail="Sai mật khẩu")
         token = (
-            create_access_token(user_id=user["MaNhanVien"], role="NhanVien")
-            if user["VaiTro"] == "NhanVien"
+            create_access_token(user_id=user["MaNhanVien"], role="nhanvien")
+            if user["VaiTro"] == "nhanvien"
             else create_access_token(user_id=user["MaNhanVien"], role="QuanLy")
         )
         return {
@@ -164,7 +164,7 @@ def khach_yeu_cau_thanh_toan(request:ThanhToanRequest):
         cursor = conn.cursor(dictionary=True)
         sql="""
             SELECT P.MaPhieuGoiMon 
-            FROM PhieuGoiMon P LEFT JOIN HoaDon HD on P.MaPhieuGoiMon = HD.MaPhieuGoiMon
+            FROM phieugoimon P LEFT JOIN hoadon HD on P.MaPhieuGoiMon = HD.MaPhieuGoiMon
             WHERE P.SDTKhach = %s AND HD.MaHoaDon IS NULL
             LIMIT 1;
         """
@@ -173,7 +173,7 @@ def khach_yeu_cau_thanh_toan(request:ThanhToanRequest):
         if not result:
             raise HTTPException(status_code=404, detail="Không tìm thấy phiếu gọi món")
         ma_phieu_goi_mon = result["MaPhieuGoiMon"]
-        cursor.execute("update PhieuGoiMon set TinhTrang='YeuCauThanhToan' where MaPhieuGoiMon=%s", (ma_phieu_goi_mon,))
+        cursor.execute("update phieugoimon set TinhTrang='YeuCauThanhToan' where MaPhieuGoiMon=%s", (ma_phieu_goi_mon,))
         conn.commit()
         return {
             "status": "success",
@@ -291,6 +291,8 @@ def khach_truy_xuat_phieu_goi_mon(ma_ban_an: int):
         return {
             "status": "success",
             "ma_phieu": ma_ban_an,
+            "ma_phieu_goi_mon": danh_sach_mon[0]["MaPhieuGoiMon"] if danh_sach_mon else None,
+            "tinh_trang_phieu": danh_sach_mon[0]["TinhTrangPhieuGoiMon"] if danh_sach_mon else None,
             "tong_tien": sum(mon["ThanhTien"] for mon in danh_sach_mon),
             "data": danh_sach_mon,
         }
@@ -300,3 +302,51 @@ def khach_truy_xuat_phieu_goi_mon(ma_ban_an: int):
     finally:
         cursor.close()
         conn.close()
+
+
+@app.get("/api/khach/sdt/{sdt}/truy-xuat-phieu-goi-mon")
+def khach_sdt_truy_xuat_phieu_goi_mon(sdt: str):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor(dictionary=True)
+        # 1. Lấy thông tin phiếu gọi món chưa thanh toán của khách theo SĐT
+        sql_phieu = """
+            SELECT P.MaPhieuGoiMon, P.TinhTrang AS TinhTrangPhieuGoiMon, P.MaBanAn, P.NgayGioTaoPhieu
+            FROM phieugoimon P 
+            LEFT JOIN hoadon HD ON P.MaPhieuGoiMon = HD.MaPhieuGoiMon
+            WHERE P.SDTKhach = %s AND HD.MaHoaDon IS NULL
+            ORDER BY P.NgayGioTaoPhieu DESC
+            LIMIT 1
+        """
+        cursor.execute(sql_phieu, (sdt,))
+        phieu = cursor.fetchone()
+        if not phieu:
+            return {
+                "status": "success",
+                "message": "Không có phiếu gọi món nào đang hoạt động",
+                "data": []
+            }
+        
+        # 2. Lấy danh sách các món ăn trong phiếu đó
+        sql_mon = """
+            SELECT MaMon, TenMon, SoLuong, DonGiaMon, ThanhTien, TinhTrangMon, TinhTrangPhieuGoiMon, ThanhToan
+            FROM chitietphieugoimon
+            WHERE MaPhieuGoiMon = %s
+        """
+        cursor.execute(sql_mon, (phieu["MaPhieuGoiMon"],))
+        danh_sach_mon = cursor.fetchall()
+        
+        return {
+            "status": "success",
+            "ma_phieu": phieu["MaPhieuGoiMon"],
+            "tinh_trang_phieu": phieu["TinhTrangPhieuGoiMon"],
+            "ma_ban_an": phieu["MaBanAn"],
+            "tong_tien": sum(mon["ThanhTien"] for mon in danh_sach_mon),
+            "data": danh_sach_mon
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
+
