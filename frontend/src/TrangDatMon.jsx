@@ -47,12 +47,14 @@ const TrangDatMon = () => {
   const [isCartVisible, setIsCartVisible] = useState(false);
   const [isCheckoutVisible, setIsCheckoutVisible] = useState(false);
 
+  // Checkout states
   const [Sdt, setSdt] = useState("");
   const [TrangThaiSdt, setTrangThaiSdt] = useState(null);
   const [HoTen, setHoTen] = useState("");
   const [TaoTaiKhoan, setTaoTaiKhoan] = useState(false);
   const [PhuongThucThanhToan, setPhuongThucThanhToan] = useState("tien_mat");
 
+  // Zustand Actions & State
   const PhieuGoiMon = useTempStore((state) => state.PhieuGoiMon);
   const ThemMon = useTempStore((state) => state.ThemMon);
   const XoaMon = useTempStore((state) => state.XoaMon);
@@ -159,10 +161,12 @@ const TrangDatMon = () => {
     }
 
     try {
+      // 1. Tạo tài khoản khách mới nếu chưa tồn tại và check tích chọn
       if (TrangThaiSdt === "khong_ton_tai" && TaoTaiKhoan) {
         await api.post(`/api/tao-tai-khoan-khach`, {
           sdt: Sdt,
           ho_ten: HoTen,
+          mat_khau: "khach123"
         });
         message.success("Đã tạo tài khoản thành viên thành công!");
       }
@@ -283,7 +287,7 @@ const TrangDatMon = () => {
             fontSize: "16px",
             fontWeight: "bold",
           }}
-          onClick={() => XoaMon(record.MaMon)}
+          onClick={() => XoaMon(record.MaMon)} // store.js has been enhanced to handle MaMon direct input
         />
       ),
     },

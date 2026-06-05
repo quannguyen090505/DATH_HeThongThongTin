@@ -194,7 +194,7 @@ def thuc_don(ma_chi_nhanh: Optional[int]=None,ma_mon_an:Optional[int]=None):
     try:
         cursor = conn.cursor(dictionary=True)
         cursor.execute(
-            "select MaMonAn,TenMon,HinhAnh,ThongTinMon,MaTheLoai,TenTheLoai,DonGia,CoSan from DsMonAn where (%s is null or MaChiNhanh=%s) and (%s is null or MaMonAn=%s)",
+            "select MaMon AS MaMonAn, TenMon, NULL AS HinhAnh, ThongTinMon, MaTheLoai, TenTheLoai, DonGia, 1 AS CoSan from dsmonan where (%s is null or MaChiNhanh=%s) and (%s is null or MaMon=%s)",
             (ma_chi_nhanh,ma_chi_nhanh,ma_mon_an,ma_mon_an),
         )
         result = cursor.fetchall()
