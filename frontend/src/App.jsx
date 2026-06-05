@@ -10,7 +10,6 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<TrangChu />} />
-        <Route path="/dat-mang-ve" element={<TrangDatMon />} />
         <Route path="/dat-mon" element={<TrangDatMon />} />
         <Route path="/dang-nhap-noi-bo" element={<DangNhapNoiBo />} />
         <Route path="/nhan-vien/phuc-vu" element={<HoatDongNhanVien />} />

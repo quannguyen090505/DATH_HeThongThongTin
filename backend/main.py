@@ -30,11 +30,11 @@ def khach_dang_nhap(request: DangNhapRequest):
     conn = get_db_connection()
     try:
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("Select SDT from khach where SDT=%s", (request.sdt,))
+        cursor.execute("Select 1 from khach where SDT=%s", (request.sdt,))
         result = cursor.fetchone()
         if not result:
             raise HTTPException(status_code=401, detail="Số điện thoại chưa đăng ký")
-        token = create_access_token(user_id=result["SDT"], role="Khach")
+        token = create_access_token(user_id=request.sdt, role="Khach")
         return {
             "status": "success",
             "message": "Đăng nhập thành công",
@@ -106,25 +106,6 @@ def tao_tai_khoan_khach(request:TaoTaiKhoanRequest):
         cursor.close()
         conn.close()
 
-
-@app.get("/api/kiem-tra-sdt-khach/{sdt_khach}")
-def kiem_tra_sdt(sdt_khach: str):
-    conn = get_db_connection()
-    if not conn:
-        raise HTTPException(status_code=500, detail="Lỗi kết nối Database")
-    try:
-        cursor = conn.cursor()
-        cursor.execute("select 1 from khach where SDT=%s;", (sdt_khach,))
-        result = cursor.fetchone()
-        if not result:
-            return {"status": "success", "data": 0}
-        return {"status": "success", "data": 1}
-    finally:
-        cursor.close()
-        conn.close()
-
-
-# cac API goi mon
 @app.post("/api/khach/goi-mon")
 def khach_goi_mon_tai_quan(request: GoiMonRequest):
     conn = get_db_connection()
@@ -149,7 +130,6 @@ def khach_goi_mon_tai_quan(request: GoiMonRequest):
     finally:
         cursor.close()
         conn.close()
-
 
 @app.post("/api/khach/dat-mang-ve")
 def khach_dat_mon_mang_ve(request: GoiMonRequest):
@@ -207,8 +187,7 @@ def khach_yeu_cau_thanh_toan(request:ThanhToanRequest):
         cursor.close()
         conn.close()
 
-# cac APi CRUD với các đối tượng
-# món ăn
+
 @app.get("/api/thong-tin-thuc-don")
 def thuc_don(ma_chi_nhanh: Optional[int]=None,ma_mon_an:Optional[int]=None):
     conn = get_db_connection()
@@ -246,34 +225,15 @@ def thong_tin_the_loai_mon(ma_chi_nhanh:Optional[int]=None,ma_the_loai: Optional
         cursor.close()
         conn.close()
 
-@app.get("/api/thong_tin_ban_an/{ma_chi_nhanh}/{ma_ban_an}")
-def thong_tin_ban_an(ma_chi_nhanh: int, ma_ban_an: int):
-    conn = get_db_connection()
-    try:
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute(
-            "select MaBan,SoLuongChoNgoi, Vitri,TinhTrangSuDung from banan where MabanAn=%s and MaChiNhanh=%s",
-            (ma_ban_an, ma_chi_nhanh),
-        )
-        result = cursor.fetchone()
-        if not result:
-            raise HTTPException(
-                status_code=404, detail="Mã bàn ăn hoặc mã chi nhánh không hợp lệ"
-            )
-        return {"status": "success", "data": result}
-    finally:
-        cursor.close()
-        conn.close()
 
-# cac API truy xuat du lieu
-@app.get("/api/ds-ban-an/{ma_chi_nhanh}")
-def danh_sach_ban_an(ma_chi_nhanh: int): #ma_chi_nhanh: Optional[int]=None
+@app.get("/api/thong-tin-ban-an/{ma_chi_nhanh}")
+def danh_sach_ban_an(ma_chi_nhanh: int, ma_ban_an:Optional[int]=None):
     conn = get_db_connection()
     try:
         cursor = conn.cursor(dictionary=True)
         cursor.execute(
-            "select MaBan, SoLuongChoNgoi,ViTri,TinhTrangSuDung, CoSan from dsbanan where MaChiNhanh=%s;", #(%s is null or %s=MaChiNhanh)
-            (ma_chi_nhanh,),
+            "select MaBan, SoLuongChoNgoi,ViTri,TinhTrangSuDung, CoSan from dsbanan where MaChiNhanh=%s and (%s is null or %s=MaBan);",
+            (ma_chi_nhanh,ma_ban_an,ma_ban_an),
         )
         result = cursor.fetchall()
         if not result:
