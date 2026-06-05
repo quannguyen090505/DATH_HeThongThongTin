@@ -481,7 +481,7 @@ const HoatDongQuanLy = () => {
   const layDanhSachBan = async () => {
     try {
       const maChiNhanh = localStorage.getItem("ma_chi_nhanh");
-      const res = await api.get(`/api/ds-ban-an/${maChiNhanh}`);
+      const res = await api.get(`/api/thong-tin-ban-an/${maChiNhanh}`);
       setDsBanAn(res.data.data || []);
     } catch (error) {
       message.error("Lỗi khi tải danh sách bàn ăn!");

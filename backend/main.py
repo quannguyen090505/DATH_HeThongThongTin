@@ -30,11 +30,11 @@ def khach_dang_nhap(request: DangNhapRequest):
     conn = get_db_connection()
     try:
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("Select SDT from khach where SDT=%s", (request.sdt,))
+        cursor.execute("Select 1 from khach where SDT=%s", (request.sdt,))
         result = cursor.fetchone()
         if not result:
             raise HTTPException(status_code=401, detail="Số điện thoại chưa đăng ký")
-        token = create_access_token(user_id=result["SDT"], role="Khach")
+        token = create_access_token(user_id=request.sdt, role="Khach")
         return {
             "status": "success",
             "message": "Đăng nhập thành công",

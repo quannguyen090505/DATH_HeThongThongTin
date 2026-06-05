@@ -4,7 +4,7 @@ from typing import Optional
 
 class DangNhapRequest(BaseModel):
     sdt: str
-    mat_khau: str
+    mat_khau: Optional[str]=None
 
 
 class TaoTaiKhoanRequest(BaseModel):

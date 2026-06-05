@@ -17,7 +17,7 @@ import {
   Divider,
   InputNumber,
   Alert,
-  Tag
+  Tag,
 } from "antd";
 import {
   ShoppingCartOutlined,
@@ -25,11 +25,11 @@ import {
   UserOutlined,
   EnvironmentOutlined,
   ShopOutlined,
-  InfoCircleOutlined
+  InfoCircleOutlined,
 } from "@ant-design/icons";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useTempStore } from "./store";
-import AppHeader from "./AppHeader";
+import AppHeader from "./HeaderTrangChu";
 import api from "./api";
 
 const { Title, Text, Paragraph } = Typography;
@@ -37,9 +37,7 @@ const { Title, Text, Paragraph } = Typography;
 const TrangDatMon = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  
-  // Extract URL parameters
-  const maChiNhanh = searchParams.get("chiNhanh") || "1";
+  const maChiNhanh = searchParams.get("chiNhanh");
   const maBanAn = searchParams.get("ban"); // null if takeaway, number if dine-in table
 
   const [ThucDon, setThucDon] = useState([]);
@@ -49,14 +47,12 @@ const TrangDatMon = () => {
   const [isCartVisible, setIsCartVisible] = useState(false);
   const [isCheckoutVisible, setIsCheckoutVisible] = useState(false);
 
-  // Checkout states
   const [Sdt, setSdt] = useState("");
   const [TrangThaiSdt, setTrangThaiSdt] = useState(null);
   const [HoTen, setHoTen] = useState("");
   const [TaoTaiKhoan, setTaoTaiKhoan] = useState(false);
   const [PhuongThucThanhToan, setPhuongThucThanhToan] = useState("tien_mat");
 
-  // Zustand Actions & State
   const PhieuGoiMon = useTempStore((state) => state.PhieuGoiMon);
   const ThemMon = useTempStore((state) => state.ThemMon);
   const XoaMon = useTempStore((state) => state.XoaMon);
@@ -66,7 +62,6 @@ const TrangDatMon = () => {
   const XoaPhieuGoiMon = useTempStore((state) => state.XoaPhieuGoiMon);
 
   useEffect(() => {
-    // 1. Pre-fill customer session details if logged in
     const savedSession = localStorage.getItem("khach_session");
     if (savedSession) {
       try {
@@ -81,10 +76,11 @@ const TrangDatMon = () => {
       }
     }
 
-    // 2. Fetch branch details
     const fetchChiNhanh = async () => {
       try {
-        const res = await api.get(`/api/thong-tin-chi-nhanh/?ma_chi_nhanh=${maChiNhanh}`);
+        const res = await api.get(
+          `/api/thong-tin-chi-nhanh/?ma_chi_nhanh=${maChiNhanh}`,
+        );
         if (res.data.data && res.data.data.length > 0) {
           setThongTinChiNhanh(res.data.data[0]);
         }
@@ -93,20 +89,20 @@ const TrangDatMon = () => {
       }
     };
 
-    // 3. Fetch menu dynamically for the branch
     const fetchThucDon = async () => {
       setLoading(true);
       try {
         const response = await api.get("/api/thong-tin-thuc-don", {
-          params: { ma_chi_nhanh: maChiNhanh }
+          params: { ma_chi_nhanh: maChiNhanh },
         });
-        
-        // Map MaMonAn -> MaMon
-        const mapped = (response.data.data || []).map(item => ({
-          ...item,
-          MaMon: item.MaMonAn !== undefined ? item.MaMonAn : item.MaMon
-        }));
-        
+
+        const mapped = (response.data.data || [])
+          .filter((item) => item.CoSan === 1)
+          .map((item) => ({
+            ...item,
+            MaMon: item.MaMonAn !== undefined ? item.MaMonAn : item.MaMon,
+          }));
+
         setThucDon(mapped);
       } catch (error) {
         console.error("Lỗi tải thực đơn:", error);
@@ -163,55 +159,50 @@ const TrangDatMon = () => {
     }
 
     try {
-      // 1. Tạo tài khoản khách mới nếu chưa tồn tại và check tích chọn
       if (TrangThaiSdt === "khong_ton_tai" && TaoTaiKhoan) {
         await api.post(`/api/tao-tai-khoan-khach`, {
           sdt: Sdt,
           ho_ten: HoTen,
-          mat_khau: "khach123"
+          mat_khau: "khach123",
         });
         message.success("Đã tạo tài khoản thành viên thành công!");
       }
 
-      // 2. Gửi lệnh đặt các món ăn dựa trên chế độ gọi món
       if (maBanAn) {
-        // LUỒNG GỌI MÓN TẠI BÀN (Dine-in)
         for (const item of PhieuGoiMon) {
           await api.post("/api/khach/goi-mon", {
             ma_mon_an: item.MaMon,
             so_luong: item.SoLuong,
             sdt_khach: Sdt,
-            ma_ban_an: parseInt(maBanAn)
+            ma_ban_an: parseInt(maBanAn),
           });
         }
         message.success("Món ăn của bạn đã được gửi xuống bếp chuẩn bị!");
       } else {
-        // LUỒNG ĐẶT MÓN MANG VỀ (Takeaway)
         for (const item of PhieuGoiMon) {
           await api.post("/api/khach/dat-mang-ve", {
             ma_mon_an: item.MaMon,
             so_luong: item.SoLuong,
-            sdt_khach: Sdt
+            sdt_khach: Sdt,
           });
         }
-        message.success("Đặt món mang về thành công! Nhà hàng đang chuẩn bị món.");
+        message.success(
+          "Đặt món mang về thành công! Nhà hàng đang chuẩn bị món.",
+        );
       }
 
-      // 3. Gửi yêu cầu thanh toán
       await api.post("/api/khach/yeu-cau-thanh-toan", {
-        sdt_khach: parseInt(Sdt), // convert to int as schema expects int
-        phuong_thuc_thanh_toan: PhuongThucThanhToan
+        sdt_khach: Sdt,
+        phuong_thuc_thanh_toan: PhuongThucThanhToan,
       });
 
       message.success("Đã gửi yêu cầu thanh toán và chốt hóa đơn thành công!");
       setIsCheckoutVisible(false);
-      XoaPhieuGoiMon(); // clear local cart
-      
-      // Navigate to homepage after successful ordering
+      XoaPhieuGoiMon();
+
       setTimeout(() => {
         navigate("/");
       }, 1500);
-
     } catch (error) {
       console.error(error);
       message.error("Lỗi khi chốt đơn hàng! Vui lòng kiểm tra và thử lại.");
@@ -225,7 +216,7 @@ const TrangDatMon = () => {
       key: "TenMon",
       width: 220,
       ellipsis: true,
-      render: (text) => <Text strong>{text}</Text>
+      render: (text) => <Text strong>{text}</Text>,
     },
     {
       title: "Số lượng",
@@ -248,8 +239,7 @@ const TrangDatMon = () => {
           >
             -
           </Button>
-          
-          {/* Chỉnh sửa số lượng trực tiếp bằng bàn phím */}
+
           <InputNumber
             min={1}
             max={99}
@@ -262,7 +252,7 @@ const TrangDatMon = () => {
             style={{ width: "55px", textAlign: "center" }}
             controls={false}
           />
-          
+
           <Button size="small" onClick={() => TangSoLuong(record)}>
             +
           </Button>
@@ -273,7 +263,7 @@ const TrangDatMon = () => {
       title: "Đơn giá",
       dataIndex: "DonGia",
       key: "DonGia",
-      render: (val) => `${val.toLocaleString()}đ`
+      render: (val) => `${val.toLocaleString()}đ`,
     },
     {
       title: "Thành tiền",
@@ -294,7 +284,7 @@ const TrangDatMon = () => {
             fontSize: "16px",
             fontWeight: "bold",
           }}
-          onClick={() => XoaMon(record.MaMon)} // store.js has been enhanced to handle MaMon direct input
+          onClick={() => XoaMon(record.MaMon)}
         />
       ),
     },
@@ -302,60 +292,109 @@ const TrangDatMon = () => {
 
   return (
     <div
-      style={{ 
-        background: "linear-gradient(180deg, #f4f6f9 0%, #ebedf2 100%)", 
-        minHeight: "100vh", 
+      style={{
+        background: "linear-gradient(180deg, #f4f6f9 0%, #ebedf2 100%)",
+        minHeight: "100vh",
         paddingBottom: "80px",
-        fontFamily: "'Outfit', 'Inter', sans-serif"
+        fontFamily: "'Outfit', 'Inter', sans-serif",
       }}
     >
-      {/* Global Header */}
       <AppHeader />
 
-      <div style={{ maxWidth: "1200px", margin: "30px auto", padding: "0 20px" }}>
-        
-        {/* Ordering Status Banner */}
+      <div
+        style={{ maxWidth: "1200px", margin: "30px auto", padding: "0 20px" }}
+      >
         <div style={{ marginBottom: "25px" }}>
           {maBanAn ? (
             <Alert
               message={
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "10px" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    flexWrap: "wrap",
+                    gap: "10px",
+                  }}
+                >
                   <span>
-                    <ShopOutlined /> Bạn đang gọi món tại <Text strong style={{ color: "#1890ff", fontSize: "1.1rem" }}>Bàn số {maBanAn}</Text> - {" "}
-                    <Text strong>{thongTinChiNhanh?.TenChiNhanh || `Chi nhánh ${maChiNhanh}`}</Text>
+                    <ShopOutlined /> Bạn đang gọi món tại{" "}
+                    <Text
+                      strong
+                      style={{ color: "#1890ff", fontSize: "1.1rem" }}
+                    >
+                      Bàn số {maBanAn}
+                    </Text>{" "}
+                    -{" "}
+                    <Text strong>
+                      {thongTinChiNhanh?.DiaChi || `Chi nhánh ${maChiNhanh}`}
+                    </Text>
                   </span>
-                  <Tag color="blue" icon={<InfoCircleOutlined />}>Gọi tại bàn ăn (Dine-in)</Tag>
+                  <Tag color="blue" icon={<InfoCircleOutlined />}>
+                    Gọi tại bàn ăn (Dine-in)
+                  </Tag>
                 </div>
               }
               type="info"
               showIcon
-              style={{ borderRadius: "12px", border: "1px solid #91d5ff", padding: "12px 20px" }}
+              style={{
+                borderRadius: "12px",
+                border: "1px solid #91d5ff",
+                padding: "12px 20px",
+              }}
             />
           ) : (
             <Alert
               message={
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "10px" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    flexWrap: "wrap",
+                    gap: "10px",
+                  }}
+                >
                   <span>
-                    <EnvironmentOutlined /> Đang đặt món mang về tại: {" "}
-                    <Text strong>{thongTinChiNhanh?.TenChiNhanh || `Chi nhánh ${maChiNhanh}`}</Text>
+                    <EnvironmentOutlined /> Đang đặt món mang về tại:{" "}
+                    <Text strong>
+                      {thongTinChiNhanh?.DiaChi || `Chi nhánh ${maChiNhanh}`}
+                    </Text>
                   </span>
                   <Tag color="orange">Đặt mang về (Takeaway)</Tag>
                 </div>
               }
               type="warning"
               showIcon
-              style={{ borderRadius: "12px", border: "1px solid #ffe58f", padding: "12px 20px" }}
+              style={{
+                borderRadius: "12px",
+                border: "1px solid #ffe58f",
+                padding: "12px 20px",
+              }}
             />
           )}
         </div>
 
-        <Title level={2} style={{ textAlign: "center", marginBottom: "35px", fontWeight: 800 }}>
+        <Title
+          level={2}
+          style={{ textAlign: "center", marginBottom: "35px", fontWeight: 800 }}
+        >
           THỰC ĐƠN ĐẶT MÓN HẤP DẪN
         </Title>
 
         {loading ? (
-          <div style={{ display: "flex", justifyContent: "center", padding: "100px 0" }}>
-            <Badge status="processing" text="Đang tải thực đơn chi nhánh..." style={{ fontSize: "1.2rem" }} />
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              padding: "100px 0",
+            }}
+          >
+            <Badge
+              status="processing"
+              text="Đang tải thực đơn chi nhánh..."
+              style={{ fontSize: "1.2rem" }}
+            />
           </div>
         ) : (
           <Row gutter={[20, 20]}>
@@ -364,41 +403,32 @@ const TrangDatMon = () => {
                 <Card
                   hoverable
                   bodyStyle={{ padding: "15px", textAlign: "center" }}
-                  style={{ 
-                    borderRadius: "14px", 
+                  style={{
+                    borderRadius: "14px",
                     overflow: "hidden",
                     border: "1px solid rgba(0,0,0,0.05)",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.02)"
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.02)",
                   }}
                   cover={
-                    <div style={{ height: "150px", overflow: "hidden", position: "relative" }}>
+                    <div
+                      style={{
+                        height: "150px",
+                        overflow: "hidden",
+                        position: "relative",
+                      }}
+                    >
                       <img
                         alt={mon.TenMon}
-                        src={mon.HinhAnh || "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500"}
+                        src={
+                          mon.HinhAnh ||
+                          "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500"
+                        }
                         style={{
                           width: "100%",
                           height: "100%",
-                          objectFit: "cover"
+                          objectFit: "cover",
                         }}
                       />
-                      {!mon.CoSan && (
-                        <div style={{
-                          position: "absolute",
-                          top: 0,
-                          left: 0,
-                          width: "100%",
-                          height: "100%",
-                          background: "rgba(0,0,0,0.6)",
-                          color: "#fff",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontWeight: "bold",
-                          fontSize: "1.1rem"
-                        }}>
-                          HẾT HÀNG
-                        </div>
-                      )}
                     </div>
                   }
                 >
@@ -410,18 +440,18 @@ const TrangDatMon = () => {
                       height: "44px",
                       overflow: "hidden",
                       fontWeight: 700,
-                      fontSize: "0.95rem"
+                      fontSize: "0.95rem",
                     }}
                   >
                     {mon.TenMon}
                   </Title>
-                  
+
                   <div
                     style={{
                       display: "flex",
                       justifyContent: "space-between",
                       alignItems: "center",
-                      marginTop: "15px"
+                      marginTop: "15px",
                     }}
                   >
                     <span
@@ -440,10 +470,12 @@ const TrangDatMon = () => {
                       style={{
                         backgroundColor: "#52c41a",
                         borderColor: "#52c41a",
-                        boxShadow: "0 2px 8px rgba(82,196,26,0.3)"
+                        boxShadow: "0 2px 8px rgba(82,196,26,0.3)",
                       }}
                       disabled={!mon.CoSan}
-                      icon={<ShoppingCartOutlined style={{ fontSize: "20px" }} />}
+                      icon={
+                        <ShoppingCartOutlined style={{ fontSize: "20px" }} />
+                      }
                       onClick={() => {
                         ThemMon(mon);
                         message.success(`Đã thêm ${mon.TenMon} vào giỏ!`);
@@ -484,7 +516,9 @@ const TrangDatMon = () => {
                 <ShoppingCartOutlined /> CHI TIẾT GIỎ HÀNG
               </Title>
               <Text type="secondary">
-                {maBanAn ? `Gọi món phục vụ tại Bàn #${maBanAn}` : "Đặt món mang về tận nhà"}
+                {maBanAn
+                  ? `Gọi món phục vụ tại Bàn #${maBanAn}`
+                  : "Đặt món mang về tận nhà"}
               </Text>
             </div>
           }
@@ -506,22 +540,29 @@ const TrangDatMon = () => {
 
           <Divider style={{ margin: "20px 0" }} />
 
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 10px" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "0 10px",
+            }}
+          >
             <Title level={3} style={{ color: "#ff4d4f", margin: 0 }}>
               Tổng tiền: {TongTien.toLocaleString()} đ
             </Title>
-            
+
             <Button
               type="primary"
               size="large"
               onClick={CuaSoThanhToan}
               disabled={PhieuGoiMon.length === 0}
-              style={{ 
-                backgroundColor: "#1890ff", 
-                height: "46px", 
+              style={{
+                backgroundColor: "#1890ff",
+                height: "46px",
                 borderRadius: "23px",
                 padding: "0 30px",
-                fontWeight: "bold"
+                fontWeight: "bold",
               }}
             >
               TIẾN HÀNH ĐẶT MÓN
@@ -536,7 +577,9 @@ const TrangDatMon = () => {
               <Title level={3} style={{ margin: 0, color: "#1890ff" }}>
                 THÔNG TIN GIAO DỊCH
               </Title>
-              <Text type="secondary">Vui lòng cung cấp số điện thoại để nhận điểm tích lũy</Text>
+              <Text type="secondary">
+                Vui lòng cung cấp số điện thoại để nhận điểm tích lũy
+              </Text>
             </div>
           }
           open={isCheckoutVisible}
@@ -598,7 +641,14 @@ const TrangDatMon = () => {
                 </div>
               )}
               {TrangThaiSdt === "hop_le" && (
-                <div style={{ marginTop: "8px", display: "flex", alignItems: "center", gap: "5px" }}>
+                <div
+                  style={{
+                    marginTop: "8px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "5px",
+                  }}
+                >
                   <Text type="success" strong>
                     ✅ Số điện thoại hợp lệ. Đã liên kết tài khoản thành viên!
                   </Text>
@@ -648,7 +698,7 @@ const TrangDatMon = () => {
                   fontSize: "18px",
                   fontWeight: "bold",
                   borderRadius: "25px",
-                  boxShadow: "0 4px 12px rgba(82,196,26,0.3)"
+                  boxShadow: "0 4px 12px rgba(82,196,26,0.3)",
                 }}
                 onClick={ChotPhieuGoiMon}
               >
