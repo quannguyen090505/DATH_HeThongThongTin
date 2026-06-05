@@ -163,7 +163,6 @@ const TrangDatMon = () => {
         await api.post(`/api/tao-tai-khoan-khach`, {
           sdt: Sdt,
           ho_ten: HoTen,
-          mat_khau: "khach123",
         });
         message.success("Đã tạo tài khoản thành viên thành công!");
       }
