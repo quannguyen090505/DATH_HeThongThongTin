@@ -292,7 +292,7 @@ const TrangDatMon = () => {
   return (
     <div
       style={{
-        background: "linear-gradient(180deg, #f4f6f9 0%, #ebedf2 100%)",
+        background: "linear-gradient(180deg, #f9fbfd 0%, #f4f7f6 100%)",
         minHeight: "100vh",
         paddingBottom: "80px",
         fontFamily: "'Outfit', 'Inter', sans-serif",
@@ -467,9 +467,9 @@ const TrangDatMon = () => {
                       shape="circle"
                       size="large"
                       style={{
-                        backgroundColor: "#52c41a",
-                        borderColor: "#52c41a",
-                        boxShadow: "0 2px 8px rgba(82,196,26,0.3)",
+                        backgroundColor: "#1890ff",
+                        borderColor: "#1890ff",
+                        boxShadow: "0 2px 8px rgba(24,144,255,0.3)",
                       }}
                       disabled={!mon.CoSan}
                       icon={
@@ -502,7 +502,7 @@ const TrangDatMon = () => {
             height: "65px",
             bottom: "50px",
             right: "50px",
-            backgroundColor: "#ff7a45",
+            backgroundColor: "#1d39c4",
           }}
           onClick={() => setIsCartVisible(true)}
         />
@@ -691,13 +691,15 @@ const TrangDatMon = () => {
                 size="large"
                 block
                 style={{
-                  backgroundColor: "#52c41a",
-                  borderColor: "#52c41a",
+                  background:
+                    "linear-gradient(135deg, #1890ff 0%, #1d39c4 100%)",
+                  border: "none",
                   height: "50px",
                   fontSize: "18px",
                   fontWeight: "bold",
                   borderRadius: "25px",
-                  boxShadow: "0 4px 12px rgba(82,196,26,0.3)",
+                  boxShadow: "0 4px 12px rgba(24,144,255,0.3)",
+                  color: "white",
                 }}
                 onClick={ChotPhieuGoiMon}
               >
