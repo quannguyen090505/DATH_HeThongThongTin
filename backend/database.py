@@ -9,6 +9,7 @@ def get_db_connection():
             database="DATH_HeThongThongTin",  # Đổi lại tên DB
             user="root",
             password="77882^66Quan",  # Đổi lại mật khẩu MySQL đang dùng
+
         )
         return connection
     except Error as e:

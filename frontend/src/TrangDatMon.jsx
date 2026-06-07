@@ -26,6 +26,8 @@ import {
   EnvironmentOutlined,
   ShopOutlined,
   InfoCircleOutlined,
+  ClockCircleOutlined,
+  FileTextOutlined,
 } from "@ant-design/icons";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useTempStore } from "./store";
@@ -47,12 +49,20 @@ const TrangDatMon = () => {
   const [isCartVisible, setIsCartVisible] = useState(false);
   const [isCheckoutVisible, setIsCheckoutVisible] = useState(false);
 
+  // Checkout states
   const [Sdt, setSdt] = useState("");
   const [TrangThaiSdt, setTrangThaiSdt] = useState(null);
   const [HoTen, setHoTen] = useState("");
   const [TaoTaiKhoan, setTaoTaiKhoan] = useState(false);
   const [PhuongThucThanhToan, setPhuongThucThanhToan] = useState("tien_mat");
 
+  // Order status tracking states
+  const [activeOrder, setActiveOrder] = useState(null);
+  const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
+  const [ptThanhToanStatus, setPtThanhToanStatus] = useState("tien_mat");
+  const [submittingPayment, setSubmittingPayment] = useState(false);
+
+  // Zustand Actions & State
   const PhieuGoiMon = useTempStore((state) => state.PhieuGoiMon);
   const ThemMon = useTempStore((state) => state.ThemMon);
   const XoaMon = useTempStore((state) => state.XoaMon);
@@ -60,6 +70,45 @@ const TrangDatMon = () => {
   const GiamSoLuong = useTempStore((state) => state.GiamSoLuong);
   const CapNhatSoLuong = useTempStore((state) => state.CapNhatSoLuong);
   const XoaPhieuGoiMon = useTempStore((state) => state.XoaPhieuGoiMon);
+
+  const fetchActiveOrder = async (sdtParam = null) => {
+    const savedSession = localStorage.getItem("khach_session");
+    let currentSdt = sdtParam || Sdt;
+    if (savedSession) {
+      try {
+        const parsed = JSON.parse(savedSession);
+        if (parsed.sdt) {
+          currentSdt = parsed.sdt;
+        }
+      } catch (e) {}
+    }
+
+    if (maBanAn && maBanAn !== "null") {
+      try {
+        const response = await api.get(`/api/khach/ban/${maBanAn}/truy-xuat-phieu-goi-mon`);
+        if (response.data.status === "success" && response.data.data && response.data.data.length > 0) {
+          setActiveOrder(response.data);
+        } else {
+          setActiveOrder(null);
+        }
+      } catch (error) {
+        console.error("Lỗi lấy thông tin phiếu gọi món theo bàn:", error);
+      }
+    } else if (currentSdt) {
+      try {
+        const response = await api.get(`/api/khach/sdt/${currentSdt}/truy-xuat-phieu-goi-mon`);
+        if (response.data.status === "success" && response.data.data && response.data.data.length > 0) {
+          setActiveOrder(response.data);
+        } else {
+          setActiveOrder(null);
+        }
+      } catch (error) {
+        console.error("Lỗi lấy thông tin phiếu gọi món theo SĐT:", error);
+      }
+    } else {
+      setActiveOrder(null);
+    }
+  };
 
   useEffect(() => {
     const savedSession = localStorage.getItem("khach_session");
@@ -77,6 +126,7 @@ const TrangDatMon = () => {
     }
 
     const fetchChiNhanh = async () => {
+      if (!maChiNhanh || maChiNhanh === "null") return;
       try {
         const res = await api.get(
           `/api/thong-tin-chi-nhanh/?ma_chi_nhanh=${maChiNhanh}`,
@@ -90,6 +140,10 @@ const TrangDatMon = () => {
     };
 
     const fetchThucDon = async () => {
+      if (!maChiNhanh || maChiNhanh === "null") {
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       try {
         const response = await api.get("/api/thong-tin-thuc-don", {
@@ -115,6 +169,14 @@ const TrangDatMon = () => {
     fetchChiNhanh();
     fetchThucDon();
   }, [maChiNhanh]);
+
+  useEffect(() => {
+    fetchActiveOrder();
+    const interval = setInterval(() => {
+      fetchActiveOrder();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [maBanAn, Sdt]);
 
   const TongTien = PhieuGoiMon.reduce(
     (tong, item) => tong + item.DonGia * item.SoLuong,
@@ -159,13 +221,22 @@ const TrangDatMon = () => {
     }
 
     try {
+      // 1. Tạo tài khoản khách mới nếu chưa tồn tại và check tích chọn
       if (TrangThaiSdt === "khong_ton_tai" && TaoTaiKhoan) {
         await api.post(`/api/tao-tai-khoan-khach`, {
           sdt: Sdt,
           ho_ten: HoTen,
+          mat_khau: "khach123"
         });
         message.success("Đã tạo tài khoản thành viên thành công!");
       }
+
+      // Lưu thông tin khách vào localStorage
+      const session = {
+        sdt: Sdt,
+        hoTen: HoTen || "Khách Hàng",
+      };
+      localStorage.setItem("khach_session", JSON.stringify(session));
 
       if (maBanAn) {
         for (const item of PhieuGoiMon) {
@@ -177,6 +248,14 @@ const TrangDatMon = () => {
           });
         }
         message.success("Món ăn của bạn đã được gửi xuống bếp chuẩn bị!");
+        
+        setIsCheckoutVisible(false);
+        XoaPhieuGoiMon();
+        
+        // Cập nhật trạng thái phiếu gọi món ngay lập tức
+        setTimeout(() => {
+          fetchActiveOrder(Sdt);
+        }, 800);
       } else {
         for (const item of PhieuGoiMon) {
           await api.post("/api/khach/dat-mang-ve", {
@@ -188,25 +267,127 @@ const TrangDatMon = () => {
         message.success(
           "Đặt món mang về thành công! Nhà hàng đang chuẩn bị món.",
         );
+
+        await api.post("/api/khach/yeu-cau-thanh-toan", {
+          sdt_khach: parseInt(Sdt),
+          phuong_thuc_thanh_toan: PhuongThucThanhToan,
+        });
+
+        message.success("Đã gửi yêu cầu thanh toán và chốt hóa đơn thành công!");
+        setIsCheckoutVisible(false);
+        XoaPhieuGoiMon();
+
+        setTimeout(() => {
+          navigate("/");
+        }, 1500);
       }
-
-      await api.post("/api/khach/yeu-cau-thanh-toan", {
-        sdt_khach: Sdt,
-        phuong_thuc_thanh_toan: PhuongThucThanhToan,
-      });
-
-      message.success("Đã gửi yêu cầu thanh toán và chốt hóa đơn thành công!");
-      setIsCheckoutVisible(false);
-      XoaPhieuGoiMon();
-
-      setTimeout(() => {
-        navigate("/");
-      }, 1500);
     } catch (error) {
       console.error(error);
       message.error("Lỗi khi chốt đơn hàng! Vui lòng kiểm tra và thử lại.");
     }
   };
+
+  const getStatusBadgeStatus = (status) => {
+    switch (status) {
+      case "GoiMon":
+        return "processing";
+      case "ChoLenMon":
+        return "warning";
+      case "DaPhucVu":
+        return "success";
+      case "YeuCauThanhToan":
+        return "default";
+      default:
+        return "default";
+    }
+  };
+
+  const getStatusDetails = (status) => {
+    switch (status) {
+      case "GoiMon":
+        return { text: "Yêu cầu gọi món mới", color: "blue" };
+      case "ChoLenMon":
+        return { text: "Đang chế biến / Chuẩn bị", color: "orange" };
+      case "DaPhucVu":
+        return { text: "Đã phục vụ xong", color: "green" };
+      case "YeuCauThanhToan":
+        return { text: "Đang chờ thanh toán", color: "purple" };
+      default:
+        return { text: "Đang xử lý", color: "default" };
+    }
+  };
+
+  const getDishStatusTag = (status) => {
+    switch (status) {
+      case "DatMonTruoc":
+        return <Tag color="blue">Đặt trước</Tag>;
+      case "GoiMon":
+        return <Tag color="cyan">Chờ xác nhận</Tag>;
+      case "DoiLenMon":
+        return <Tag color="orange">Đang chuẩn bị</Tag>;
+      case "DaPhucVu":
+        return <Tag color="green">Đã lên món</Tag>;
+      default:
+        return <Tag>{status}</Tag>;
+    }
+  };
+
+  const handleYeuCauThanhToanStatusModal = async () => {
+    if (!Sdt) {
+      message.error("Vui lòng đăng nhập hoặc nhập SĐT để thanh toán!");
+      return;
+    }
+    setSubmittingPayment(true);
+    try {
+      await api.post("/api/khach/yeu-cau-thanh-toan", {
+        sdt_khach: parseInt(Sdt),
+        phuong_thuc_thanh_toan: ptThanhToanStatus,
+      });
+      message.success("Đã gửi yêu cầu thanh toán thành công! Vui lòng chờ nhân viên.");
+      await fetchActiveOrder();
+    } catch (error) {
+      console.error(error);
+      message.error("Gửi yêu cầu thanh toán thất bại!");
+    } finally {
+      setSubmittingPayment(false);
+    }
+  };
+
+  const cotStatusPhieu = [
+    {
+      title: "Tên món ăn",
+      dataIndex: "TenMon",
+      key: "TenMon",
+      width: 250,
+      render: (text) => <Text strong>{text}</Text>,
+    },
+    {
+      title: "Số lượng",
+      dataIndex: "SoLuong",
+      key: "SoLuong",
+      align: "center",
+      width: 100,
+    },
+    {
+      title: "Đơn giá",
+      dataIndex: "DonGiaMon",
+      key: "DonGiaMon",
+      render: (val) => `${val.toLocaleString()}đ`,
+    },
+    {
+      title: "Thành tiền",
+      dataIndex: "ThanhTien",
+      key: "ThanhTien",
+      render: (val) => `${val.toLocaleString()}đ`,
+    },
+    {
+      title: "Trạng thái",
+      dataIndex: "TinhTrangMon",
+      key: "TinhTrangMon",
+      align: "center",
+      render: (status) => getDishStatusTag(status),
+    },
+  ];
 
   const cotPhieuGoiMon = [
     {
@@ -283,7 +464,7 @@ const TrangDatMon = () => {
             fontSize: "16px",
             fontWeight: "bold",
           }}
-          onClick={() => XoaMon(record.MaMon)}
+          onClick={() => XoaMon(record.MaMon)} // store.js has been enhanced to handle MaMon direct input
         />
       ),
     },
@@ -655,27 +836,29 @@ const TrangDatMon = () => {
               )}
             </div>
 
-            <div>
-              <Text strong>Phương thức thanh toán:</Text>
-              <Radio.Group
-                onChange={(e) => setPhuongThucThanhToan(e.target.value)}
-                value={PhuongThucThanhToan}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "12px",
-                  marginTop: "10px",
-                }}
-              >
-                <Radio value="tien_mat">
-                  Thanh toán tiền mặt / Trực tiếp tại quầy
-                </Radio>
-                <Radio value="chuyen_khoan">
-                  Chuyển khoản Ngân hàng (Quét mã QR)
-                </Radio>
-                <Radio value="momo">Ví điện tử MoMo</Radio>
-              </Radio.Group>
-            </div>
+            {!maBanAn && (
+              <div>
+                <Text strong>Phương thức thanh toán:</Text>
+                <Radio.Group
+                  onChange={(e) => setPhuongThucThanhToan(e.target.value)}
+                  value={PhuongThucThanhToan}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "12px",
+                    marginTop: "10px",
+                  }}
+                >
+                  <Radio value="tien_mat">
+                    Thanh toán tiền mặt / Trực tiếp tại quầy
+                  </Radio>
+                  <Radio value="chuyen_khoan">
+                    Chuyển khoản Ngân hàng (Quét mã QR)
+                  </Radio>
+                  <Radio value="momo">Ví điện tử MoMo</Radio>
+                </Radio.Group>
+              </div>
+            )}
 
             <Divider style={{ margin: "10px 0" }} />
 
@@ -684,7 +867,7 @@ const TrangDatMon = () => {
                 level={4}
                 style={{ color: "#ff4d4f", marginBottom: "20px" }}
               >
-                Cần thanh toán: {TongTien.toLocaleString()} đ
+                {maBanAn ? "Tạm tính: " : "Cần thanh toán: "}{TongTien.toLocaleString()} đ
               </Title>
               <Button
                 type="primary"
@@ -703,10 +886,155 @@ const TrangDatMon = () => {
                 }}
                 onClick={ChotPhieuGoiMon}
               >
-                XÁC NHẬN CHỐT ĐƠN HÀNG
+                {maBanAn ? "GỬI YÊU CẦU ĐẶT MÓN" : "XÁC NHẬN CHỐT ĐƠN HÀNG"}
               </Button>
             </div>
           </div>
+        </Modal>
+
+        {/* Floating Order Status Trigger */}
+        {activeOrder && (
+          <FloatButton
+            icon={
+              <Badge status={getStatusBadgeStatus(activeOrder.tinh_trang_phieu || activeOrder.data[0]?.TinhTrangPhieuGoiMon)}>
+                <ClockCircleOutlined
+                  style={{ color: "white", fontSize: "24px" }}
+                />
+              </Badge>
+            }
+            type="default"
+            style={{
+              width: "65px",
+              height: "65px",
+              bottom: "50px",
+              right: "130px",
+              backgroundColor: "#52c41a",
+            }}
+            onClick={() => setIsStatusModalVisible(true)}
+            tooltip="Theo dõi tình trạng phục vụ"
+          />
+        )}
+
+        {/* Order Status Tracking Modal */}
+        <Modal
+          title={
+            <div style={{ textAlign: "center" }}>
+              <Title level={3} style={{ margin: 0, color: "#52c41a" }}>
+                <ClockCircleOutlined /> THEO DÕI PHIẾU GỌI MÓN
+              </Title>
+              <Text type="secondary">
+                {activeOrder?.ma_ban_an
+                  ? `Phiếu đang phục vụ tại Bàn #${activeOrder.ma_ban_an}`
+                  : "Phiếu đặt món mang về"}
+              </Text>
+            </div>
+          }
+          open={isStatusModalVisible}
+          onCancel={() => setIsStatusModalVisible(false)}
+          footer={null}
+          width={750}
+          centered
+        >
+          {activeOrder && (
+            <div style={{ marginTop: "15px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" }}>
+                <div>
+                  <Text strong>Mã phiếu: </Text>
+                  <Tag color="cyan">#{activeOrder.ma_phieu}</Tag>
+                </div>
+                <div>
+                  <Text strong>Tình trạng: </Text>
+                  <Tag color={getStatusDetails(activeOrder.tinh_trang_phieu || activeOrder.data[0]?.TinhTrangPhieuGoiMon).color}>
+                    {getStatusDetails(activeOrder.tinh_trang_phieu || activeOrder.data[0]?.TinhTrangPhieuGoiMon).text.toUpperCase()}
+                  </Tag>
+                </div>
+              </div>
+
+              <Table
+                dataSource={activeOrder.data}
+                columns={cotStatusPhieu}
+                rowKey={(record, idx) => `${record.MaMon || record.MaMonAn || idx}-${idx}`}
+                pagination={false}
+                size="middle"
+                style={{ marginTop: "10px" }}
+              />
+
+              <Divider style={{ margin: "20px 0" }} />
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: "0 10px",
+                  marginBottom: "20px",
+                }}
+              >
+                <Title level={3} style={{ color: "#ff4d4f", margin: 0 }}>
+                  Tổng hóa đơn: {activeOrder.tong_tien?.toLocaleString()} đ
+                </Title>
+              </div>
+
+              {activeOrder.ma_ban_an && (activeOrder.tinh_trang_phieu || activeOrder.data[0]?.TinhTrangPhieuGoiMon) !== "YeuCauThanhToan" ? (
+                <div
+                  style={{
+                    background: "#f9f9f9",
+                    padding: "20px",
+                    borderRadius: "12px",
+                    border: "1px solid #e8e8e8",
+                  }}
+                >
+                  <Title level={5} style={{ marginTop: 0, marginBottom: "15px" }}>
+                    <InfoCircleOutlined style={{ color: "#1890ff", marginRight: "8px" }} />
+                    Bạn muốn thanh toán?
+                  </Title>
+                  <div style={{ marginBottom: "15px" }}>
+                    <Text strong style={{ display: "block", marginBottom: "8px" }}>
+                      Chọn phương thức thanh toán:
+                    </Text>
+                    <Radio.Group
+                      onChange={(e) => setPtThanhToanStatus(e.target.value)}
+                      value={ptThanhToanStatus}
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        flexWrap: "wrap",
+                        gap: "15px",
+                      }}
+                    >
+                      <Radio value="tien_mat">Tiền mặt / Quầy</Radio>
+                      <Radio value="chuyen_khoan">Chuyển khoản QR</Radio>
+                      <Radio value="momo">Ví MoMo</Radio>
+                    </Radio.Group>
+                  </div>
+                  <Button
+                    type="primary"
+                    size="large"
+                    block
+                    loading={submittingPayment}
+                    style={{
+                      backgroundColor: "#ff7a45",
+                      borderColor: "#ff7a45",
+                      height: "45px",
+                      borderRadius: "22px",
+                      fontWeight: "bold",
+                    }}
+                    onClick={handleYeuCauThanhToanStatusModal}
+                  >
+                    GỬI YÊU CẦU THANH TOÁN
+                  </Button>
+                </div>
+              ) : (activeOrder.tinh_trang_phieu || activeOrder.data[0]?.TinhTrangPhieuGoiMon) === "YeuCauThanhToan" ? (
+                <Alert
+                  message="Đang chờ thanh toán"
+                  description="Bạn đã gửi yêu cầu thanh toán thành công. Vui lòng chờ nhân viên phục vụ hỗ trợ bạn thanh toán tại bàn hoặc tại quầy."
+                  type="warning"
+                  showIcon
+                  style={{ borderRadius: "10px" }}
+                />
+              ) : null}
+            </div>
+          )}
         </Modal>
       </div>
     </div>
