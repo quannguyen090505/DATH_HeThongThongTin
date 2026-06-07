@@ -1,3 +1,4 @@
+from backend.routers import phieu
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.security import HTTPBearer
 import mysql.connector  # Phải import thư viện này ở đầu file
@@ -6,7 +7,7 @@ from schemas import *
 from security import verify_password, create_access_token, get_password_hash
 from fastapi.middleware.cors import CORSMiddleware
 from utils import error_complier
-from routers import quan_ly, nhan_vien
+from routers import quan_ly, nhan_vien, phieu
 
 app = FastAPI(title="Hệ Thống F&B API")
 app.add_middleware(
@@ -20,7 +21,7 @@ app.add_middleware(
 
 app.include_router(quan_ly.router)
 app.include_router(nhan_vien.router)
-
+app.include_router(phieu.router)
 # uvicorn main:app --reload
 # API bao mat
 
