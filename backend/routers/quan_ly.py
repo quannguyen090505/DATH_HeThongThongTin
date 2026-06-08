@@ -329,7 +329,6 @@ def chinh_trang_thai_nv(ma_chi_nhanh:int,ma_nhan_vien:int,tinh_trang_lam_viec:in
         cursor.close()
         conn.close()
 
-
 @router.get("/thong-ke-doanh-so/")
 def thong_ke_doanh_so(
     ma_chi_nhanh: Optional[int] = None,
@@ -419,8 +418,8 @@ def thong_ke_mon_an(
 @router.get("/thong-ke-kinh-phi")
 def thong_ke_kinh_phi(
     ma_chi_nhanh: Optional[int] = None,
-    thoi_diem_bat_dau: Optional[int] = None,
-    thoi_diem_ket_thuc: Optional[int] = None,
+    thoi_gian_bat_dau: Optional[str] = None,
+    thoi_gian_ket_thuc: Optional[str] = None,
     pham_vi: Optional[str] = None,
     uu_tien: Optional[str] = None,
 ):
@@ -431,8 +430,8 @@ def thong_ke_kinh_phi(
             "thong_ke_kinh_phi",
             (
                 ma_chi_nhanh,
-                thoi_diem_bat_dau,
-                thoi_diem_ket_thuc,
+                thoi_gian_bat_dau,
+                thoi_gian_ket_thuc,
                 pham_vi,
                 uu_tien,
             ),
@@ -446,6 +445,85 @@ def thong_ke_kinh_phi(
                 "message": "Danh sách kinh phí trống",
                 "data": [],
             }
+        return {
+            "status": "success",
+            "data": result,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
+
+@router.get("/truy-xuat-hoa-don/{ma_chi_nhanh}")
+def truy_xuat_hoa_don(
+    ma_chi_nhanh: int,
+    thoi_gian_bat_dau: Optional[str] = None,
+    thoi_gian_ket_thuc: Optional[str] = None,
+):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor(dictionary=True)
+        sql_query = """
+            SELECT MaChiNhanh, NgayGioTaoHoaDon, GiaTri, HoTenNhanVien 
+            FROM tongkethoadon 
+            WHERE MaChiNhanh = %s 
+              AND (%s IS NULL OR NgayGioTaoHoaDon >= %s) 
+              AND (%s IS NULL OR NgayGioTaoHoaDon <= %s);
+        """
+        cursor.execute(sql_query, (
+            ma_chi_nhanh, 
+            thoi_gian_bat_dau, thoi_gian_bat_dau, 
+            thoi_gian_ket_thuc, thoi_gian_ket_thuc
+        ))
+        result = cursor.fetchall()
+        
+        if not result:
+            return {
+                "status": "success",
+                "message": "dữ liệu hóa đơn trống",
+                "data": []
+            }
+        return {
+            "status": "success",
+            "data": result,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
+
+@router.get("/truy-xuat-kinh-phi/{ma_chi_nhanh}")
+def truy_xuat_kinh_phi(
+    ma_chi_nhanh: int,
+    thoi_gian_bat_dau: Optional[str] = None,
+    thoi_gian_ket_thuc: Optional[str] = None,
+):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor(dictionary=True)
+        sql_query = """
+            SELECT MaChiNhanh, NgayGioTaoPhieu, GiaTri, HoTenNhanVien 
+            FROM tongketkinhphi 
+            WHERE MaChiNhanh = %s 
+              AND (%s IS NULL OR NgayGioTaoPhieu >= %s) 
+              AND (%s IS NULL OR NgayGioTaoPhieu <= %s);
+        """
+        cursor.execute(sql_query, (
+            ma_chi_nhanh, 
+            thoi_gian_bat_dau, thoi_gian_bat_dau, 
+            thoi_gian_ket_thuc, thoi_gian_ket_thuc
+        ))
+        result = cursor.fetchall()
+        
+        if not result:
+            return {
+                "status": "success",
+                "message": "Dữ liệu phiếu nhập kho trống",
+                "data": []
+            }
+            
         return {
             "status": "success",
             "data": result,

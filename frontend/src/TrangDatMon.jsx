@@ -13,7 +13,6 @@ import {
   Input,
   Radio,
   Checkbox,
-  Space,
   Divider,
   InputNumber,
   Alert,
@@ -27,20 +26,19 @@ import {
   ShopOutlined,
   InfoCircleOutlined,
   ClockCircleOutlined,
-  FileTextOutlined,
 } from "@ant-design/icons";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useTempStore } from "./store";
 import AppHeader from "./HeaderTrangChu";
 import api from "./api";
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 
 const TrangDatMon = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const maChiNhanh = searchParams.get("chiNhanh");
-  const maBanAn = searchParams.get("ban"); // null if takeaway, number if dine-in table
+  const maBanAn = searchParams.get("ban");
 
   const [ThucDon, setThucDon] = useState([]);
   const [thongTinChiNhanh, setThongTinChiNhanh] = useState(null);
@@ -49,20 +47,17 @@ const TrangDatMon = () => {
   const [isCartVisible, setIsCartVisible] = useState(false);
   const [isCheckoutVisible, setIsCheckoutVisible] = useState(false);
 
-  // Checkout states
   const [Sdt, setSdt] = useState("");
   const [TrangThaiSdt, setTrangThaiSdt] = useState(null);
   const [HoTen, setHoTen] = useState("");
   const [TaoTaiKhoan, setTaoTaiKhoan] = useState(false);
   const [PhuongThucThanhToan, setPhuongThucThanhToan] = useState("tien_mat");
 
-  // Order status tracking states
   const [activeOrder, setActiveOrder] = useState(null);
   const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
   const [ptThanhToanStatus, setPtThanhToanStatus] = useState("tien_mat");
   const [submittingPayment, setSubmittingPayment] = useState(false);
 
-  // Zustand Actions & State
   const PhieuGoiMon = useTempStore((state) => state.PhieuGoiMon);
   const ThemMon = useTempStore((state) => state.ThemMon);
   const XoaMon = useTempStore((state) => state.XoaMon);
@@ -72,40 +67,39 @@ const TrangDatMon = () => {
   const XoaPhieuGoiMon = useTempStore((state) => state.XoaPhieuGoiMon);
 
   const fetchActiveOrder = async (sdtParam = null) => {
-    const savedSession = localStorage.getItem("khach_session");
     let currentSdt = sdtParam || Sdt;
+    const savedSession = localStorage.getItem("khach_session");
+
     if (savedSession) {
       try {
         const parsed = JSON.parse(savedSession);
-        if (parsed.sdt) {
-          currentSdt = parsed.sdt;
-        }
+        if (parsed.sdt) currentSdt = parsed.sdt;
       } catch (e) {}
     }
 
+    let params = { thanh_toan: 0 };
     if (maBanAn && maBanAn !== "null") {
-      try {
-        const response = await api.get(`/api/khach/ban/${maBanAn}/truy-xuat-phieu-goi-mon`);
-        if (response.data.status === "success" && response.data.data && response.data.data.length > 0) {
-          setActiveOrder(response.data);
-        } else {
-          setActiveOrder(null);
-        }
-      } catch (error) {
-        console.error("Lỗi lấy thông tin phiếu gọi món theo bàn:", error);
-      }
+      params.ma_ban_an = maBanAn;
     } else if (currentSdt) {
-      try {
-        const response = await api.get(`/api/khach/sdt/${currentSdt}/truy-xuat-phieu-goi-mon`);
-        if (response.data.status === "success" && response.data.data && response.data.data.length > 0) {
-          setActiveOrder(response.data);
-        } else {
-          setActiveOrder(null);
-        }
-      } catch (error) {
-        console.error("Lỗi lấy thông tin phiếu gọi món theo SĐT:", error);
-      }
+      params.sdt_khach = currentSdt;
     } else {
+      return setActiveOrder(null);
+    }
+
+    try {
+      const response = await api.get(`/api/truy-xuat-phieu-goi-mon`, {
+        params,
+      });
+      if (
+        response.data.status === "success" &&
+        response.data.data?.length > 0
+      ) {
+        setActiveOrder(response.data);
+      } else {
+        setActiveOrder(null);
+      }
+    } catch (error) {
+      console.error("Lỗi lấy thông tin phiếu gọi món:", error);
       setActiveOrder(null);
     }
   };
@@ -120,9 +114,7 @@ const TrangDatMon = () => {
           setHoTen(parsed.hoTen || "");
           setTrangThaiSdt("hop_le");
         }
-      } catch (e) {
-        console.error("Lỗi đọc session:", e);
-      }
+      } catch (e) {}
     }
 
     const fetchChiNhanh = async () => {
@@ -131,35 +123,25 @@ const TrangDatMon = () => {
         const res = await api.get(
           `/api/thong-tin-chi-nhanh/?ma_chi_nhanh=${maChiNhanh}`,
         );
-        if (res.data.data && res.data.data.length > 0) {
-          setThongTinChiNhanh(res.data.data[0]);
-        }
-      } catch (err) {
-        console.error("Lỗi lấy thông tin chi nhánh:", err);
-      }
+        if (res.data.data?.length > 0) setThongTinChiNhanh(res.data.data[0]);
+      } catch (err) {}
     };
 
     const fetchThucDon = async () => {
-      if (!maChiNhanh || maChiNhanh === "null") {
-        setLoading(false);
-        return;
-      }
+      if (!maChiNhanh || maChiNhanh === "null") return setLoading(false);
       setLoading(true);
       try {
         const response = await api.get("/api/thong-tin-thuc-don", {
           params: { ma_chi_nhanh: maChiNhanh },
         });
-
         const mapped = (response.data.data || [])
           .filter((item) => item.CoSan === 1)
           .map((item) => ({
             ...item,
             MaMon: item.MaMonAn !== undefined ? item.MaMonAn : item.MaMon,
           }));
-
         setThucDon(mapped);
       } catch (error) {
-        console.error("Lỗi tải thực đơn:", error);
         message.error("Lỗi tải thực đơn chi nhánh. Vui lòng chọn lại!");
       } finally {
         setLoading(false);
@@ -172,9 +154,7 @@ const TrangDatMon = () => {
 
   useEffect(() => {
     fetchActiveOrder();
-    const interval = setInterval(() => {
-      fetchActiveOrder();
-    }, 5000);
+    const interval = setInterval(fetchActiveOrder, 30000);
     return () => clearInterval(interval);
   }, [maBanAn, Sdt]);
 
@@ -184,10 +164,8 @@ const TrangDatMon = () => {
   );
 
   const CuaSoThanhToan = () => {
-    if (PhieuGoiMon.length === 0) {
-      message.warning("Phiếu gọi món của bạn đang trống!");
-      return;
-    }
+    if (PhieuGoiMon.length === 0)
+      return message.warning("Phiếu gọi món của bạn đang trống!");
     setIsCartVisible(false);
     setIsCheckoutVisible(true);
   };
@@ -195,8 +173,7 @@ const TrangDatMon = () => {
   const KiemTraSDT = async () => {
     if (!Sdt || Sdt.length < 9 || Sdt.length > 11) {
       setTrangThaiSdt(null);
-      message.error("Vui lòng nhập SĐT hợp lệ!");
-      return;
+      return message.error("Vui lòng nhập SĐT hợp lệ!");
     }
     try {
       const response = await api.get(`/api/kiem-tra-sdt-khach/${Sdt}`);
@@ -211,75 +188,59 @@ const TrangDatMon = () => {
   };
 
   const ChotPhieuGoiMon = async () => {
-    if (!Sdt || Sdt.length < 9) {
-      message.error("Vui lòng nhập SĐT hợp lệ trước khi đặt món!");
-      return;
-    }
+    if (!Sdt || Sdt.length < 9)
+      return message.error("Vui lòng nhập SĐT hợp lệ trước khi đặt món!");
     if (TrangThaiSdt === "khong_ton_tai" && TaoTaiKhoan && !HoTen.trim()) {
-      message.error("Vui lòng nhập Họ Tên để đăng ký tài khoản!");
-      return;
+      return message.error("Vui lòng nhập Họ Tên để đăng ký tài khoản!");
     }
 
     try {
-      // 1. Tạo tài khoản khách mới nếu chưa tồn tại và check tích chọn
       if (TrangThaiSdt === "khong_ton_tai" && TaoTaiKhoan) {
-        await api.post(`/api/tao-tai-khoan-khach`, {
-          sdt: Sdt,
-          ho_ten: HoTen,
-          mat_khau: "khach123"
-        });
+        await api.post(`/api/tao-tai-khoan-khach`, { sdt: Sdt, ho_ten: HoTen });
         message.success("Đã tạo tài khoản thành viên thành công!");
       }
 
-      // Lưu thông tin khách vào localStorage
-      const session = {
-        sdt: Sdt,
-        hoTen: HoTen || "Khách Hàng",
-      };
-      localStorage.setItem("khach_session", JSON.stringify(session));
+      localStorage.setItem(
+        "khach_session",
+        JSON.stringify({ sdt: Sdt, hoTen: HoTen || "Khách Hàng" }),
+      );
 
-      if (maBanAn) {
-        for (const item of PhieuGoiMon) {
-          await api.post("/api/khach/goi-mon", {
+      const isDineIn = maBanAn && maBanAn !== "null";
+      const endpoint = isDineIn
+        ? "/api/khach/goi-mon"
+        : "/api/khach/dat-mang-ve";
+
+      await Promise.all(
+        PhieuGoiMon.map((item) =>
+          api.post(endpoint, {
             ma_mon_an: item.MaMon,
             so_luong: item.SoLuong,
             sdt_khach: Sdt,
-            ma_ban_an: parseInt(maBanAn),
-          });
-        }
+            ...(isDineIn
+              ? { ma_ban_an: parseInt(maBanAn) }
+              : { ma_chi_nhanh: parseInt(maChiNhanh) }),
+          }),
+        ),
+      );
+
+      setIsCheckoutVisible(false);
+      XoaPhieuGoiMon();
+
+      if (isDineIn) {
         message.success("Món ăn của bạn đã được gửi xuống bếp chuẩn bị!");
-        
-        setIsCheckoutVisible(false);
-        XoaPhieuGoiMon();
-        
-        // Cập nhật trạng thái phiếu gọi món ngay lập tức
-        setTimeout(() => {
-          fetchActiveOrder(Sdt);
-        }, 800);
+        setTimeout(() => fetchActiveOrder(Sdt), 800);
       } else {
-        for (const item of PhieuGoiMon) {
-          await api.post("/api/khach/dat-mang-ve", {
-            ma_mon_an: item.MaMon,
-            so_luong: item.SoLuong,
-            sdt_khach: Sdt,
-          });
-        }
         message.success(
           "Đặt món mang về thành công! Nhà hàng đang chuẩn bị món.",
         );
-
         await api.post("/api/khach/yeu-cau-thanh-toan", {
-          sdt_khach: parseInt(Sdt),
+          sdt_khach: Sdt,
           phuong_thuc_thanh_toan: PhuongThucThanhToan,
         });
-
-        message.success("Đã gửi yêu cầu thanh toán và chốt hóa đơn thành công!");
-        setIsCheckoutVisible(false);
-        XoaPhieuGoiMon();
-
-        setTimeout(() => {
-          navigate("/");
-        }, 1500);
+        message.success(
+          "Đã gửi yêu cầu thanh toán và chốt hóa đơn thành công!",
+        );
+        setTimeout(() => navigate("/"), 1500);
       }
     } catch (error) {
       console.error(error);
@@ -333,20 +294,20 @@ const TrangDatMon = () => {
   };
 
   const handleYeuCauThanhToanStatusModal = async () => {
-    if (!Sdt) {
-      message.error("Vui lòng đăng nhập hoặc nhập SĐT để thanh toán!");
-      return;
-    }
+    if (!Sdt)
+      return message.error("Vui lòng đăng nhập hoặc nhập SĐT để thanh toán!");
+
     setSubmittingPayment(true);
     try {
       await api.post("/api/khach/yeu-cau-thanh-toan", {
-        sdt_khach: parseInt(Sdt),
+        sdt_khach: Sdt,
         phuong_thuc_thanh_toan: ptThanhToanStatus,
       });
-      message.success("Đã gửi yêu cầu thanh toán thành công! Vui lòng chờ nhân viên.");
+      message.success(
+        "Đã gửi yêu cầu thanh toán thành công! Vui lòng chờ nhân viên.",
+      );
       await fetchActiveOrder();
     } catch (error) {
-      console.error(error);
       message.error("Gửi yêu cầu thanh toán thất bại!");
     } finally {
       setSubmittingPayment(false);
@@ -370,15 +331,15 @@ const TrangDatMon = () => {
     },
     {
       title: "Đơn giá",
-      dataIndex: "DonGiaMon",
-      key: "DonGiaMon",
-      render: (val) => `${val.toLocaleString()}đ`,
+      key: "DonGia",
+      render: (_, record) =>
+        `${(record.DonGia || record.DonGiaMon || 0).toLocaleString()}đ`,
     },
     {
       title: "Thành tiền",
-      dataIndex: "ThanhTien",
       key: "ThanhTien",
-      render: (val) => `${val.toLocaleString()}đ`,
+      render: (_, record) =>
+        `${((record.DonGia || record.DonGiaMon || 0) * record.SoLuong).toLocaleString()}đ`,
     },
     {
       title: "Trạng thái",
@@ -419,20 +380,16 @@ const TrangDatMon = () => {
           >
             -
           </Button>
-
           <InputNumber
             min={1}
             max={99}
             value={record.SoLuong}
             onChange={(val) => {
-              if (val !== null && val >= 1) {
-                CapNhatSoLuong(record.MaMon, val);
-              }
+              if (val >= 1) CapNhatSoLuong(record.MaMon, val);
             }}
             style={{ width: "55px", textAlign: "center" }}
             controls={false}
           />
-
           <Button size="small" onClick={() => TangSoLuong(record)}>
             +
           </Button>
@@ -464,7 +421,7 @@ const TrangDatMon = () => {
             fontSize: "16px",
             fontWeight: "bold",
           }}
-          onClick={() => XoaMon(record.MaMon)} // store.js has been enhanced to handle MaMon direct input
+          onClick={() => XoaMon(record.MaMon)}
         />
       ),
     },
@@ -473,7 +430,7 @@ const TrangDatMon = () => {
   return (
     <div
       style={{
-        background: "linear-gradient(180deg, #f4f6f9 0%, #ebedf2 100%)",
+        background: "linear-gradient(180deg, #f9fbfd 0%, #f4f7f6 100%)",
         minHeight: "100vh",
         paddingBottom: "80px",
         fontFamily: "'Outfit', 'Inter', sans-serif",
@@ -625,7 +582,6 @@ const TrangDatMon = () => {
                   >
                     {mon.TenMon}
                   </Title>
-
                   <div
                     style={{
                       display: "flex",
@@ -648,9 +604,9 @@ const TrangDatMon = () => {
                       shape="circle"
                       size="large"
                       style={{
-                        backgroundColor: "#52c41a",
-                        borderColor: "#52c41a",
-                        boxShadow: "0 2px 8px rgba(82,196,26,0.3)",
+                        backgroundColor: "#1890ff",
+                        borderColor: "#1890ff",
+                        boxShadow: "0 2px 8px rgba(24,144,255,0.3)",
                       }}
                       disabled={!mon.CoSan}
                       icon={
@@ -668,7 +624,6 @@ const TrangDatMon = () => {
           </Row>
         )}
 
-        {/* Floating Shopping Cart Trigger */}
         <FloatButton
           icon={
             <Badge count={PhieuGoiMon.length} size="large" offset={[5, -5]}>
@@ -683,12 +638,11 @@ const TrangDatMon = () => {
             height: "65px",
             bottom: "50px",
             right: "50px",
-            backgroundColor: "#ff7a45",
+            backgroundColor: "#1d39c4",
           }}
           onClick={() => setIsCartVisible(true)}
         />
 
-        {/* Visual Shopping Cart Drawer Modal */}
         <Modal
           title={
             <div style={{ textAlign: "center" }}>
@@ -717,9 +671,7 @@ const TrangDatMon = () => {
             size="middle"
             style={{ marginTop: "10px" }}
           />
-
           <Divider style={{ margin: "20px 0" }} />
-
           <div
             style={{
               display: "flex",
@@ -731,7 +683,6 @@ const TrangDatMon = () => {
             <Title level={3} style={{ color: "#ff4d4f", margin: 0 }}>
               Tổng tiền: {TongTien.toLocaleString()} đ
             </Title>
-
             <Button
               type="primary"
               size="large"
@@ -750,7 +701,6 @@ const TrangDatMon = () => {
           </div>
         </Modal>
 
-        {/* Checkout Details Modal */}
         <Modal
           title={
             <div style={{ textAlign: "center" }}>
@@ -867,20 +817,23 @@ const TrangDatMon = () => {
                 level={4}
                 style={{ color: "#ff4d4f", marginBottom: "20px" }}
               >
-                {maBanAn ? "Tạm tính: " : "Cần thanh toán: "}{TongTien.toLocaleString()} đ
+                {maBanAn ? "Tạm tính: " : "Cần thanh toán: "}{" "}
+                {TongTien.toLocaleString()} đ
               </Title>
               <Button
                 type="primary"
                 size="large"
                 block
                 style={{
-                  backgroundColor: "#52c41a",
-                  borderColor: "#52c41a",
+                  background:
+                    "linear-gradient(135deg, #1890ff 0%, #1d39c4 100%)",
+                  border: "none",
                   height: "50px",
                   fontSize: "18px",
                   fontWeight: "bold",
                   borderRadius: "25px",
-                  boxShadow: "0 4px 12px rgba(82,196,26,0.3)",
+                  boxShadow: "0 4px 12px rgba(24,144,255,0.3)",
+                  color: "white",
                 }}
                 onClick={ChotPhieuGoiMon}
               >
@@ -890,11 +843,15 @@ const TrangDatMon = () => {
           </div>
         </Modal>
 
-        {/* Floating Order Status Trigger */}
         {activeOrder && (
           <FloatButton
             icon={
-              <Badge status={getStatusBadgeStatus(activeOrder.tinh_trang_phieu || activeOrder.data[0]?.TinhTrangPhieuGoiMon)}>
+              <Badge
+                status={getStatusBadgeStatus(
+                  activeOrder.tinh_trang_phieu ||
+                    activeOrder.data[0]?.TinhTrangPhieuGoiMon,
+                )}
+              >
                 <ClockCircleOutlined
                   style={{ color: "white", fontSize: "24px" }}
                 />
@@ -913,7 +870,6 @@ const TrangDatMon = () => {
           />
         )}
 
-        {/* Order Status Tracking Modal */}
         <Modal
           title={
             <div style={{ textAlign: "center" }}>
@@ -935,15 +891,32 @@ const TrangDatMon = () => {
         >
           {activeOrder && (
             <div style={{ marginTop: "15px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "15px",
+                }}
+              >
                 <div>
                   <Text strong>Mã phiếu: </Text>
                   <Tag color="cyan">#{activeOrder.ma_phieu}</Tag>
                 </div>
                 <div>
                   <Text strong>Tình trạng: </Text>
-                  <Tag color={getStatusDetails(activeOrder.tinh_trang_phieu || activeOrder.data[0]?.TinhTrangPhieuGoiMon).color}>
-                    {getStatusDetails(activeOrder.tinh_trang_phieu || activeOrder.data[0]?.TinhTrangPhieuGoiMon).text.toUpperCase()}
+                  <Tag
+                    color={
+                      getStatusDetails(
+                        activeOrder.tinh_trang_phieu ||
+                          activeOrder.data[0]?.TinhTrangPhieuGoiMon,
+                      ).color
+                    }
+                  >
+                    {getStatusDetails(
+                      activeOrder.tinh_trang_phieu ||
+                        activeOrder.data[0]?.TinhTrangPhieuGoiMon,
+                    ).text.toUpperCase()}
                   </Tag>
                 </div>
               </div>
@@ -951,12 +924,13 @@ const TrangDatMon = () => {
               <Table
                 dataSource={activeOrder.data}
                 columns={cotStatusPhieu}
-                rowKey={(record, idx) => `${record.MaMon || record.MaMonAn || idx}-${idx}`}
+                rowKey={(record, idx) =>
+                  `${record.MaMon || record.MaMonAn || idx}-${idx}`
+                }
                 pagination={false}
                 size="middle"
                 style={{ marginTop: "10px" }}
               />
-
               <Divider style={{ margin: "20px 0" }} />
 
               <div
@@ -969,68 +943,114 @@ const TrangDatMon = () => {
                 }}
               >
                 <Title level={3} style={{ color: "#ff4d4f", margin: 0 }}>
-                  Tổng hóa đơn: {activeOrder.tong_tien?.toLocaleString()} đ
+                  Tổng hóa đơn:{" "}
+                  {(
+                    activeOrder.tong_tien ||
+                    activeOrder.data.reduce(
+                      (sum, item) =>
+                        sum +
+                        (item.DonGia || item.DonGiaMon || 0) *
+                          (item.SoLuong || 0),
+                      0,
+                    )
+                  ).toLocaleString()}{" "}
+                  đ
                 </Title>
               </div>
 
-              {activeOrder.ma_ban_an && (activeOrder.tinh_trang_phieu || activeOrder.data[0]?.TinhTrangPhieuGoiMon) !== "YeuCauThanhToan" ? (
-                <div
-                  style={{
-                    background: "#f9f9f9",
-                    padding: "20px",
-                    borderRadius: "12px",
-                    border: "1px solid #e8e8e8",
-                  }}
-                >
-                  <Title level={5} style={{ marginTop: 0, marginBottom: "15px" }}>
-                    <InfoCircleOutlined style={{ color: "#1890ff", marginRight: "8px" }} />
-                    Bạn muốn thanh toán?
-                  </Title>
-                  <div style={{ marginBottom: "15px" }}>
-                    <Text strong style={{ display: "block", marginBottom: "8px" }}>
-                      Chọn phương thức thanh toán:
-                    </Text>
-                    <Radio.Group
-                      onChange={(e) => setPtThanhToanStatus(e.target.value)}
-                      value={ptThanhToanStatus}
+              {(() => {
+                const trangThaiPhieuHienTai =
+                  activeOrder.tinh_trang_phieu ||
+                  activeOrder.data[0]?.TinhTrangPhieuGoiMon;
+                const duocPhepThanhToan =
+                  trangThaiPhieuHienTai &&
+                  !["GoiMon", "YeuCauThanhToan", "DaThanhToan"].includes(
+                    trangThaiPhieuHienTai,
+                  );
+
+                if (trangThaiPhieuHienTai === "YeuCauThanhToan")
+                  return (
+                    <Alert
+                      message="Đang chờ thanh toán"
+                      description="Bạn đã gửi yêu cầu thanh toán thành công. Vui lòng chờ nhân viên phục vụ hỗ trợ bạn thanh toán tại bàn hoặc tại quầy."
+                      type="warning"
+                      showIcon
+                      style={{ borderRadius: "10px" }}
+                    />
+                  );
+                if (trangThaiPhieuHienTai === "GoiMon")
+                  return (
+                    <Alert
+                      message="Đang chờ nhà hàng xác nhận"
+                      description="Đơn hàng của bạn vừa được gửi đi. Vui lòng chờ bộ phận bếp xác nhận món trước khi tiến hành thanh toán."
+                      type="info"
+                      showIcon
+                      style={{ borderRadius: "10px" }}
+                    />
+                  );
+
+                if (duocPhepThanhToan) {
+                  return (
+                    <div
                       style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        flexWrap: "wrap",
-                        gap: "15px",
+                        background: "#f9f9f9",
+                        padding: "20px",
+                        borderRadius: "12px",
+                        border: "1px solid #e8e8e8",
                       }}
                     >
-                      <Radio value="tien_mat">Tiền mặt / Quầy</Radio>
-                      <Radio value="chuyen_khoan">Chuyển khoản QR</Radio>
-                      <Radio value="momo">Ví MoMo</Radio>
-                    </Radio.Group>
-                  </div>
-                  <Button
-                    type="primary"
-                    size="large"
-                    block
-                    loading={submittingPayment}
-                    style={{
-                      backgroundColor: "#ff7a45",
-                      borderColor: "#ff7a45",
-                      height: "45px",
-                      borderRadius: "22px",
-                      fontWeight: "bold",
-                    }}
-                    onClick={handleYeuCauThanhToanStatusModal}
-                  >
-                    GỬI YÊU CẦU THANH TOÁN
-                  </Button>
-                </div>
-              ) : (activeOrder.tinh_trang_phieu || activeOrder.data[0]?.TinhTrangPhieuGoiMon) === "YeuCauThanhToan" ? (
-                <Alert
-                  message="Đang chờ thanh toán"
-                  description="Bạn đã gửi yêu cầu thanh toán thành công. Vui lòng chờ nhân viên phục vụ hỗ trợ bạn thanh toán tại bàn hoặc tại quầy."
-                  type="warning"
-                  showIcon
-                  style={{ borderRadius: "10px" }}
-                />
-              ) : null}
+                      <Title
+                        level={5}
+                        style={{ marginTop: 0, marginBottom: "15px" }}
+                      >
+                        <InfoCircleOutlined
+                          style={{ color: "#1890ff", marginRight: "8px" }}
+                        />{" "}
+                        Xác nhận thanh toán
+                      </Title>
+                      <div style={{ marginBottom: "15px" }}>
+                        <Text
+                          strong
+                          style={{ display: "block", marginBottom: "8px" }}
+                        >
+                          Chọn phương thức thanh toán:
+                        </Text>
+                        <Radio.Group
+                          onChange={(e) => setPtThanhToanStatus(e.target.value)}
+                          value={ptThanhToanStatus}
+                          style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            flexWrap: "wrap",
+                            gap: "15px",
+                          }}
+                        >
+                          <Radio value="tien_mat">Tiền mặt / Quầy</Radio>
+                          <Radio value="chuyen_khoan">Chuyển khoản QR</Radio>
+                          <Radio value="momo">Ví MoMo</Radio>
+                        </Radio.Group>
+                      </div>
+                      <Button
+                        type="primary"
+                        size="large"
+                        block
+                        loading={submittingPayment}
+                        style={{
+                          backgroundColor: "#ff7a45",
+                          borderColor: "#ff7a45",
+                          height: "45px",
+                          borderRadius: "22px",
+                          fontWeight: "bold",
+                        }}
+                        onClick={handleYeuCauThanhToanStatusModal}
+                      >
+                        GỬI YÊU CẦU THANH TOÁN
+                      </Button>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
             </div>
           )}
         </Modal>

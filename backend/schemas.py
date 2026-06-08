@@ -18,7 +18,7 @@ class GoiMonRequest(BaseModel):
     so_luong: int
     sdt_khach: Optional[str] = None
     ma_ban_an: Optional[int] = None
-
+    ma_chi_nhanh:Optional[int]= None
 
 class NhanVienDatMonRequest(GoiMonRequest):
     ma_phieu_dat_ban: int

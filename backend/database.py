@@ -6,9 +6,10 @@ def get_db_connection():
     try:
         connection = mysql.connector.connect(
             host="localhost",
-            database="dath_hethongthongtin",
-            user="dungpham",
-            password="123",  # <-- Bạn hãy điền mật khẩu MySQL của bạn vào đây
+            database="DATH_HeThongThongTin",  # Đổi lại tên DB
+            user="root",
+            password="77882^66Quan",  # Đổi lại mật khẩu MySQL đang dùng
+
         )
         return connection
     except Error as e:

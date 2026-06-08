@@ -242,6 +242,81 @@ const HoatDongQuanLy = () => {
     layDuLieuTaiChinh();
   }, [ThoiGianTC, PhamViTC, UuTienTC]);
 
+  const [dsHoaDon, setDsHoaDon] = useState([]);
+  const [dsKinhPhi, setDsKinhPhi] = useState([]);
+  const [loadingChiTiet, setLoadingChiTiet] = useState(false);
+  const formatTien = (val) => `${(val || 0).toLocaleString()} đ`;
+  const formatThoiGian = (dateStr) => new Date(dateStr).toLocaleString("vi-VN");
+  const cotHoaDon = [
+    {
+      title: "Thời gian",
+      dataIndex: "NgayGioTaoHoaDon",
+      key: "NgayGioTaoHoaDon",
+      render: formatThoiGian,
+    },
+    { title: "Thu ngân", dataIndex: "HoTenNhanVien", key: "HoTenNhanVien" },
+    {
+      title: "Doanh thu",
+      dataIndex: "GiaTri",
+      key: "GiaTri",
+      render: (val) => (
+        <Text type="success" strong>
+          +{formatTien(val)}
+        </Text>
+      ),
+    },
+  ];
+  const cotKinhPhi = [
+    {
+      title: "Thời gian",
+      dataIndex: "NgayGioTaoPhieu",
+      key: "NgayGioTaoPhieu",
+      render: formatThoiGian,
+    },
+    { title: "Người nhập", dataIndex: "HoTenNhanVien", key: "HoTenNhanVien" },
+    {
+      title: "Chi phí",
+      dataIndex: "GiaTri",
+      key: "GiaTri",
+      render: (val) => (
+        <Text type="danger" strong>
+          -{formatTien(val)}
+        </Text>
+      ),
+    },
+  ];
+  useEffect(() => {
+    const layChiTietTaiChinh = async () => {
+      setLoadingChiTiet(true);
+      try {
+        const MaChiNhanh = localStorage.getItem("ma_chi_nhanh");
+        const params = {};
+
+        if (ThoiGianTC && ThoiGianTC.length === 2) {
+          params.thoi_gian_bat_dau = ThoiGianTC[0].format("YYYY-MM-DD");
+          params.thoi_gian_ket_thuc = ThoiGianTC[1].format("YYYY-MM-DD");
+        }
+
+        const [resHoaDon, resKinhPhi] = await Promise.all([
+          api.get(`/api/quan-ly/truy-xuat-hoa-don/${MaChiNhanh}`, { params }),
+          api.get(`/api/quan-ly/truy-xuat-kinh-phi/${MaChiNhanh}`, { params }),
+        ]);
+
+        setDsHoaDon(resHoaDon.data.data || []);
+        setDsKinhPhi(resKinhPhi.data.data || []);
+      } catch (error) {
+        message.error("Lỗi tải chi tiết danh sách tài chính!");
+        console.error(error);
+      } finally {
+        setLoadingChiTiet(false);
+      }
+    };
+
+    if (trangHienTai === "dashboard") {
+      layChiTietTaiChinh();
+    }
+  }, [ThoiGianTC, trangHienTai]);
+
   const [dsMonAn, setDsMonAn] = useState([]);
   const [dsTheLoai, setDsTheLoai] = useState([]);
   const [isModalMonOpen, setIsModalMonOpen] = useState(false);
@@ -727,7 +802,7 @@ const HoatDongQuanLy = () => {
       dataIndex: "HoTen",
       key: "HoTen",
       fontWeight: "bold",
-      color: "#004d33",
+      color: "#1d39c4",
     },
     {
       title: "Vai trò",
@@ -844,7 +919,7 @@ const HoatDongQuanLy = () => {
             padding: "0 30px",
             fontSize: "18px",
             fontWeight: "bold",
-            color: "#004d33",
+            color: "#1d39c4",
             borderRight: "1px solid #f0f0f0",
           }}
         >
@@ -872,7 +947,7 @@ const HoatDongQuanLy = () => {
             <Title
               level={2}
               style={{
-                color: "#004d33",
+                color: "#1d39c4",
                 marginBottom: "30px",
                 textAlign: "center",
               }}
@@ -951,7 +1026,7 @@ const HoatDongQuanLy = () => {
                     labelStyle={{ fontWeight: 500, color: "#8c8c8c" }}
                   >
                     <Descriptions.Item label="Họ và tên">
-                      <strong style={{ fontSize: "15px", color: "#004d33" }}>
+                      <strong style={{ fontSize: "15px", color: "#1d39c4" }}>
                         {ThongTinNhanVien.ho_ten}
                       </strong>
                     </Descriptions.Item>
@@ -1081,10 +1156,6 @@ const HoatDongQuanLy = () => {
                             ]}
                           />
 
-                          {/* ========================================================
-                        CHÚ Ý 1: CHUYỂN CHÚ THÍCH (LEGEND) XUỐNG DƯỚI
-                        Thay đổi verticalAlign="top" -> "bottom" 
-                      ======================================================== */}
                           <Legend
                             verticalAlign="bottom"
                             iconType="circle"
@@ -1241,6 +1312,45 @@ const HoatDongQuanLy = () => {
                 </Card>
               </Col>
             </Row>
+            <Row gutter={24} style={{ marginTop: "24px" }}>
+              <Col span={12}>
+                <Card
+                  title="📄 CHI TIẾT HÓA ĐƠN (DOANH THU)"
+                  style={{
+                    borderRadius: "12px",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                  }}
+                >
+                  <Table
+                    columns={cotHoaDon}
+                    dataSource={dsHoaDon}
+                    rowKey={(record, index) => `hd_${index}`}
+                    pagination={{ pageSize: 5 }}
+                    loading={loadingChiTiet}
+                    size="small"
+                  />
+                </Card>
+              </Col>
+
+              <Col span={12}>
+                <Card
+                  title="📦 CHI TIẾT NHẬP KHO (KINH PHÍ)"
+                  style={{
+                    borderRadius: "12px",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                  }}
+                >
+                  <Table
+                    columns={cotKinhPhi}
+                    dataSource={dsKinhPhi}
+                    rowKey={(record, index) => `kp_${index}`}
+                    pagination={{ pageSize: 5 }}
+                    loading={loadingChiTiet}
+                    size="small"
+                  />
+                </Card>
+              </Col>
+            </Row>
           </>
         )}
         {trangHienTai === "thuc-don" && (
@@ -1273,7 +1383,7 @@ const HoatDongQuanLy = () => {
                       >
                         <Title
                           level={4}
-                          style={{ color: "#004d33", margin: 0 }}
+                          style={{ color: "#1d39c4", margin: 0 }}
                         >
                           🍲 Danh sách Món Ăn
                         </Title>
@@ -1479,7 +1589,7 @@ const HoatDongQuanLy = () => {
                       >
                         <Title
                           level={4}
-                          style={{ color: "#004d33", margin: 0 }}
+                          style={{ color: "#1d39c4", margin: 0 }}
                         >
                           🪑 Danh sách Bàn Ăn
                         </Title>
@@ -1619,7 +1729,7 @@ const HoatDongQuanLy = () => {
                   marginBottom: 16,
                 }}
               >
-                <Title level={4} style={{ color: "#004d33", margin: 0 }}>
+                <Title level={4} style={{ color: "#1d39c4", margin: 0 }}>
                   👥 Danh sách Nhân sự cấp dưới
                 </Title>
                 <Button

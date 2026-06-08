@@ -9,7 +9,7 @@ const { Title } = Typography;
 
 //để mở trang đăng nhập nội bộ truy cập đường dẫn http://localhost:5173/dang-nhap-noi-bo
 
-const TrangDangNhapNhanVien = () => {
+const TrangDangNhapNoiBo = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
@@ -46,7 +46,7 @@ const TrangDangNhapNhanVien = () => {
         justifyContent: "center",
         alignItems: "center",
         height: "100vh",
-        background: "#004d33",
+        background: "linear-gradient(135deg, #1890ff 0%, #1d39c4 100%)",
       }}
     >
       <Card
@@ -57,7 +57,7 @@ const TrangDangNhapNhanVien = () => {
         }}
       >
         <div style={{ textAlign: "center", marginBottom: "20px" }}>
-          <Title level={3} style={{ color: "#ffb100" }}>
+          <Title level={3} style={{ color: "#1890ff" }}>
             HỆ THỐNG NỘI BỘ
           </Title>
         </div>
@@ -92,7 +92,7 @@ const TrangDangNhapNhanVien = () => {
               size="large"
               block
               loading={loading}
-              style={{ background: "#004d33" }}
+              style={{ background: "#1890ff", borderColor: "#1890ff" }}
             >
               ĐĂNG NHẬP
             </Button>
@@ -103,4 +103,4 @@ const TrangDangNhapNhanVien = () => {
   );
 };
 
-export default TrangDangNhapNhanVien;
+export default TrangDangNhapNoiBo;
