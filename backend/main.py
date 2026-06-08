@@ -46,7 +46,6 @@ def khach_dang_nhap(request: DangNhapRequest):
         cursor.close()
         conn.close()
 
-
 @app.post("/api/nhan-vien-dang-nhap")  # nhan vien dang nhap su dung pass nhanvien123
 def nhan_vien_dang_nhap(request: DangNhapRequest):
     conn = get_db_connection()
@@ -106,6 +105,22 @@ def tao_tai_khoan_khach(request:TaoTaiKhoanRequest):
         cursor.close()
         conn.close()
 
+@app.get("/api/kiem-tra-sdt-khach/{sdt_khach}")
+def kiem_tra_sdt(sdt_khach: str):
+    conn = get_db_connection()
+    if not conn:
+        raise HTTPException(status_code=500, detail="Lỗi kết nối Database")
+    try:
+        cursor = conn.cursor()
+        cursor.execute("select 1 from Khach where SDT=%s;", (sdt_khach,))
+        result = cursor.fetchone()
+        if not result:
+            return {"status": "success", "data": 0}
+        return {"status": "success", "data": 1}
+    finally:
+        cursor.close()
+        conn.close()
+
 @app.post("/api/khach/goi-mon")
 def khach_goi_mon_tai_quan(request: GoiMonRequest):
     conn = get_db_connection()
@@ -140,7 +155,7 @@ def khach_dat_mon_mang_ve(request: GoiMonRequest):
         cursor = conn.cursor()
         cursor.callproc(
             "khach_dat_mon_mang_ve",
-            (request.sdt_khach, request.ma_mon_an, request.so_luong),
+            (request.sdt_khach, request.ma_mon_an, request.so_luong,request.ma_chi_nhanh),
         )
         conn.commit()
         return {
@@ -265,8 +280,12 @@ def thong_tin_chi_nhanh(ma_chi_nhanh:Optional[int]=None):
         cursor.close()
         conn.close()
 
-@app.get("/api/khach/ban/{ma_ban_an}/truy-xuat-phieu-goi-mon")
-def khach_truy_xuat_phieu_goi_mon(ma_ban_an: int):
+@app.get("/api/truy-xuat-phieu-goi-mon")
+def khach_truy_xuat_phieu_goi_mon(
+    ma_ban_an: Optional[int] = None,
+    sdt_khach: Optional[str] = None,
+    tinh_trang: Optional[str] = None,
+    thanh_toan: Optional[int] = None):
     conn = get_db_connection()
     try:
         cursor = conn.cursor(dictionary=True)
@@ -274,8 +293,9 @@ def khach_truy_xuat_phieu_goi_mon(ma_ban_an: int):
             "truy_xuat_phieu_goi_mon",
             (
                 ma_ban_an,
-                None,
-                False,
+                sdt_khach,
+                tinh_trang,
+                thanh_toan,
             ),
         )
         danh_sach_mon = []
@@ -290,8 +310,8 @@ def khach_truy_xuat_phieu_goi_mon(ma_ban_an: int):
 
         return {
             "status": "success",
-            "ma_phieu": ma_ban_an,
-            "ma_phieu_goi_mon": danh_sach_mon[0]["MaPhieuGoiMon"] if danh_sach_mon else None,
+            "ma_phieu": danh_sach_mon[0]["MaPhieuGoiMon"] if danh_sach_mon else None,
+            "ma_chi_nhanh": danh_sach_mon[0]["MaChiNhanh"] if danh_sach_mon else None,
             "tinh_trang_phieu": danh_sach_mon[0]["TinhTrangPhieuGoiMon"] if danh_sach_mon else None,
             "tong_tien": sum(mon["ThanhTien"] for mon in danh_sach_mon),
             "data": danh_sach_mon,
@@ -303,50 +323,4 @@ def khach_truy_xuat_phieu_goi_mon(ma_ban_an: int):
         cursor.close()
         conn.close()
 
-
-@app.get("/api/khach/sdt/{sdt}/truy-xuat-phieu-goi-mon")
-def khach_sdt_truy_xuat_phieu_goi_mon(sdt: str):
-    conn = get_db_connection()
-    try:
-        cursor = conn.cursor(dictionary=True)
-        # 1. Lấy thông tin phiếu gọi món chưa thanh toán của khách theo SĐT
-        sql_phieu = """
-            SELECT P.MaPhieuGoiMon, P.TinhTrang AS TinhTrangPhieuGoiMon, P.MaBanAn, P.NgayGioTaoPhieu
-            FROM phieugoimon P 
-            LEFT JOIN hoadon HD ON P.MaPhieuGoiMon = HD.MaPhieuGoiMon
-            WHERE P.SDTKhach = %s AND HD.MaHoaDon IS NULL
-            ORDER BY P.NgayGioTaoPhieu DESC
-            LIMIT 1
-        """
-        cursor.execute(sql_phieu, (sdt,))
-        phieu = cursor.fetchone()
-        if not phieu:
-            return {
-                "status": "success",
-                "message": "Không có phiếu gọi món nào đang hoạt động",
-                "data": []
-            }
-        
-        # 2. Lấy danh sách các món ăn trong phiếu đó
-        sql_mon = """
-            SELECT MaMon, TenMon, SoLuong, DonGiaMon, ThanhTien, TinhTrangMon, TinhTrangPhieuGoiMon, ThanhToan
-            FROM chitietphieugoimon
-            WHERE MaPhieuGoiMon = %s
-        """
-        cursor.execute(sql_mon, (phieu["MaPhieuGoiMon"],))
-        danh_sach_mon = cursor.fetchall()
-        
-        return {
-            "status": "success",
-            "ma_phieu": phieu["MaPhieuGoiMon"],
-            "tinh_trang_phieu": phieu["TinhTrangPhieuGoiMon"],
-            "ma_ban_an": phieu["MaBanAn"],
-            "tong_tien": sum(mon["ThanhTien"] for mon in danh_sach_mon),
-            "data": danh_sach_mon
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-        conn.close()
 
