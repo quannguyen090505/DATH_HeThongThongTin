@@ -72,7 +72,7 @@ const TrangChu = () => {
     };
     fetchDanhSachChiNhanh();
   }, []);
-  h;
+
   const getDishStatusTag = (status) => {
     const config = {
       DatMonTruoc: { color: "blue", text: "Đặt trước" },
