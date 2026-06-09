@@ -71,3 +71,35 @@ class NhanVienRequest(BaseModel):
     ca_lam:Optional[str]=None
     luong:Optional[int]=None
     anh_the:Optional[str]=None
+
+class ChiNhanhRequest(BaseModel):
+    dia_chi: str
+    gio_mo_cua: str  
+
+class PhieuGoiMonCRUDRequest(BaseModel):
+    ma_ban_an: Optional[int] = None
+    sdt_khach: Optional[str] = None
+    ma_nhan_vien_phuc_vu: Optional[int] = None
+    phuong_thuc_dung_mon: str  
+    phuong_thuc_thanh_toan: Optional[str] = None
+    tinh_trang: str  
+
+class PhieuDatBanCRUDRequest(BaseModel):
+    ma_ban_an: int
+    ngay_gio_nhan_ban: str  
+    sdt_khach: str
+    ma_nhan_vien_phuc_vu: int
+    tinh_trang: str 
+    tien_coc: int = 0
+
+class PhieuNhapKhoRequest(BaseModel):
+    ma_nhan_vien_kiem_toan: int
+    gia_tri: int
+    thong_tin_ghi_chu: Optional[str] = None
+
+class MonDuocGoiRequest(BaseModel):
+    ma_phieu_goi_mon: int
+    ma_mon_an: int
+    so_luong: int
+    don_gia_mon: int
+    tinh_trang: str
