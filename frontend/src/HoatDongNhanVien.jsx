@@ -942,6 +942,7 @@ const HoatDongNhanVien = () => {
   const countCanThanhToan = danhSachPhieuChiNhanhNay.filter(
     (p) => p.TinhTrangPhieu === "CanThanhToan",
   ).length;
+  const tongThongBaoGoiMon = countCanXacNhan + countCanThanhToan;
 
   const drawerTabs = [
     {
@@ -1017,9 +1018,9 @@ const HoatDongNhanVien = () => {
       label: (
         <span>
           Danh sách phiếu gọi món{" "}
-          {countCanXacNhan > 0 && (
+          {tongThongBaoGoiMon > 0 && (
             <Badge
-              count={countCanXacNhan}
+              count={tongThongBaoGoiMon}
               size="small"
               style={{ marginLeft: "8px" }}
               offset={[5, 0]}
