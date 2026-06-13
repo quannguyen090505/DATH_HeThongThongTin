@@ -19,8 +19,10 @@ class GoiMonRequest(BaseModel):
     sdt_khach: Optional[str] = None
     ma_ban_an: Optional[int] = None
     ma_chi_nhanh:Optional[int]= None
+    ma_phieu_dat_ban:Optional[int]=None
 
-class NhanVienDatMonRequest(GoiMonRequest):
+
+class NhanVienDatMonTruocRequest(GoiMonRequest):
     ma_phieu_dat_ban: int
 
 
@@ -30,6 +32,39 @@ class DatBanRequest(BaseModel):
     sdt_khach: str
 
 
+class ThanhToanPhieuGoiMonRequest(BaseModel):
+    ma_phieu_goi_mon: Optional[int]=None
+    ma_ban_an:Optional[int]=None
+    sdt_khach:Optional[int]=None
+    phuong_thuc_thanh_toan: str
+
+
+class MonDuocGoiRequest(BaseModel):
+    ma_phieu_goi_mon: int
+    ma_goi_mon: int
+    so_luong: Optional[int]=None
+    tinh_trang: str
+
+
+class XacNhanPhieuGoiMonRequest(BaseModel):
+    ma_phieu_goi_mon:int
+
+
+class ChinhSuaPhieuGoiMonRequest(BaseModel):
+    ma_phieu_goi_mon:int
+    sdt_khach: Optional[str] = None
+    ma_ban_an: Optional[int] = None
+    ma_chi_nhanh:Optional[int]= None
+    ma_phieu_dat_ban:Optional[int]=None
+
+
+class ChinhSuaPhieuDatBanRequest(BaseModel):
+    ma_phieu_dat_ban:int
+    ma_ban_an: int
+    ngay_gio_nhan: str 
+    sdt_khach: str
+
+#api CRUD
 class MonAnRequest(BaseModel):
     ten_mon: Optional[str]=None
     don_gia: int
@@ -37,9 +72,6 @@ class MonAnRequest(BaseModel):
     thong_tin_mo_ta: Optional[str] = None
     ma_the_loai:Optional[int]=None
 
-class ThanhToanRequest(BaseModel):
-    sdt_khach:int
-    phuong_thuc_thanh_toan:str
 
 class TheLoaiMonRequest(BaseModel):
     ten_the_loai: str
@@ -52,17 +84,6 @@ class BanAnRequest(BaseModel):
     vi_tri: str
 
 
-class ThemChiNhanhRequest(BaseModel):
-    dia_chi: str
-    sdt_quan: str
-    email_quan: str
-    gio_mo_cua: str
-
-
-class ThanhToanPhieuGoiMonRequest(BaseModel):
-    ma_phieu_goi_mon: int
-    phuong_thuoc_thanh_toan: str
-
 class NhanVienRequest(BaseModel):
     ho_ten:str
     sdt:str
@@ -72,34 +93,17 @@ class NhanVienRequest(BaseModel):
     luong:Optional[int]=None
     anh_the:Optional[str]=None
 
-class ChiNhanhRequest(BaseModel):
+
+class ThemChiNhanhRequest(BaseModel):
     dia_chi: str
-    gio_mo_cua: str  
+    sdt_quan: str
+    email_quan: str
+    gio_mo_cua: str
 
-class PhieuGoiMonCRUDRequest(BaseModel):
-    ma_ban_an: Optional[int] = None
-    sdt_khach: Optional[str] = None
-    ma_nhan_vien_phuc_vu: Optional[int] = None
-    phuong_thuc_dung_mon: str  
-    phuong_thuc_thanh_toan: Optional[str] = None
-    tinh_trang: str  
 
-class PhieuDatBanCRUDRequest(BaseModel):
-    ma_ban_an: int
-    ngay_gio_nhan_ban: str  
-    sdt_khach: str
-    ma_nhan_vien_phuc_vu: int
-    tinh_trang: str 
-    tien_coc: int = 0
-
-class PhieuNhapKhoRequest(BaseModel):
-    ma_nhan_vien_kiem_toan: int
+class TaoPhieuNhapKhoRequest(BaseModel):
+    ma_quan_ly:int
     gia_tri: int
     thong_tin_ghi_chu: Optional[str] = None
 
-class MonDuocGoiRequest(BaseModel):
-    ma_phieu_goi_mon: int
-    ma_mon_an: int
-    so_luong: int
-    don_gia_mon: int
-    tinh_trang: str
+

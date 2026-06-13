@@ -44,15 +44,19 @@ import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
+  ArrowLeftOutlined,
+  SaveOutlined,
 } from "@ant-design/icons";
 import api from "./api";
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 const { Header, Content } = Layout;
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
 
 const HoatDongQuanLy = () => {
+  const navigate = useNavigate();
   const [trangHienTai, setTrangHienTai] = useState("dashboard");
   const danhMucMenu = [
     {
@@ -70,9 +74,15 @@ const HoatDongQuanLy = () => {
       icon: <TeamOutlined />,
       label: "Quản Lý Nhân Viên (CRUD)",
     },
+    {
+      key: "nhap-kho",
+      icon: <ShopOutlined />,
+      label: "Quản Lý Nhập Kho",
+    },
   ];
   const [ThongTinNhanVien, setThongTinNhanVien] = useState([]);
   const [ThongTinChiNhanh, setThongTinChiNhanh] = useState([]);
+
   useEffect(() => {
     const layThongTinProfile = async () => {
       try {
@@ -247,6 +257,7 @@ const HoatDongQuanLy = () => {
   const [loadingChiTiet, setLoadingChiTiet] = useState(false);
   const formatTien = (val) => `${(val || 0).toLocaleString()} đ`;
   const formatThoiGian = (dateStr) => new Date(dateStr).toLocaleString("vi-VN");
+
   const cotHoaDon = [
     {
       title: "Thời gian",
@@ -266,6 +277,7 @@ const HoatDongQuanLy = () => {
       ),
     },
   ];
+
   const cotKinhPhi = [
     {
       title: "Thời gian",
@@ -285,6 +297,7 @@ const HoatDongQuanLy = () => {
       ),
     },
   ];
+
   useEffect(() => {
     const layChiTietTaiChinh = async () => {
       setLoadingChiTiet(true);
@@ -324,6 +337,12 @@ const HoatDongQuanLy = () => {
   const [formSuaMon] = Form.useForm();
   const [isModalThemMonOpen, setIsModalThemMonOpen] = useState(false);
   const [formThemMon] = Form.useForm();
+
+  const [formNhapKho] = Form.useForm();
+  const [loadingNhapKho, setLoadingNhapKho] = useState(false);
+  const [dsPhieuNhapKho, setDsPhieuNhapKho] = useState([]);
+  const [loadingDanhSachNhap, setLoadingDanhSachNhap] = useState(false);
+
   const layDanhSachMon = async () => {
     try {
       const MaChiNhanh = localStorage.getItem("ma_chi_nhanh");
@@ -335,6 +354,7 @@ const HoatDongQuanLy = () => {
       message.error("Lỗi khi tải danh sách thực đơn!");
     }
   };
+
   const layDanhSachTheLoai = async () => {
     try {
       const res = await api.get("/api/thong-tin-the-loai-mon");
@@ -343,13 +363,38 @@ const HoatDongQuanLy = () => {
       console.error("Lỗi khi tải danh sách thể loại", error);
     }
   };
+
+  const layDanhSachPhieuNhap = async () => {
+    setLoadingDanhSachNhap(true);
+    try {
+      const maChiNhanh = localStorage.getItem("ma_chi_nhanh");
+      const res = await api.get(
+        `/api/quan-ly/truy-xuat-phieu-nhap-kho/${maChiNhanh}`,
+      );
+      if (res.data.status === "success") {
+        setDsPhieuNhapKho(res.data.data || []);
+      }
+    } catch (error) {
+      message.error("Lỗi khi tải danh sách phiếu nhập kho!");
+    } finally {
+      setLoadingDanhSachNhap(false);
+    }
+  };
+
   useEffect(() => {
     if (trangHienTai === "thuc-don") {
       layDanhSachMon();
       layDanhSachTheLoai();
       layDanhSachBan();
     }
+    if (trangHienTai === "nhan-vien") {
+      layDanhSachNhanVien();
+    }
+    if (trangHienTai === "nhap-kho") {
+      layDanhSachPhieuNhap();
+    }
   }, [trangHienTai]);
+
   const ChinhSuaThongTinMonAn = async (values) => {
     try {
       const MaChiNhanh = localStorage.getItem("ma_chi_nhanh");
@@ -376,6 +421,7 @@ const HoatDongQuanLy = () => {
       console.error("Chi tiết lỗi 422:", error.response?.data);
     }
   };
+
   const ChinhSuaTrangThaiMonAn = async (record, TrangThaiMoi) => {
     try {
       const MaChiNhanh = localStorage.getItem("ma_chi_nhanh");
@@ -396,6 +442,7 @@ const HoatDongQuanLy = () => {
       console.error(error);
     }
   };
+
   const ThemMonMoi = async (values) => {
     try {
       const maChiNhanh = localStorage.getItem("ma_chi_nhanh");
@@ -423,6 +470,69 @@ const HoatDongQuanLy = () => {
       console.error(error);
     }
   };
+
+  const onHoanTatNhapKho = async (values) => {
+    setLoadingNhapKho(true);
+    try {
+      const payload = {
+        gia_tri: values.gia_tri,
+        thong_tin_ghi_chu: values.thong_tin_ghi_chu || "",
+      };
+
+      const res = await api.post("/api/quan-ly/tao-phieu-nhap-kho", payload);
+
+      if (res.data.status === "success") {
+        message.success("Tạo phiếu nhập kho thành công!");
+        formNhapKho.resetFields();
+        layDanhSachPhieuNhap();
+      }
+    } catch (error) {
+      message.error("Có lỗi xảy ra khi lưu phiếu nhập kho!");
+    } finally {
+      setLoadingNhapKho(false);
+    }
+  };
+
+  const cotPhieuNhapKho = [
+    {
+      title: "STT",
+      key: "stt",
+      width: 60,
+      align: "center",
+      render: (_, __, index) => <Text strong>{index + 1}</Text>,
+    },
+    {
+      title: "Thời gian nhập",
+      dataIndex: "NgayGiotaoPhieu",
+      key: "NgayGiotaoPhieu",
+      render: (val, record) => {
+        const dateVal =
+          val || record.NgayGioTaoPhieu || record.ngay_gio_tao_phieu;
+        return dateVal ? formatThoiGian(dateVal) : "Không xác định";
+      },
+    },
+    {
+      title: "Giá trị (VNĐ)",
+      dataIndex: "GiaTri",
+      key: "GiaTri",
+      render: (val, record) => {
+        const num = val || record.gia_tri || 0;
+        return (
+          <Text type="danger" strong>
+            -{num.toLocaleString()} đ
+          </Text>
+        );
+      },
+    },
+    {
+      title: "Ghi chú",
+      dataIndex: "ThongTinGhiChu",
+      key: "ThongTinGhiChu",
+      render: (val, record) =>
+        val || record.thong_tin_ghi_chu || "Không có ghi chú",
+    },
+  ];
+
   const columnsThucDon = [
     {
       title: "Tên món",
@@ -534,9 +644,11 @@ const HoatDongQuanLy = () => {
       },
     },
   ];
+
   const [tuKhoaTimKiem, setTuKhoaTimKiem] = useState("");
   const [boLocTheLoai, setBoLocTheLoai] = useState(null);
   const [boLocTrangThai, setBoLocTrangThai] = useState(null);
+
   const danhSachMonHienThi = dsMonAn.filter((mon) => {
     const tenMon = mon.TenMon ? mon.TenMon.toLowerCase() : "";
     const tuKhoa = tuKhoaTimKiem.toLowerCase();
@@ -553,6 +665,7 @@ const HoatDongQuanLy = () => {
   const [isModalBanOpen, setIsModalBanOpen] = useState(false);
   const [banDangSua, setBanDangSua] = useState(null);
   const [formBan] = Form.useForm();
+
   const layDanhSachBan = async () => {
     try {
       const maChiNhanh = localStorage.getItem("ma_chi_nhanh");
@@ -562,6 +675,7 @@ const HoatDongQuanLy = () => {
       message.error("Lỗi khi tải danh sách bàn ăn!");
     }
   };
+
   const ChinhSuaThongTinBanAn = async (values) => {
     try {
       const maChiNhanh = localStorage.getItem("ma_chi_nhanh");
@@ -588,6 +702,7 @@ const HoatDongQuanLy = () => {
       message.error("Lỗi khi lưu thông tin bàn!");
     }
   };
+
   const ChinhTrangTrangThaiBan = async (MaBan, TrangThaiMoi) => {
     try {
       const maChiNhanh = localStorage.getItem("ma_chi_nhanh");
@@ -602,6 +717,7 @@ const HoatDongQuanLy = () => {
       message.error("Lỗi khi cập nhật trạng thái bàn!");
     }
   };
+
   const columnsBanAn = [
     {
       title: "STT",
@@ -708,6 +824,7 @@ const HoatDongQuanLy = () => {
   const [formNV] = Form.useForm();
   const token = localStorage.getItem("token_nhan_vien");
   const maNhanVienHienTai = jwtDecode(token).sub;
+
   const layDanhSachNhanVien = async () => {
     try {
       const maChiNhanh = localStorage.getItem("ma_chi_nhanh");
@@ -719,16 +836,7 @@ const HoatDongQuanLy = () => {
       message.error("Lỗi khi tải danh sách nhân viên!");
     }
   };
-  useEffect(() => {
-    if (trangHienTai === "thuc-don") {
-      layDanhSachMon();
-      layDanhSachTheLoai();
-      layDanhSachBan();
-    }
-    if (trangHienTai === "nhan-vien") {
-      layDanhSachNhanVien();
-    }
-  }, [trangHienTai]);
+
   const ChinhSuaThongTinNhanVien = async (values) => {
     try {
       const maChiNhanh = localStorage.getItem("ma_chi_nhanh");
@@ -762,6 +870,7 @@ const HoatDongQuanLy = () => {
       console.error(error);
     }
   };
+
   const ChinhSuaTrangThaiNhanVien = async (record, TrangThaiMoi) => {
     try {
       const maChiNhanh = localStorage.getItem("ma_chi_nhanh");
@@ -781,6 +890,7 @@ const HoatDongQuanLy = () => {
       console.error(error);
     }
   };
+
   const columnsNhanVien = [
     {
       title: "Ảnh đại diện",
@@ -893,6 +1003,7 @@ const HoatDongQuanLy = () => {
       },
     },
   ];
+
   const nguoiQuanLy = dsNhanVien.find(
     (nv) => String(nv.MaNhanVien) === maNhanVienHienTai,
   );
@@ -906,9 +1017,9 @@ const HoatDongQuanLy = () => {
         style={{
           display: "flex",
           alignItems: "center",
-          background: "#fff",
+          background: "#001f3f",
           padding: 0,
-          boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
           position: "sticky",
           top: 0,
           zIndex: 10,
@@ -919,19 +1030,46 @@ const HoatDongQuanLy = () => {
             padding: "0 30px",
             fontSize: "18px",
             fontWeight: "bold",
-            color: "#1d39c4",
-            borderRight: "1px solid #f0f0f0",
+            color: "#fff",
+            borderRight: "1px solid rgba(255, 255, 255, 0.2)",
           }}
         >
           HỆ THỐNG QUẢN TRỊ
         </div>
+
         <Menu
+          theme="dark"
           mode="horizontal"
           selectedKeys={[trangHienTai]}
           onClick={(e) => setTrangHienTai(e.key)}
           items={danhMucMenu}
-          style={{ flex: 1, borderBottom: "none", fontWeight: 500 }}
+          style={{
+            flex: 1,
+            borderBottom: "none",
+            fontWeight: 500,
+            background: "transparent",
+          }}
         />
+
+        <div
+          style={{
+            padding: "0 30px",
+            borderLeft: "1px solid rgba(255, 255, 255, 0.2)",
+          }}
+        >
+          <Button
+            type="primary"
+            ghost
+            icon={<ArrowLeftOutlined />}
+            onClick={() => navigate("/nhan-vien/phuc-vu")}
+            style={{
+              borderColor: "#faad14",
+              color: "#faad14",
+            }}
+          >
+            Quay lại POS
+          </Button>
+        </div>
       </Header>
 
       <Content
@@ -1669,23 +1807,23 @@ const HoatDongQuanLy = () => {
             style={{ display: "flex", flexDirection: "column", gap: "20px" }}
           >
             {nguoiQuanLy && (
-              <Badge.Ribbon text="QUẢN LÝ" color="red">
+              <Badge.Ribbon text="QUẢN LÝ" color="blue">
                 <Card
                   style={{
                     borderRadius: "12px",
-                    boxShadow: "0 8px 16px rgba(255, 77, 79, 0.1)",
-                    background: "#fff1f0",
-                    borderColor: "#ffa39e",
+                    boxShadow: "0 8px 16px rgba(24, 144, 255, 0.15)",
+                    background: "#e6f7ff",
+                    borderColor: "#91d5ff",
                   }}
                 >
                   <Row gutter={24} align="middle">
                     <Col span={4} style={{ textAlign: "center" }}>
-                      <div style={{ fontSize: "60px", color: "#ff4d4f" }}>
+                      <div style={{ fontSize: "60px", color: "#1890ff" }}>
                         <UserOutlined />
                       </div>
                     </Col>
                     <Col span={16}>
-                      <Title level={2} style={{ color: "#cf1322", margin: 0 }}>
+                      <Title level={2} style={{ color: "#0050b3", margin: 0 }}>
                         {nguoiQuanLy.HoTen}
                       </Title>
                       <Text style={{ fontSize: "16px", color: "#8c8c8c" }}>
@@ -1699,7 +1837,6 @@ const HoatDongQuanLy = () => {
                     <Col span={4} style={{ textAlign: "right" }}>
                       <Button
                         type="primary"
-                        danger
                         size="large"
                         onClick={() => {
                           setNvDangSua(nguoiQuanLy);
@@ -1825,7 +1962,113 @@ const HoatDongQuanLy = () => {
               </Form>
             </Modal>
           </div>
-        )}{" "}
+        )}
+        {/* 🌟 VÙNG RENDER QUẢN LÝ NHẬP KHO VỚI LAYOUT CHIA ĐÔI MÀN HÌNH */}
+        {trangHienTai === "nhap-kho" && (
+          <Row gutter={24}>
+            {/* Cột trái: Form Nhập Liệu */}
+            <Col span={8}>
+              <Card
+                title={
+                  <Title level={4} style={{ color: "#1d39c4", margin: 0 }}>
+                    📦 GHI NHẬN PHIẾU NHẬP KHO
+                  </Title>
+                }
+                bordered={false}
+                style={{
+                  borderRadius: "12px",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                }}
+              >
+                <Form
+                  form={formNhapKho}
+                  name="form_nhap_kho"
+                  onFinish={onHoanTatNhapKho}
+                  autoComplete="off"
+                  layout="vertical"
+                >
+                  <Form.Item
+                    name="gia_tri"
+                    label={<Text strong>Tổng giá trị phiếu nhập (VNĐ)</Text>}
+                    rules={[
+                      {
+                        required: true,
+                        message: "Vui lòng nhập giá trị phiếu nhập!",
+                      },
+                    ]}
+                  >
+                    <InputNumber
+                      placeholder="VD: 5,000,000"
+                      min={1000}
+                      style={{ width: "100%" }}
+                      size="large"
+                      formatter={(value) =>
+                        `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                      }
+                      parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                    />
+                  </Form.Item>
+
+                  <Form.Item
+                    name="thong_tin_ghi_chu"
+                    label={
+                      <Text strong>Thông tin ghi chú (Tối đa 30 ký tự)</Text>
+                    }
+                    rules={[
+                      { required: true, message: "Vui lòng nhập thông tin!" },
+                      { max: 30, message: "Tối đa 30 ký tự!" },
+                    ]}
+                  >
+                    <Input
+                      placeholder="VD: Nhập thịt bò từ Cty ABC..."
+                      size="large"
+                      maxLength={30}
+                      showCount
+                    />
+                  </Form.Item>
+
+                  <Form.Item style={{ marginTop: "20px" }}>
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      size="large"
+                      icon={<SaveOutlined />}
+                      loading={loadingNhapKho}
+                      block
+                    >
+                      Hoàn Tất & Lưu Phiếu Nhập
+                    </Button>
+                  </Form.Item>
+                </Form>
+              </Card>
+            </Col>
+
+            {/* Cột phải: Bảng Lịch Sử */}
+            <Col span={16}>
+              <Card
+                title={
+                  <Title level={4} style={{ color: "#1d39c4", margin: 0 }}>
+                    📋 LỊCH SỬ PHIẾU NHẬP KHO
+                  </Title>
+                }
+                bordered={false}
+                style={{
+                  borderRadius: "12px",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                }}
+              >
+                <Table
+                  columns={cotPhieuNhapKho}
+                  dataSource={dsPhieuNhapKho}
+                  rowKey={(record, index) => index}
+                  loading={loadingDanhSachNhap}
+                  pagination={{ pageSize: 8 }}
+                  bordered
+                />
+              </Card>
+            </Col>
+          </Row>
+        )}
       </Content>
     </Layout>
   );

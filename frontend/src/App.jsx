@@ -4,6 +4,7 @@ import TrangDatMon from "./TrangDatMon";
 import DangNhapNoiBo from "./DangNhapNoiBo";
 import HoatDongNhanVien from "./HoatDongNhanVien";
 import HoatDongQuanLy from "./HoatDongQuanLy";
+import PhieuGoiMonTab from "./PhieuGoiMonTab";
 
 function App() {
   return (

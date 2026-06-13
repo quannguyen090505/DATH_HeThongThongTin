@@ -533,3 +533,58 @@ def truy_xuat_kinh_phi(
     finally:
         cursor.close()
         conn.close()
+
+@router.post("/tao-phieu-nhap-kho")
+def tao_phieu_nhap_kho(
+    request: TaoPhieuNhapKhoRequest, 
+    _= Depends(kiem_tra_quyen_quan_ly)
+):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            INSERT INTO phieunhapkho (MaQuanLy, GiaTri, ThongTinGhiChu) 
+            VALUES (%s, %s, %s)
+            """,
+            (request.ma_quan_ly, request.gia_tri, request.thong_tin_ghi_chu)
+        )
+
+        conn.commit()
+        return {"status": "success", "message": "Tạo phiếu nhập kho thành công!"}
+        
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
+
+@router.get("/truy-xuat-phieu-nhap-kho/{ma_chi_nhanh}")
+def truy_xuat_phieu_nhap_kho(
+    ma_chi_nhanh:int,
+    _= Depends(kiem_tra_quyen_quan_ly)
+):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            """
+            select NgayGiotaoPhieu, GiaTri,ThongTinGhiChu from PhieuNhapKho where MaChiNhanh=%s;
+            """,
+            (ma_chi_nhanh,)
+        )
+        danh_sach_phieu=[]
+        danh_sach_phieu=cursor.fetchall()
+        if not danh_sach_phieu:
+            return {"status":"success","message": "danh sách phiếu nhập kho rỗng", "data":[]}
+        conn.commit()
+        return {"status": "success", "data": danh_sach_phieu, }
+        
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
+

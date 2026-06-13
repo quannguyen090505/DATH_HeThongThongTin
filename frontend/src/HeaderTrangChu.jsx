@@ -37,7 +37,6 @@ const HeaderTrangChu = () => {
   const [isAuthVisible, setIsAuthVisible] = useState(false);
   const [isQrModalVisible, setIsQrModalVisible] = useState(false);
 
-  // QR simulation state
   const [danhSachChiNhanh, setDanhSachChiNhanh] = useState([]);
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [danhSachBanAn, setDanhSachBanAn] = useState([]);
@@ -114,7 +113,6 @@ const HeaderTrangChu = () => {
   };
 
   const batDauGoiMonTaiBan = () => {
-    //chi cho quet qr de lay thong tin chi nhanh va ban an
     const maChiNhanhQuetDuoc = 1;
     const maBanQuetDuoc = 1;
     setIsQrModalVisible(false);
@@ -252,9 +250,7 @@ const HeaderTrangChu = () => {
           </Menu.SubMenu>
         </Menu>
 
-        {/* Action Buttons */}
         <Space size="large">
-          {/* Cart Icon Badge */}
           {cart.length > 0 && (
             <Badge count={cart.length} showZero={false} offset={[5, -5]}>
               <Button
@@ -270,7 +266,6 @@ const HeaderTrangChu = () => {
             </Badge>
           )}
 
-          {/* User Auth */}
           {session ? (
             <Dropdown
               menu={{ items: userMenuItems }}
@@ -304,14 +299,12 @@ const HeaderTrangChu = () => {
         </Space>
       </Header>
 
-      {/* Authentication Modal */}
       <KhachDangNhap
         visible={isAuthVisible}
         onClose={() => setIsAuthVisible(false)}
         onLoginSuccess={handleLoginSuccess}
       />
 
-      {/* Simulated Table QR Scanner Modal */}
       <Modal
         title={
           <div style={{ textAlign: "center" }}>
@@ -337,7 +330,6 @@ const HeaderTrangChu = () => {
             padding: "10px 0",
           }}
         >
-          {/* Mock Camera View */}
           <div
             style={{
               height: "200px",
@@ -352,7 +344,6 @@ const HeaderTrangChu = () => {
                 "inset 0 0 20px rgba(255,255,255,0.1), 0 4px 12px rgba(0,0,0,0.15)",
             }}
           >
-            {/* Holographic scanning effect */}
             <div
               style={{
                 position: "absolute",

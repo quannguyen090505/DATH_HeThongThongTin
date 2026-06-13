@@ -156,7 +156,7 @@ const TrangChu = () => {
         );
         if (!session.sdt) return;
 
-        const res = await api.get(`/api/truy-xuat-phieu-goi-mon`, {
+        const res = await api.get(`/api/khach/truy-xuat-phieu-goi-mon`, {
           params: { sdt_khach: session.sdt },
         });
         if (res.data.status === "success" && res.data.data?.length > 0) {

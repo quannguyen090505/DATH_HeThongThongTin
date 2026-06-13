@@ -2,12 +2,13 @@ from fastapi import HTTPException
 import mysql.connector
 
 
-def error_complier(error: mysql.connector.Error):
+def error_complier(error: Exception):
+    if not isinstance(error,mysql.connector.Error):
+        raise HTTPException(status_code=500, detail=f"Lỗi hệ thống nội bộ: {str(error)}")
     error_code = error.errno
     if error_code == 1644:
         message = error.msg
     elif error_code == 3819:
-        # Lỗi CHECK Constraint
         if "banan_chk_1" in error.msg:
             message = "Lỗi: Số lượng chỗ ngồi phải lớn hon 0!"
         elif "monduocgoi_chk_2" in error.msg:
@@ -19,10 +20,8 @@ def error_complier(error: mysql.connector.Error):
         elif "phieunhapkho_chk_1" in error.msg:
             message = "Lỗi: Giá trị phiếu nhập kho phải lớn hơn 0."
     elif error_code == 1062:
-        # Lỗi UNIQUE (Trùng lặp)
         message = "Lỗi: Dữ liệu này (SĐT hoặc Email) đã tồn tại trong hệ thống."
     elif error_code == 1452:
-        # Lỗi Khóa ngoại (Tham chiếu sai)
         if "banan_ibfk_1" in error.msg:
             message = " Lỗi: Mã chi nhánh không hợp lệ."
         elif "cungcapthucdon_ibfk_1" in error.msg:
@@ -62,6 +61,5 @@ def error_complier(error: mysql.connector.Error):
         elif "phieunhapkho_ibfk_1" in error.msg:
             message = "Lỗi: Mã nhân viên không hợp lệ."
     else:
-        # Bắt các lỗi hệ thống khác
         message = f"Lỗi cơ sở dữ liệu ({error_code}): {error.msg}"
     raise HTTPException(status_code=400, detail=message)

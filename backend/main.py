@@ -52,7 +52,7 @@ def nhan_vien_dang_nhap(request: DangNhapRequest):
     try:
         cursor = conn.cursor(dictionary=True)
         cursor.execute(
-            "SELECT MaNhanVien, VaiTro, MatKhau, MaChiNhanh FROM nhanvien WHERE sdt = %s",
+            "SELECT MaNhanVien, HoTen, VaiTro, MatKhau, MaChiNhanh FROM nhanvien WHERE sdt = %s",
             (request.sdt,),
         )
         user = cursor.fetchone()
@@ -61,9 +61,9 @@ def nhan_vien_dang_nhap(request: DangNhapRequest):
         if not verify_password(request.mat_khau, user["MatKhau"]):
             raise HTTPException(status_code=401, detail="Sai mật khẩu")
         token = (
-            create_access_token(user_id=user["MaNhanVien"], role="NhanVien")
+            create_access_token(user_id=user["MaNhanVien"], role="NhanVien",user_name=user["HoTen"])
             if user["VaiTro"] == "NhanVien"
-            else create_access_token(user_id=user["MaNhanVien"], role="QuanLy")
+            else create_access_token(user_id=user["MaNhanVien"], role="QuanLy",user_name=user["HoTen"])
         )
         return {
             "status": "success",
@@ -76,7 +76,6 @@ def nhan_vien_dang_nhap(request: DangNhapRequest):
     finally:
         cursor.close()
         conn.close()
-
 
 @app.post("/api/tao-tai-khoan-khach")
 def tao_tai_khoan_khach(request:TaoTaiKhoanRequest):
@@ -171,19 +170,18 @@ def khach_dat_mon_mang_ve(request: GoiMonRequest):
         conn.close()
 
 @app.post("/api/khach/yeu-cau-thanh-toan")
-def khach_yeu_cau_thanh_toan(request:ThanhToanRequest):
+def khach_yeu_cau_thanh_toan(request:ThanhToanPhieuGoiMonRequest):
     conn = get_db_connection()
     if not conn:
         raise HTTPException(status_code=500, detail="Lỗi kết nối Database")
     try:
         cursor = conn.cursor(dictionary=True)
         sql="""
-            SELECT P.MaPhieuGoiMon 
+            SELECT max(P.MaPhieuGoiMon )as MaPhieuGoiMon
             FROM phieugoimon P LEFT JOIN hoadon HD on P.MaPhieuGoiMon = HD.MaPhieuGoiMon
-            WHERE P.SDTKhach = %s AND HD.MaHoaDon IS NULL
-            LIMIT 1;
+            WHERE ((%s is null and P.SDTKhach = %s) or P.MaBanAn=%s)  AND HD.MaHoaDon IS NULL;
         """
-        cursor.execute(sql, (request.sdt_khach,),)
+        cursor.execute(sql, (request.ma_ban_an,request.sdt_khach,request.ma_ban_an),)
         result=cursor.fetchone()
         if not result:
             raise HTTPException(status_code=404, detail="Không tìm thấy phiếu gọi món")
@@ -201,7 +199,6 @@ def khach_yeu_cau_thanh_toan(request:ThanhToanRequest):
     finally:
         cursor.close()
         conn.close()
-
 
 @app.get("/api/thong-tin-thuc-don")
 def thuc_don(ma_chi_nhanh: Optional[int]=None,ma_mon_an:Optional[int]=None):
@@ -242,12 +239,12 @@ def thong_tin_the_loai_mon(ma_chi_nhanh:Optional[int]=None,ma_the_loai: Optional
 
 
 @app.get("/api/thong-tin-ban-an/{ma_chi_nhanh}")
-def danh_sach_ban_an(ma_chi_nhanh: int, ma_ban_an:Optional[int]=None):
+def thong_tin_ban_an(ma_chi_nhanh: int, ma_ban_an:Optional[int]=None):
     conn = get_db_connection()
     try:
         cursor = conn.cursor(dictionary=True)
         cursor.execute(
-            "select MaBan, SoLuongChoNgoi,ViTri,TinhTrangSuDung, CoSan from dsbanan where MaChiNhanh=%s and (%s is null or %s=MaBan);",
+            "select MaBan, SoLuongChoNgoi,ViTri,TinhTrangSuDung, CoSan from banan where MaChiNhanh=%s and (%s is null or %s=MaBan);",
             (ma_chi_nhanh,ma_ban_an,ma_ban_an),
         )
         result = cursor.fetchall()
@@ -280,22 +277,18 @@ def thong_tin_chi_nhanh(ma_chi_nhanh:Optional[int]=None):
         cursor.close()
         conn.close()
 
-@app.get("/api/truy-xuat-phieu-goi-mon")
+@app.get("/api/khach/truy-xuat-phieu-goi-mon")
 def khach_truy_xuat_phieu_goi_mon(
     ma_ban_an: Optional[int] = None,
-    sdt_khach: Optional[str] = None,
-    tinh_trang: Optional[str] = None,
-    thanh_toan: Optional[int] = None):
+    sdt_khach: Optional[str] = None,):
     conn = get_db_connection()
     try:
         cursor = conn.cursor(dictionary=True)
         cursor.callproc(
-            "truy_xuat_phieu_goi_mon",
+            "khach_truy_xuat_phieu_goi_mon",
             (
                 ma_ban_an,
                 sdt_khach,
-                tinh_trang,
-                thanh_toan,
             ),
         )
         danh_sach_mon = []

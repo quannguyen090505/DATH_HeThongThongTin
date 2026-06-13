@@ -77,7 +77,7 @@ const TrangDatMon = () => {
       } catch (e) {}
     }
 
-    let params = { thanh_toan: 0 };
+    let params = {};
     if (maBanAn && maBanAn !== "null") {
       params.ma_ban_an = maBanAn;
     } else if (currentSdt) {
@@ -87,7 +87,7 @@ const TrangDatMon = () => {
     }
 
     try {
-      const response = await api.get(`/api/truy-xuat-phieu-goi-mon`, {
+      const response = await api.get(`/api/khach/truy-xuat-phieu-goi-mon`, {
         params,
       });
       if (
@@ -188,52 +188,67 @@ const TrangDatMon = () => {
   };
 
   const ChotPhieuGoiMon = async () => {
-    if (!Sdt || Sdt.length < 9)
-      return message.error("Vui lòng nhập SĐT hợp lệ trước khi đặt món!");
-    if (TrangThaiSdt === "khong_ton_tai" && TaoTaiKhoan && !HoTen.trim()) {
+    const isDineIn = maBanAn && maBanAn !== "null";
+
+    if (!isDineIn && (!Sdt || Sdt.length < 9)) {
+      return message.error(
+        "Vui lòng nhập SĐT hợp lệ trước khi đặt món mang về!",
+      );
+    }
+
+    if (Sdt && Sdt.length > 0 && Sdt.length < 9) {
+      return message.error("Số điện thoại không hợp lệ!");
+    }
+
+    if (
+      Sdt &&
+      TrangThaiSdt === "khong_ton_tai" &&
+      TaoTaiKhoan &&
+      !HoTen.trim()
+    ) {
       return message.error("Vui lòng nhập Họ Tên để đăng ký tài khoản!");
     }
 
     try {
-      if (TrangThaiSdt === "khong_ton_tai" && TaoTaiKhoan) {
+      if (Sdt && TrangThaiSdt === "khong_ton_tai" && TaoTaiKhoan) {
         await api.post(`/api/tao-tai-khoan-khach`, { sdt: Sdt, ho_ten: HoTen });
         message.success("Đã tạo tài khoản thành viên thành công!");
       }
 
-      localStorage.setItem(
-        "khach_session",
-        JSON.stringify({ sdt: Sdt, hoTen: HoTen || "Khách Hàng" }),
-      );
+      if (Sdt) {
+        localStorage.setItem(
+          "khach_session",
+          JSON.stringify({ sdt: Sdt, hoTen: HoTen || "Khách Hàng" }),
+        );
+      }
 
-      const isDineIn = maBanAn && maBanAn !== "null";
       const endpoint = isDineIn
         ? "/api/khach/goi-mon"
         : "/api/khach/dat-mang-ve";
 
-      await Promise.all(
-        PhieuGoiMon.map((item) =>
-          api.post(endpoint, {
-            ma_mon_an: item.MaMon,
-            so_luong: item.SoLuong,
-            sdt_khach: Sdt,
-            ...(isDineIn
-              ? { ma_ban_an: parseInt(maBanAn) }
-              : { ma_chi_nhanh: parseInt(maChiNhanh) }),
-          }),
-        ),
-      );
+      for (const item of PhieuGoiMon) {
+        await api.post(endpoint, {
+          ma_mon_an: item.MaMon,
+          so_luong: item.SoLuong,
+          sdt_khach: Sdt ? Sdt : null,
+          ...(isDineIn
+            ? { ma_ban_an: parseInt(maBanAn) }
+            : { ma_chi_nhanh: parseInt(maChiNhanh) }),
+        });
+      }
 
       setIsCheckoutVisible(false);
       XoaPhieuGoiMon();
 
       if (isDineIn) {
         message.success("Món ăn của bạn đã được gửi xuống bếp chuẩn bị!");
-        setTimeout(() => fetchActiveOrder(Sdt), 800);
+        setTimeout(() => fetchActiveOrder(), 800);
       } else {
         message.success(
           "Đặt món mang về thành công! Nhà hàng đang chuẩn bị món.",
         );
         await api.post("/api/khach/yeu-cau-thanh-toan", {
+          ma_ban_an: null,
           sdt_khach: Sdt,
           phuong_thuc_thanh_toan: PhuongThucThanhToan,
         });
@@ -294,15 +309,29 @@ const TrangDatMon = () => {
   };
 
   const handleYeuCauThanhToanStatusModal = async () => {
-    if (!Sdt)
-      return message.error("Vui lòng đăng nhập hoặc nhập SĐT để thanh toán!");
+    const isDineIn = maBanAn && maBanAn !== "null";
+
+    if (!isDineIn && !Sdt) {
+      return message.error("Vui lòng nhập SĐT để thanh toán hóa đơn mang về!");
+    }
 
     setSubmittingPayment(true);
     try {
-      await api.post("/api/khach/yeu-cau-thanh-toan", {
-        sdt_khach: Sdt,
+      const payload = {
         phuong_thuc_thanh_toan: ptThanhToanStatus,
-      });
+      };
+
+      if (isDineIn) {
+        payload.ma_ban_an = parseInt(maBanAn);
+      } else {
+        payload.ma_ban_an = null;
+      }
+
+      if (Sdt) {
+        payload.sdt_khach = Sdt;
+      }
+
+      await api.post("/api/khach/yeu-cau-thanh-toan", payload);
       message.success(
         "Đã gửi yêu cầu thanh toán thành công! Vui lòng chờ nhân viên.",
       );
@@ -708,7 +737,9 @@ const TrangDatMon = () => {
                 THÔNG TIN GIAO DỊCH
               </Title>
               <Text type="secondary">
-                Vui lòng cung cấp số điện thoại để nhận điểm tích lũy
+                {maBanAn
+                  ? "Cung cấp số điện thoại để tích điểm (Không bắt buộc)"
+                  : "Vui lòng cung cấp số điện thoại để nhận điểm tích lũy"}
               </Text>
             </div>
           }
@@ -727,9 +758,17 @@ const TrangDatMon = () => {
             }}
           >
             <div>
-              <Text strong>Số điện thoại liên lạc:</Text>
+              <Text strong>
+                {maBanAn
+                  ? "Số điện thoại (Tùy chọn):"
+                  : "Số điện thoại liên lạc (*):"}
+              </Text>
               <Input
-                placeholder="Nhập số điện thoại..."
+                placeholder={
+                  maBanAn
+                    ? "Nhập số điện thoại (Tùy chọn)..."
+                    : "Nhập số điện thoại..."
+                }
                 allowClear
                 size="large"
                 value={Sdt}
@@ -737,7 +776,9 @@ const TrangDatMon = () => {
                   setSdt(e.target.value.replace(/[^0-9]/g, ""));
                   setTrangThaiSdt(null);
                 }}
-                onBlur={KiemTraSDT}
+                onBlur={() => {
+                  if (Sdt) KiemTraSDT();
+                }}
                 prefix={<UserOutlined />}
                 style={{ marginTop: "8px" }}
               />

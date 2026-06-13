@@ -22,11 +22,12 @@ def verify_password(plain_password: str, hashed_password: str):
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def create_access_token(user_id: int, role: str):
+def create_access_token(user_id: int, role: str, user_name:str):
     """Tạo thẻ VIP (Token) chứa ID và Quyền (Khách hay Nhân Viên)"""
     expire = datetime.now() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
     payload = {
+        "name": user_name,
         "sub": str(user_id),
         "role": role,
         "exp": expire,

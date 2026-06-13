@@ -23,11 +23,12 @@ def nhan_vien_goi_mon(
     try:
         cursor = conn.cursor()
         cursor.callproc(
-            "nhan_vien_goi_mon_tai_quan",
+            "nhan_vien_goi_mon",
             (
                 request.ma_ban_an,
                 request.ma_mon_an,
                 request.so_luong,
+                request.sdt_khach,
                 ma_nhan_vien,
             ),
         )
@@ -40,8 +41,7 @@ def nhan_vien_goi_mon(
         cursor.close()
         conn.close()
 
-
-@router.post("/dat-mon")
+@router.post("/dat-mon-truoc")
 def nhan_vien_dat_mon_truoc(
     request: GoiMonRequest,
     ma_nhan_vien: int = Depends(kiem_tra_quyen_nhan_vien),
@@ -50,12 +50,11 @@ def nhan_vien_dat_mon_truoc(
     try:
         cursor = conn.cursor()
         cursor.callproc(
-            "nhan_vien_dat_mon_truoc",
+            "nhan_vien_dat_truoc_mon",
             (
                 request.ma_phieu_dat_ban,
                 request.ma_mon_an,
                 request.so_luong,
-                request.sdt_khach,
                 ma_nhan_vien,
             ),
         )
@@ -68,26 +67,20 @@ def nhan_vien_dat_mon_truoc(
         cursor.close()
         conn.close()
 
-
-# API dat ban
-@router.post("/dat-ban")
-def tao_phieu_dat_ban(
-    request: DatBanRequest, ma_nhan_vien: int = Depends(kiem_tra_quyen_nhan_vien)
+@router.put("/chinh-sua-phieu-goi-mon")
+def chinh_sua_phieu_goi_mon(
+    request: ChinhSuaPhieuGoiMonRequest,
+    _= Depends(kiem_tra_quyen_nhan_vien)
 ):
     conn = get_db_connection()
     try:
         cursor = conn.cursor()
-        cursor.callproc(
-            "tao_phieu_dat_ban",
-            (
-                request.ma_ban_an,
-                request.ngay_gio_nhan,
-                request.sdt_khach,
-                ma_nhan_vien,
-            ),
+        cursor.execute(
+            "UPDATE PhieuGoiMon SET SDTKhach = %s WHERE MaPhieuGoiMon = %s",
+            (request.sdt_khach, request.ma_phieu_goi_mon)
         )
         conn.commit()
-        return {"status": "success", "message": "Đặt bàn thành công!"}
+        return {"status": "success", "message": "Cập nhật SĐT khách thành công!"}
     except Exception as e:
         conn.rollback()
         error_complier(e)
@@ -95,37 +88,10 @@ def tao_phieu_dat_ban(
         cursor.close()
         conn.close()
 
-
-# API thanh toan
-@router.post("/thanh-toan")
-def thanh_toan_phieu_goi_mon(
-    request: ThanhToanPhieuGoiMonRequest,
-    ma_nhan_vien: int = Depends(kiem_tra_quyen_nhan_vien),
-):
-    conn = get_db_connection()
-    try:
-        cursor = conn.cursor()
-        cursor.callproc(
-            "thanh_toan_phieu_goi_mon",
-            (
-                request.ma_phieu_goi_mon,
-                request.phuong_thuoc_thanh_toan,
-                ma_nhan_vien,
-            ),
-        )
-        conn.commit()
-        return {"status": "success", "message": "thanh toán  thành công!"}
-    except Exception as e:
-        conn.rollback()
-        error_complier(e)
-    finally:
-        cursor.close()
-        conn.close()
-
-
-@router.get("/truy-xuat-phieu-goi-mon/")
+@router.get("/truy-xuat-phieu-goi-mon")
 def nhan_vien_truy_xuat_phieu_goi_mon(
     ma_ban_an: Optional[int] = None,
+    sdt_khach:Optional[str]=None,
     tinh_trang_phieu: Optional[str] = None,
     thanh_toan: Optional[bool] = None,
 ):
@@ -133,9 +99,10 @@ def nhan_vien_truy_xuat_phieu_goi_mon(
     try:
         cursor = conn.cursor(dictionary=True)
         cursor.callproc(
-            "truy_xuat_phieu_goi_mon",
+            "nv_truy_xuat_phieu_goi_mon",
             (
                 ma_ban_an,
+                sdt_khach,
                 tinh_trang_phieu,
                 thanh_toan,
             ),
@@ -159,6 +126,192 @@ def nhan_vien_truy_xuat_phieu_goi_mon(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
+
+@router.post("/xac-nhan-goi-mon")
+def xac_nhan_yeu_cau_goi_mon(request:XacNhanPhieuGoiMonRequest):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.callproc("nhan_vien_xac_nhan_yeu_cau_goi_mon", (request.ma_phieu_goi_mon,))
+        conn.commit()
+        return {"status": "success", "message": "Đã chuyển yêu cầu xuống bếp!"}
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
+
+@router.patch("/cap-nhat-trang-thai-goi-mon")
+def cap_nhat_trang_thai_goi_mon(request:MonDuocGoiRequest):
+    conn=get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("update MonDuocGoi set tinhtrang=%s where MaPhieuGoiMon=%s and MaGoiMon=%s order by MaGoiMon desc limit 1;",
+                        (request.tinh_trang,request.ma_phieu_goi_mon,request.ma_goi_mon,))
+        conn.commit()
+        return {"status": "success", "message": "Đã phục vụ món"}
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
+
+@router.post("/dat-ban-an")
+def tao_phieu_dat_ban(
+    request: DatBanRequest, ma_nhan_vien: int = Depends(kiem_tra_quyen_nhan_vien)
+):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.callproc(
+            "tao_phieu_dat_ban",
+            (
+                request.ma_ban_an,
+                request.ngay_gio_nhan,
+                request.sdt_khach,
+                ma_nhan_vien,
+            ),
+        )
+        ma_phieu_dat_ban = None
+        for res in cursor.stored_results():
+            row = res.fetchone()
+            if row:
+                ma_phieu_dat_ban = row[0]
+        conn.commit()
+        if not ma_phieu_dat_ban:
+            raise Exception("Không thể lấy được Mã Phiếu Đặt Bàn từ Database!")
+        return {"status": "success", "message": "Đặt bàn thành công!", "ma_phieu_dat_ban":ma_phieu_dat_ban,}
+    except Exception as e:
+        conn.rollback()
+        error_complier(e)
+    finally:
+        cursor.close()
+        conn.close()
+
+@router.put("/chinh-sua-phieu-dat-ban")
+def chinh_sua_phieu_dat_ban(
+    request: ChinhSuaPhieuDatBanRequest,
+    _= Depends(kiem_tra_quyen_nhan_vien)
+):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE PhieuDatBan SET SDTKhach = %s, NgayGioNhanBan = %s ,MaBanAn=%s WHERE MaPhieuDatBan = %s",
+            (request.sdt_khach, request.ngay_gio_nhan, request.ma_ban_an, request.ma_phieu_dat_ban,)
+        )
+        conn.commit()
+        return {"status": "success", "message": "Cập nhật thông tin Phiếu đặt bàn thành công!"}
+    except Exception as e:
+        conn.rollback()
+        error_complier(e)
+    finally:
+        cursor.close()
+        conn.close()
+
+@router.get("/truy-xuat-phieu-dat-ban")
+def nhan_vien_truy_xuat_phieu_dat_ban(ma_ban_an:Optional[int]=None):
+    conn=get_db_connection()
+    try:
+        cursor=conn.cursor(dictionary=True)
+        sql = (
+            "SELECT * "
+            "FROM ChiTietPhieuDatBan "
+            "WHERE (%s is null or MaBanAn=%s) AND date(NgayGioNhanBan)=date(now());"
+        )
+        cursor.execute(sql, (ma_ban_an,ma_ban_an,))
+        danh_sach_phieu = cursor.fetchall()
+        if not danh_sach_phieu:
+            return {
+                "status": "success",
+                "message": "Chưa có phiếu đặt bàn",
+                "data": []
+            }
+        return {
+            "status": "success",
+            "data": danh_sach_phieu,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
+
+@router.patch("/cap-nhat-trang-thai-phieu-dat-ban/{ma_phieu_dat_ban}")
+def cap_nhat_trang_thai_phieu_dat_ban(
+    ma_phieu_dat_ban: int, 
+    tinh_trang: str, 
+    _: int = Depends(kiem_tra_quyen_nhan_vien)
+):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE PhieuDatBan SET TinhTrang = %s WHERE MaPhieuDatBan = %s",
+            (tinh_trang, ma_phieu_dat_ban)
+        )
+        if tinh_trang == "DaNhanBan":
+            cursor.execute(
+                "UPDATE BanAn SET TinhTrangSuDung = 'DangSuDung' WHERE MaBan = (SELECT MaBanAn FROM PhieuDatBan WHERE MaPhieuDatBan = %s)",
+                (ma_phieu_dat_ban,)
+            )
+        conn.commit()
+        return {"status": "success", "message": f"Cập nhật trạng thái phiếu thành {tinh_trang} thành công!"}
+    except Exception as e:
+        conn.rollback()
+        error_complier(e)
+    finally:
+        cursor.close()
+        conn.close()
+
+@router.post("/thuc-hien-thanh-toan")
+def thanh_toan_phieu_goi_mon(
+    request: ThanhToanPhieuGoiMonRequest,
+    ma_nhan_vien: int = Depends(kiem_tra_quyen_nhan_vien),
+):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.callproc(
+            "thanh_toan_phieu_goi_mon",
+            (
+                request.ma_phieu_goi_mon,
+                request.phuong_thuc_thanh_toan,
+                ma_nhan_vien,
+            ),
+        )
+        conn.commit()
+        return {"status": "success", "message": "thanh toán  thành công!"}
+    except Exception as e:
+        conn.rollback()
+        error_complier(e)
+    finally:
+        cursor.close()
+        conn.close()
+
+@router.patch("/thay-doi-trang-thai-ban-an/{ma_ban_an}")
+def thay_doi_trang_thai_ban_an(
+    ma_ban_an: int,
+    trang_thai:str,
+    _: int = Depends(kiem_tra_quyen_nhan_vien)
+):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE BanAn SET TinhTrangSuDung = %s WHERE MaBan = %s",
+            (trang_thai,ma_ban_an,)
+        )
+        conn.commit()
+        return {"status": "success", "message": "Xác nhận dọn bàn thành công!"}
+    except Exception as e:
+        conn.rollback()
+        error_complier(e)
     finally:
         cursor.close()
         conn.close()
