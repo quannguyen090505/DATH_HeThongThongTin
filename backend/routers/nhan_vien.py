@@ -76,7 +76,7 @@ def chinh_sua_phieu_goi_mon(
     try:
         cursor = conn.cursor()
         cursor.execute(
-            "UPDATE PhieuGoiMon SET SDTKhach = %s WHERE MaPhieuGoiMon = %s",
+            "UPDATE phieugoimon SET SDTKhach = %s WHERE MaPhieuGoiMon = %s",
             (request.sdt_khach, request.ma_phieu_goi_mon)
         )
         conn.commit()
@@ -150,7 +150,7 @@ def cap_nhat_trang_thai_goi_mon(request:MonDuocGoiRequest):
     conn=get_db_connection()
     try:
         cursor = conn.cursor()
-        cursor.execute("update MonDuocGoi set tinhtrang=%s where MaPhieuGoiMon=%s and MaGoiMon=%s order by MaGoiMon desc limit 1;",
+        cursor.execute("update monduocgoi set tinhtrang=%s where MaPhieuGoiMon=%s and MaGoiMon=%s order by MaGoiMon desc limit 1;",
                         (request.tinh_trang,request.ma_phieu_goi_mon,request.ma_goi_mon,))
         conn.commit()
         return {"status": "success", "message": "Đã phục vụ món"}
@@ -202,7 +202,7 @@ def chinh_sua_phieu_dat_ban(
     try:
         cursor = conn.cursor()
         cursor.execute(
-            "UPDATE PhieuDatBan SET SDTKhach = %s, NgayGioNhanBan = %s ,MaBanAn=%s WHERE MaPhieuDatBan = %s",
+            "UPDATE phieudatban SET SDTKhach = %s, NgayGioNhanBan = %s ,MaBanAn=%s WHERE MaPhieuDatBan = %s",
             (request.sdt_khach, request.ngay_gio_nhan, request.ma_ban_an, request.ma_phieu_dat_ban,)
         )
         conn.commit()
@@ -221,7 +221,7 @@ def nhan_vien_truy_xuat_phieu_dat_ban(ma_ban_an:Optional[int]=None):
         cursor=conn.cursor(dictionary=True)
         sql = (
             "SELECT * "
-            "FROM ChiTietPhieuDatBan "
+            "FROM chitietphieudatban "
             "WHERE (%s is null or MaBanAn=%s) AND date(NgayGioNhanBan)=date(now());"
         )
         cursor.execute(sql, (ma_ban_an,ma_ban_an,))
@@ -252,12 +252,12 @@ def cap_nhat_trang_thai_phieu_dat_ban(
     try:
         cursor = conn.cursor()
         cursor.execute(
-            "UPDATE PhieuDatBan SET TinhTrang = %s WHERE MaPhieuDatBan = %s",
+            "UPDATE phieudatban SET TinhTrang = %s WHERE MaPhieuDatBan = %s",
             (tinh_trang, ma_phieu_dat_ban)
         )
         if tinh_trang == "DaNhanBan":
             cursor.execute(
-                "UPDATE BanAn SET TinhTrangSuDung = 'DangSuDung' WHERE MaBan = (SELECT MaBanAn FROM PhieuDatBan WHERE MaPhieuDatBan = %s)",
+                "UPDATE banan SET TinhTrangSuDung = 'DangSuDung' WHERE MaBan = (SELECT MaBanAn FROM phieudatban WHERE MaPhieuDatBan = %s)",
                 (ma_phieu_dat_ban,)
             )
         conn.commit()
@@ -279,7 +279,7 @@ def thay_doi_trang_thai_ban_an(
     try:
         cursor = conn.cursor()
         cursor.execute(
-            "UPDATE BanAn SET TinhTrangSuDung = %s WHERE MaBan = %s",
+            "UPDATE banan SET TinhTrangSuDung = %s WHERE MaBan = %s",
             (trang_thai,ma_ban_an,)
         )
         conn.commit()
@@ -325,7 +325,7 @@ def truy_xuat_hoa_don(
     try:
         cursor = conn.cursor(dictionary=True)
         cursor.execute(
-            "select * from HoaDon where MaPhieuGoiMon=%s;",(ma_phieu_goi_mon,),
+            "select * from hoadon where MaPhieuGoiMon=%s;",(ma_phieu_goi_mon,),
         )
         hoa_don=cursor.fetchone()
         return {"status": "success", "data":hoa_don}
@@ -344,7 +344,7 @@ def xac_nhan_thanh_toan(
     conn = get_db_connection()
     try:
         cursor = conn.cursor()
-        cursor.execute("update HoaDon set XacNhanThanhToan=1 where MaPhieuGoiMon=%s",(ma_phieu_goi_mon,),)
+        cursor.execute("update hoadon set XacNhanThanhToan=1 where MaPhieuGoiMon=%s",(ma_phieu_goi_mon,),)
         conn.commit()
         return {"status": "success", "message": "Đã xác nhận thanh toán"}
     except Exception as e:

@@ -235,7 +235,7 @@ def tao_tai_khoan_nv(
     ThongTinReqest:NhanVienRequest,
     TaiKhoanRequest: TaoTaiKhoanRequest,
 ):
-    conn = get_db_connection
+    conn = get_db_connection()
     try:
         cursor = conn.cursor()
         hashed_pw = get_password_hash(TaiKhoanRequest.mat_khau)
@@ -570,7 +570,7 @@ def truy_xuat_phieu_nhap_kho(
         cursor = conn.cursor(dictionary=True)
         cursor.execute(
             """
-            select NgayGiotaoPhieu, GiaTri,ThongTinGhiChu from PhieuNhapKho where MaChiNhanh=%s;
+            select NgayGiotaoPhieu, GiaTri,ThongTinGhiChu from phieunhapkho where MaChiNhanh=%s;
             """,
             (ma_chi_nhanh,)
         )
