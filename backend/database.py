@@ -6,7 +6,7 @@ def get_db_connection():
     try:
         connection = mysql.connector.connect(
             host="",
-            database="",  # Đổi lại tên DB
+            database="DATH_HeThongThongTin",  # Đổi lại tên DB
             user="",
             password="",  # Đổi lại mật khẩu MySQL đang dùng
 
