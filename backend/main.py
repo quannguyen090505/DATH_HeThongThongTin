@@ -30,11 +30,11 @@ def khach_dang_nhap(request: DangNhapRequest):
     conn = get_db_connection()
     try:
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("Select 1 from khach where SDT=%s", (request.sdt,))
+        cursor.execute("Select SDT, HoTen from khach where SDT=%s", (request.sdt,))
         result = cursor.fetchone()
         if not result:
             raise HTTPException(status_code=401, detail="Số điện thoại chưa đăng ký")
-        token = create_access_token(user_id=request.sdt, role="Khach")
+        token = create_access_token(user_id=request.sdt, role="Khach", user_name=result["HoTen"])
         return {
             "status": "success",
             "message": "Đăng nhập thành công",
@@ -111,7 +111,7 @@ def kiem_tra_sdt(sdt_khach: str):
         raise HTTPException(status_code=500, detail="Lỗi kết nối Database")
     try:
         cursor = conn.cursor()
-        cursor.execute("select 1 from Khach where SDT=%s;", (sdt_khach,))
+        cursor.execute("select 1 from khach where SDT=%s;", (sdt_khach,))
         result = cursor.fetchone()
         if not result:
             return {"status": "success", "data": 0}
@@ -206,7 +206,7 @@ def thuc_don(ma_chi_nhanh: Optional[int]=None,ma_mon_an:Optional[int]=None):
     try:
         cursor = conn.cursor(dictionary=True)
         cursor.execute(
-            "select MaMonAn,TenMon,HinhAnh,ThongTinMon,MaTheLoai,TenTheLoai,DonGia,CoSan from DsMonAn where (%s is null or MaChiNhanh=%s) and (%s is null or MaMonAn=%s)",
+            "select MaMonAn,TenMon,HinhAnh,ThongTinMon,MaTheLoai,TenTheLoai,DonGia,CoSan from dsmonan where (%s is null or MaChiNhanh=%s) and (%s is null or MaMonAn=%s)",
             (ma_chi_nhanh,ma_chi_nhanh,ma_mon_an,ma_mon_an),
         )
         result = cursor.fetchall()
