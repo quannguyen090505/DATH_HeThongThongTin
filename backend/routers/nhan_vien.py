@@ -269,6 +269,28 @@ def cap_nhat_trang_thai_phieu_dat_ban(
         cursor.close()
         conn.close()
 
+@router.patch("/thay-doi-trang-thai-ban-an/{ma_ban_an}")
+def thay_doi_trang_thai_ban_an(
+    ma_ban_an: int,
+    trang_thai:str,
+    _: int = Depends(kiem_tra_quyen_nhan_vien)
+):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE BanAn SET TinhTrangSuDung = %s WHERE MaBan = %s",
+            (trang_thai,ma_ban_an,)
+        )
+        conn.commit()
+        return {"status": "success", "message": "Xác nhận dọn bàn thành công!"}
+    except Exception as e:
+        conn.rollback()
+        error_complier(e)
+    finally:
+        cursor.close()
+        conn.close()
+
 @router.post("/thuc-hien-thanh-toan")
 def thanh_toan_phieu_goi_mon(
     request: ThanhToanPhieuGoiMonRequest,
@@ -294,21 +316,37 @@ def thanh_toan_phieu_goi_mon(
         cursor.close()
         conn.close()
 
-@router.patch("/thay-doi-trang-thai-ban-an/{ma_ban_an}")
-def thay_doi_trang_thai_ban_an(
-    ma_ban_an: int,
-    trang_thai:str,
-    _: int = Depends(kiem_tra_quyen_nhan_vien)
+@router.get("/truy-xuat-hoa-don")
+def truy_xuat_hoa_don(
+    ma_phieu_goi_mon:int,
+    _= Depends(kiem_tra_quyen_nhan_vien),
+):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            "select * from HoaDon where MaPhieuGoiMon=%s;",(ma_phieu_goi_mon,),
+        )
+        hoa_don=cursor.fetchone()
+        return {"status": "success", "data":hoa_don}
+    except Exception as e:
+        conn.rollback()
+        error_complier(e)
+    finally:
+        cursor.close()
+        conn.close()
+
+@router.post("/xac-nhan-thanh-toan")
+def xac_nhan_thanh_toan(
+    ma_phieu_goi_mon:int,
+    _= Depends(kiem_tra_quyen_nhan_vien),
 ):
     conn = get_db_connection()
     try:
         cursor = conn.cursor()
-        cursor.execute(
-            "UPDATE BanAn SET TinhTrangSuDung = %s WHERE MaBan = %s",
-            (trang_thai,ma_ban_an,)
-        )
+        cursor.execute("update HoaDon set XacNhanThanhToan=1 where MaPhieuGoiMon=%s",(ma_phieu_goi_mon,),)
         conn.commit()
-        return {"status": "success", "message": "Xác nhận dọn bàn thành công!"}
+        return {"status": "success", "message": "Đã xác nhận thanh toán"}
     except Exception as e:
         conn.rollback()
         error_complier(e)

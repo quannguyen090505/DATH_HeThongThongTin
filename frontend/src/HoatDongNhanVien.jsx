@@ -20,6 +20,8 @@ import {
   Checkbox,
   Select,
   Space,
+  Divider,
+  Spin,
 } from "antd";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
@@ -96,6 +98,11 @@ const HoatDongNhanVien = () => {
   const [trangThaiSdtPGM, setTrangThaiSdtPGM] = useState(null);
   const [hoTenPGM, setHoTenPGM] = useState("");
   const [taoTaiKhoanPGM, setTaoTaiKhoanPGM] = useState(false);
+
+  const [isModalHoaDonVisible, setIsModalHoaDonVisible] = useState(false);
+  const [chiTietHoaDon, setChiTietHoaDon] = useState(null);
+  const [loadingHoaDon, setLoadingHoaDon] = useState(false);
+  const [loadingXacNhanThanhToan, setLoadingXacNhanThanhToan] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token_nhan_vien");
@@ -552,6 +559,22 @@ const HoatDongNhanVien = () => {
     }
   };
 
+  const fetchChiTietHoaDon = async (maPhieu) => {
+    setLoadingHoaDon(true);
+    try {
+      const res = await api.get("/api/nhan-vien/truy-xuat-hoa-don", {
+        params: { ma_phieu_goi_mon: maPhieu },
+      });
+      if (res.data.status === "success") {
+        setChiTietHoaDon(res.data.data);
+      }
+    } catch (error) {
+      message.error("Lỗi khi tải thông tin chi tiết hóa đơn!");
+    } finally {
+      setLoadingHoaDon(false);
+    }
+  };
+
   const handleThanhToan = async () => {
     const maPhieuGoiMon =
       phieuHienTai?.ma_phieu_goi_mon ||
@@ -564,23 +587,44 @@ const HoatDongNhanVien = () => {
         ma_phieu_goi_mon: maPhieuGoiMon,
         phuong_thuc_thanh_toan: phuongThucThanhToan,
       });
-      message.success("Thanh toán thành công!");
-      setIsDrawerVisible(false);
-      setPhieuHienTai(null);
-      fetchToanBoPhieu(true);
-      fetchToanBoPhieuDatBan();
 
-      const resBan = await api.get(`/api/thong-tin-ban-an/${maChiNhanh}`);
-      if (resBan.data.status === "success") {
-        setDanhSachBan(resBan.data.data.filter((b) => b.CoSan === 1));
-      }
+      message.success("Đã tạo hóa đơn! Vui lòng xác nhận thu tiền.");
+      setIsModalHoaDonVisible(true);
+      fetchChiTietHoaDon(maPhieuGoiMon);
     } catch (error) {
-      message.error("Có lỗi xảy ra khi thực hiện thanh toán!");
+      message.error("Có lỗi xảy ra khi tạo hóa đơn!");
     } finally {
       setLoadingThanhToan(false);
     }
   };
+  const handleXacNhanThuTien = async () => {
+    if (!chiTietHoaDon) return;
+    setLoadingXacNhanThanhToan(true);
+    try {
+      const res = await api.post(
+        `/api/nhan-vien/xac-nhan-thanh-toan?ma_phieu_goi_mon=${chiTietHoaDon.MaPhieuGoiMon}`,
+      );
+      if (res.data.status === "success") {
+        message.success("Thanh toán thành công! Giao dịch hoàn tất.");
 
+        setIsModalHoaDonVisible(false);
+        setChiTietHoaDon(null);
+        setIsDrawerVisible(false);
+        setPhieuHienTai(null);
+        fetchToanBoPhieu(true);
+        fetchToanBoPhieuDatBan();
+
+        const resBan = await api.get(`/api/thong-tin-ban-an/${maChiNhanh}`);
+        if (resBan.data.status === "success") {
+          setDanhSachBan(resBan.data.data.filter((b) => b.CoSan === 1));
+        }
+      }
+    } catch (error) {
+      message.error("Lỗi khi xác nhận giao dịch thanh toán!");
+    } finally {
+      setLoadingXacNhanThanhToan(false);
+    }
+  };
   const handleXacNhanDonBan = async () => {
     if (!banDuocChon || banDuocChon.isTakeaway) return;
     setLoadingDonBan(true);
@@ -1661,7 +1705,129 @@ const HoatDongNhanVien = () => {
           </Form.Item>
         </Form>
       </Modal>
+      <Modal
+        title={
+          <Title
+            level={4}
+            style={{ textAlign: "center", margin: 0, color: "#1890ff" }}
+          >
+            <DollarOutlined /> XÁC NHẬN HÓA ĐƠN
+          </Title>
+        }
+        open={isModalHoaDonVisible}
+        onCancel={() => setIsModalHoaDonVisible(false)}
+        footer={[
+          <Button key="back" onClick={() => setIsModalHoaDonVisible(false)}>
+            Hủy / Đóng
+          </Button>,
+          <Button
+            key="submit"
+            type="primary"
+            loading={loadingXacNhanThanhToan}
+            onClick={handleXacNhanThuTien}
+            style={{ backgroundColor: "#52c41a", borderColor: "#52c41a" }}
+          >
+            Xác nhận đã thu tiền
+          </Button>,
+        ]}
+        centered
+        width={400}
+      >
+        <Spin spinning={loadingHoaDon}>
+          {chiTietHoaDon ? (
+            <div
+              style={{
+                background: "#f9f9f9",
+                padding: "20px",
+                borderRadius: "8px",
+                border: "1px dashed #d9d9d9",
+                marginTop: "15px",
+              }}
+            >
+              <Row gutter={[0, 10]}>
+                <Col span={12}>
+                  <Text type="secondary">Mã Hóa Đơn:</Text>
+                </Col>
+                <Col span={12} style={{ textAlign: "right" }}>
+                  <Text strong>#{chiTietHoaDon.MaHoaDon}</Text>
+                </Col>
 
+                <Col span={12}>
+                  <Text type="secondary">Mã Phiếu Gọi Món:</Text>
+                </Col>
+                <Col span={12} style={{ textAlign: "right" }}>
+                  <Text strong>#{chiTietHoaDon.MaPhieuGoiMon}</Text>
+                </Col>
+
+                <Col span={12}>
+                  <Text type="secondary">Ngày lập:</Text>
+                </Col>
+                <Col span={12} style={{ textAlign: "right" }}>
+                  <Text strong>
+                    {new Date(
+                      chiTietHoaDon.NgayGioTaoHoaDon || new Date(),
+                    ).toLocaleString("vi-VN")}
+                  </Text>
+                </Col>
+
+                <Col span={12}>
+                  <Text type="secondary">Phương thức:</Text>
+                </Col>
+                <Col span={12} style={{ textAlign: "right" }}>
+                  <Tag color="blue">{phuongThucThanhToan}</Tag>
+                </Col>
+              </Row>
+
+              <Divider style={{ margin: "15px 0" }} />
+
+              <Row gutter={[0, 10]}>
+                <Col span={12}>
+                  <Text type="secondary">Tổng tiền món:</Text>
+                </Col>
+                <Col span={12} style={{ textAlign: "right" }}>
+                  <Text strong>
+                    {(chiTietHoaDon.GiaTri || tongTienMoi).toLocaleString()}đ
+                  </Text>
+                </Col>
+
+                <Col span={12}>
+                  <Text type="secondary">Ưu đãi / Giảm giá:</Text>
+                </Col>
+                <Col span={12} style={{ textAlign: "right" }}>
+                  <Text type="danger" strong>
+                    -{(chiTietHoaDon.GiamGia || 0).toLocaleString()}đ
+                  </Text>
+                </Col>
+              </Row>
+
+              <Divider style={{ margin: "15px 0", borderColor: "#1890ff" }} />
+
+              <Row gutter={[0, 10]} align="middle">
+                <Col span={10}>
+                  <Title level={5} style={{ margin: 0 }}>
+                    TỔNG CỘNG:
+                  </Title>
+                </Col>
+                <Col span={14} style={{ textAlign: "right" }}>
+                  <Title level={3} style={{ margin: 0, color: "#f5222d" }}>
+                    {(
+                      (chiTietHoaDon.GiaTri || tongTienMoi) -
+                      (chiTietHoaDon.GiamGia || 0)
+                    ).toLocaleString()}
+                    đ
+                  </Title>
+                </Col>
+              </Row>
+            </div>
+          ) : (
+            <div style={{ textAlign: "center", padding: "30px 20px" }}>
+              <Text type="danger">
+                Không tìm thấy hoặc chưa load được thông tin hóa đơn!
+              </Text>
+            </div>
+          )}
+        </Spin>
+      </Modal>
       <Drawer
         title={
           <div
