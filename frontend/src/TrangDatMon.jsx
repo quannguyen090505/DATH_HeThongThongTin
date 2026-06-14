@@ -372,8 +372,8 @@ const TrangDatMon = () => {
     },
     {
       title: "Trạng thái",
-      dataIndex: "TinhTrangMon",
-      key: "TinhTrangMon",
+      dataIndex: "TinhTrangGoiMon",
+      key: "TinhTrangGoiMon",
       align: "center",
       render: (status) => getDishStatusTag(status),
     },

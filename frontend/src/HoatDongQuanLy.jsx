@@ -475,6 +475,7 @@ const HoatDongQuanLy = () => {
     setLoadingNhapKho(true);
     try {
       const payload = {
+        ma_quan_ly: parseInt(maNhanVienHienTai),
         gia_tri: values.gia_tri,
         thong_tin_ghi_chu: values.thong_tin_ghi_chu || "",
       };

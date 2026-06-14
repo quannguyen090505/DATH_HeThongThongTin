@@ -141,10 +141,10 @@ const TrangChu = () => {
     },
     {
       title: "Trạng thái",
-      dataIndex: "TinhTrangMon",
-      key: "TinhTrangMon",
+      dataIndex: "TinhTrangGoiMon",
+      key: "TinhTrangGoiMon",
       align: "center",
-      render: (status) => getDishStatusTag(status),
+      render: (status) => getDishStatusTag(status || record.TinhTrangGoiMon),
     },
   ];
 
