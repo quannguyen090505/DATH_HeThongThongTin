@@ -323,15 +323,15 @@ def truy_xuat_hoa_don(
 ):
     conn = get_db_connection()
     try:
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(dictionary=True,buffered=True)
         cursor.execute(
             "select * from hoadon where MaPhieuGoiMon=%s;",(ma_phieu_goi_mon,),
         )
         hoa_don=cursor.fetchone()
         return {"status": "success", "data":hoa_don}
     except Exception as e:
-        conn.rollback()
         error_complier(e)
+        raise HTTPException(status_code=500, detail=str(e))
     finally:
         cursor.close()
         conn.close()

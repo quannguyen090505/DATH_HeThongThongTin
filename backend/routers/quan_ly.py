@@ -329,6 +329,42 @@ def chinh_trang_thai_nv(ma_chi_nhanh:int,ma_nhan_vien:int,tinh_trang_lam_viec:in
         cursor.close()
         conn.close()
 
+@router.post("/them-nhan-vien-moi/{ma_chi_nhanh}")
+def them_nhan_vien_moi(
+    request: NhanVienRequest,
+    ma_chi_nhanh:int,
+    _ = Depends(kiem_tra_quyen_quan_ly)
+):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor(dictionary=True)
+        sql = """
+            INSERT INTO nhanvien (HoTen, SDT, DiaChi, CaLam, VaiTro, Luong, AnhThe,MaChiNhanh )
+            VALUES (%s, %s, %s, %s, %s, %s, %s,%s)
+        """
+        values = (
+            request.ho_ten,
+            request.sdt,
+            request.dia_chi,
+            request.ca_lam,
+            request.vai_tro,
+            request.luong,
+            request.anh_the,
+            ma_chi_nhanh,
+        )
+        
+        cursor.execute(sql, values)
+        conn.commit()
+        
+        return {"status": "success", "message": "Thêm nhân viên mới thành công!"}
+        
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=f"Lỗi cơ sở dữ liệu: {str(e)}")
+    finally:
+        cursor.close()
+        conn.close()
+
 @router.get("/thong-ke-doanh-so/")
 def thong_ke_doanh_so(
     ma_chi_nhanh: Optional[int] = None,

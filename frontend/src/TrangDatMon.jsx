@@ -917,11 +917,6 @@ const TrangDatMon = () => {
               <Title level={3} style={{ margin: 0, color: "#52c41a" }}>
                 <ClockCircleOutlined /> THEO DÕI PHIẾU GỌI MÓN
               </Title>
-              <Text type="secondary">
-                {activeOrder?.ma_ban_an
-                  ? `Phiếu đang phục vụ tại Bàn #${activeOrder.ma_ban_an}`
-                  : "Phiếu đặt món mang về"}
-              </Text>
             </div>
           }
           open={isStatusModalVisible}

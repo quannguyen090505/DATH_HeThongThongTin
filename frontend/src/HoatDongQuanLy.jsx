@@ -859,7 +859,10 @@ const HoatDongQuanLy = () => {
         );
         message.success("Cập nhật thông tin nhân viên thành công!");
       } else {
-        await api.post("/api/quan-ly/them-nhan-vien-moi", payload);
+        await api.post(
+          `/api/quan-ly/them-nhan-vien-moi/${maChiNhanh}`,
+          payload,
+        );
         message.success("Thêm nhân viên mới thành công!");
       }
 

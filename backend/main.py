@@ -11,7 +11,8 @@ from routers import quan_ly, nhan_vien
 app = FastAPI(title="Hệ Thống F&B API")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Chỉ cho phép cổng 5173 của React gọi vào
+    #allow_origins=["http://localhost:5173"],  # Chỉ cho phép cổng 5173 của React gọi vào
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],  # Cho phép tất cả các lệnh GET, POST, PUT, DELETE
     allow_headers=["*"],  # Cho phép mọi loại Header (bao gồm cả Header chứa Token)
@@ -186,7 +187,7 @@ def khach_yeu_cau_thanh_toan(request:ThanhToanPhieuGoiMonRequest):
         if not result:
             raise HTTPException(status_code=404, detail="Không tìm thấy phiếu gọi món")
         ma_phieu_goi_mon = result["MaPhieuGoiMon"]
-        cursor.execute("update phieugoimon set TinhTrang='YeuCauThanhToan' where MaPhieuGoiMon=%s", (ma_phieu_goi_mon,))
+        cursor.execute("update phieugoimon set TinhTrang='CanThanhToan' where MaPhieuGoiMon=%s", (ma_phieu_goi_mon,))
         conn.commit()
         return {
             "status": "success",

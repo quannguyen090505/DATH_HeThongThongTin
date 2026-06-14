@@ -977,6 +977,8 @@ const HoatDongNhanVien = () => {
     if (filterTabPhieu === "da_phuc_vu") return p.TinhTrangPhieu === "DaPhucVu";
     if (filterTabPhieu === "can_thanh_toan")
       return p.TinhTrangPhieu === "CanThanhToan";
+    if (filterTabPhieu === "da_thanh_toan")
+      return p.TinhTrangPhieu === "DaThanhToan";
     return false;
   });
 
@@ -1477,6 +1479,7 @@ const HoatDongNhanVien = () => {
                     </Badge>
                   ),
                 },
+                { key: "da_thanh_toan", label: "Đã thanh toán" },
               ]}
             />
             <Table
