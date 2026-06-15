@@ -104,6 +104,12 @@ const HoatDongNhanVien = () => {
   const [loadingHoaDon, setLoadingHoaDon] = useState(false);
   const [loadingXacNhanThanhToan, setLoadingXacNhanThanhToan] = useState(false);
 
+  const [isModalMangVeVisible, setIsModalMangVeVisible] = useState(false);
+  const [formMangVe] = Form.useForm();
+  const [trangThaiSdtMangVe, setTrangThaiSdtMangVe] = useState(null);
+  const [hoTenKhachMangVe, setHoTenKhachMangVe] = useState("");
+  const [taoTaiKhoanMangVe, setTaoTaiKhoanMangVe] = useState(false);
+
   useEffect(() => {
     const token = localStorage.getItem("token_nhan_vien");
     const localMaChiNhanh = localStorage.getItem("ma_chi_nhanh");
@@ -415,7 +421,48 @@ const HoatDongNhanVien = () => {
       message.error(errorMsg, 5);
     }
   };
+  const kiemTraSDTMangVe = async (sdt) => {
+    if (!sdt || sdt.length < 9) {
+      setTrangThaiSdtMangVe(null);
+      return;
+    }
+    try {
+      const response = await api.get(`/api/kiem-tra-sdt-khach/${sdt}`);
+      if (response.data.data === 1) {
+        setTrangThaiSdtMangVe("hop_le");
+      } else {
+        setTrangThaiSdtMangVe("khong_ton_tai");
+      }
+    } catch (error) {
+      console.error("Lỗi khi kết nối hệ thống kiểm tra SĐT!", error);
+    }
+  };
 
+  const onTaoDonMangVe = async (values) => {
+    try {
+      if (trangThaiSdtMangVe === "khong_ton_tai" && taoTaiKhoanMangVe) {
+        if (!hoTenKhachMangVe.trim()) {
+          return message.error("Vui lòng nhập Họ Tên cho khách hàng mới!");
+        }
+        await api.post(`/api/tao-tai-khoan-khach`, {
+          sdt: values.SDT,
+          ho_ten: hoTenKhachMangVe,
+        });
+        message.success("Đã đăng ký tài khoản cho khách hàng thành công!");
+      }
+
+      setBanDuocChon({
+        MaBan: "MangVe",
+        isTakeaway: true,
+        SDTKhach: values.SDT || null,
+      });
+      setIsModalMangVeVisible(false);
+      setIsDrawerVisible(true);
+      setActiveTabDrawer("thuc_don");
+    } catch (error) {
+      message.error("Lỗi xác nhận thông tin khách hàng!");
+    }
+  };
   const xemChiTietPhieu = (phieu) => {
     if (phieu.MaBanAn) {
       const banThucTe = danhSachBan.find(
@@ -473,8 +520,6 @@ const HoatDongNhanVien = () => {
   const guiYeuCauBep = async () => {
     if (gioHang.length === 0)
       return message.warning("Vui lòng chọn món trước!");
-    if (!banDuocChon || banDuocChon.isTakeaway)
-      return message.error("Chỉ hỗ trợ đặt tại bàn!");
 
     setLoadingSubmit(true);
     try {
@@ -985,10 +1030,16 @@ const HoatDongNhanVien = () => {
   const countCanXacNhan = danhSachPhieuChiNhanhNay.filter(
     (p) => p.TinhTrangPhieu === "GoiMon",
   ).length;
+  const countDangPhucVu = danhSachPhieuChiNhanhNay.filter(
+    (p) => p.TinhTrangPhieu === "DoiLenMon",
+  ).length;
   const countCanThanhToan = danhSachPhieuChiNhanhNay.filter(
     (p) => p.TinhTrangPhieu === "CanThanhToan",
   ).length;
   const tongThongBaoGoiMon = countCanXacNhan + countCanThanhToan;
+  const countChoNhanBan = danhSachPhieuDatBan.filter(
+    (p) => p.TinhTrang === "ChoNhanBan",
+  ).length;
 
   const drawerTabs = [
     {
@@ -1463,7 +1514,18 @@ const HoatDongNhanVien = () => {
                     </Badge>
                   ),
                 },
-                { key: "dang_phuc_vu", label: "Đang phục vụ / Bếp làm" },
+                {
+                  key: "dang_phuc_vu",
+                  label: (
+                    <Badge
+                      count={countDangPhucVu}
+                      offset={[15, 0]}
+                      size="small"
+                    >
+                      <span style={{ paddingRight: "10px" }}>Đang phục vụ</span>
+                    </Badge>
+                  ),
+                },
                 { key: "da_phuc_vu", label: "Đã phục vụ" },
                 {
                   key: "can_thanh_toan",
@@ -1730,7 +1792,7 @@ const HoatDongNhanVien = () => {
             onClick={handleXacNhanThuTien}
             style={{ backgroundColor: "#52c41a", borderColor: "#52c41a" }}
           >
-            Xác nhận đã thu tiền
+            Xác nhận đã thanh toán
           </Button>,
         ]}
         centered
@@ -1830,6 +1892,91 @@ const HoatDongNhanVien = () => {
             </div>
           )}
         </Spin>
+      </Modal>
+      <Modal
+        title={
+          <Title level={4} style={{ color: "#1890ff", margin: 0 }}>
+            <ShoppingOutlined /> TẠO ĐƠN MANG VỀ
+          </Title>
+        }
+        open={isModalMangVeVisible}
+        onCancel={() => {
+          setIsModalMangVeVisible(false);
+          setTrangThaiSdtMangVe(null);
+          setHoTenKhachMangVe("");
+          setTaoTaiKhoanMangVe(false);
+        }}
+        onOk={() => formMangVe.submit()}
+        okText="Xác nhận & Chọn món"
+        cancelText="Hủy bỏ"
+        centered
+      >
+        <div style={{ marginTop: "20px" }}>
+          <Form form={formMangVe} layout="vertical" onFinish={onTaoDonMangVe}>
+            <Form.Item
+              name="SDT"
+              label={
+                <Text strong>
+                  Số điện thoại khách (Không bắt buộc nếu khách vãng lai)
+                </Text>
+              }
+            >
+              <Input
+                placeholder="Nhập số điện thoại để tích điểm..."
+                size="large"
+                onChange={() => setTrangThaiSdtMangVe(null)}
+                onBlur={(e) => kiemTraSDTMangVe(e.target.value)}
+              />
+            </Form.Item>
+            {trangThaiSdtMangVe === "hop_le" && (
+              <Text
+                type="success"
+                strong
+                style={{
+                  display: "block",
+                  marginBottom: "15px",
+                  marginTop: "-15px",
+                }}
+              >
+                ✅ Số điện thoại hợp lệ (Khách hàng thành viên).
+              </Text>
+            )}
+            {trangThaiSdtMangVe === "khong_ton_tai" && (
+              <div
+                style={{
+                  marginBottom: "15px",
+                  marginTop: "-10px",
+                  padding: "10px",
+                  background: "#fffbe6",
+                  border: "1px solid #ffe58f",
+                  borderRadius: "8px",
+                }}
+              >
+                <Text
+                  type="warning"
+                  strong
+                  style={{ display: "block", marginBottom: "8px" }}
+                >
+                  ⚠️ SĐT chưa đăng ký tài khoản thành viên!
+                </Text>
+                <Checkbox
+                  checked={taoTaiKhoanMangVe}
+                  onChange={(e) => setTaoTaiKhoanMangVe(e.target.checked)}
+                  style={{ marginBottom: "10px" }}
+                >
+                  Tạo tài khoản khách hàng mới
+                </Checkbox>
+                {taoTaiKhoanMangVe && (
+                  <Input
+                    placeholder="Nhập Họ và Tên khách hàng..."
+                    value={hoTenKhachMangVe}
+                    onChange={(e) => setHoTenKhachMangVe(e.target.value)}
+                  />
+                )}
+              </div>
+            )}
+          </Form>
+        </div>
       </Modal>
       <Drawer
         title={
@@ -2018,11 +2165,21 @@ const HoatDongNhanVien = () => {
           !maPhieuDatBanActive ? (
             <div style={{ padding: "10px 0" }}>
               {(() => {
+                const phieuTuDanhSach = danhSachPhieuToanBo.find(
+                  (p) => Number(p.MaBanAn) === Number(banDuocChon?.MaBan),
+                );
                 const tinhTrangPhieu =
                   phieuHienTai?.data?.[0]?.TinhTrangPhieuGoiMon ||
-                  phieuHienTai?.data?.[0]?.TinhTrangPhieu;
-                const isDaThanhToan = tinhTrangPhieu === "DaThanhToan";
-
+                  phieuHienTai?.data?.[0]?.TinhTrangPhieu ||
+                  phieuTuDanhSach?.TinhTrangPhieu;
+                const trangThaiBanThucTe = (
+                  banDuocChon?.TinhTrangSuDung ||
+                  banDuocChon?.TinhTrang ||
+                  "BanTrong"
+                ).trim();
+                const isDaThanhToan =
+                  tinhTrangPhieu === "DaThanhToan" &&
+                  trangThaiBanThucTe !== "BanTrong";
                 if (isDaThanhToan && !banDuocChon?.isTakeaway) {
                   return (
                     <Button

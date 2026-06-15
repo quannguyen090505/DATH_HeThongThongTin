@@ -26,9 +26,10 @@ def nhan_vien_goi_mon(
             "nhan_vien_goi_mon",
             (
                 request.ma_ban_an,
+                request.ma_chi_nhanh,
+                request.sdt_khach,
                 request.ma_mon_an,
                 request.so_luong,
-                request.sdt_khach,
                 ma_nhan_vien,
             ),
         )
