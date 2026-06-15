@@ -187,7 +187,7 @@ def khach_yeu_cau_thanh_toan(request:ThanhToanPhieuGoiMonRequest):
         if not result:
             raise HTTPException(status_code=404, detail="Không tìm thấy phiếu gọi món")
         ma_phieu_goi_mon = result["MaPhieuGoiMon"]
-        cursor.execute("update phieugoimon set TinhTrang='CanThanhToan' where MaPhieuGoiMon=%s", (ma_phieu_goi_mon,))
+        cursor.execute("update phieugoimon set TinhTrang='GoiMon' where MaPhieuGoiMon=%s", (ma_phieu_goi_mon,))
         conn.commit()
         return {
             "status": "success",

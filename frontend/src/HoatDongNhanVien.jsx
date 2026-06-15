@@ -295,6 +295,14 @@ const HoatDongNhanVien = () => {
       formDatBan.resetFields();
       setIsModalDatBanVisible(true);
     } else {
+      if (ban.isTakeaway && !maPhieuLoad) {
+        formMangVe.resetFields();
+        setTrangThaiSdtMangVe(null);
+        setTaoTaiKhoanMangVe(false);
+        setIsModalMangVeVisible(true);
+        return;
+      }
+
       setIsDrawerVisible(true);
       setActiveTabDrawer("phieu_goi_mon");
 
@@ -442,6 +450,7 @@ const HoatDongNhanVien = () => {
     try {
       if (trangThaiSdtMangVe === "khong_ton_tai" && taoTaiKhoanMangVe) {
         if (!hoTenKhachMangVe.trim()) {
+          activeView;
           return message.error("Vui lòng nhập Họ Tên cho khách hàng mới!");
         }
         await api.post(`/api/tao-tai-khoan-khach`, {
@@ -539,6 +548,8 @@ const HoatDongNhanVien = () => {
         for (const mon of gioHang) {
           await api.post("/api/nhan-vien/goi-mon", {
             ma_ban_an: parseInt(banDuocChon.MaBan),
+            ma_chi_nhanh: parseInt(maChiNhanh),
+            sdt_khach: banDuocChon.SDTKhach,
             ma_mon_an: mon.MaMon,
             so_luong: mon.SoLuong,
             ma_nhan_vien: parseInt(maNhanVien),
@@ -1095,6 +1106,7 @@ const HoatDongNhanVien = () => {
                     {mon.TenMon}
                   </Text>
                   <Text type="danger" strong>
+                    {" "}
                     {mon.DonGia?.toLocaleString()}đ
                   </Text>
                 </Card>
